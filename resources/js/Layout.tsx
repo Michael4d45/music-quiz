@@ -1,14 +1,16 @@
-import { usePage } from "@inertiajs/react";
-import { useFlashToast } from "@/hooks/use-flash-toast";
-import { Toaster } from "react-hot-toast";
-import Sidebar from "@/components/Sidebar";
-import Header from "@/components/Header";
-import UserDropdown from "@/components/UserDropdown";
-import AuthButtons from "@/components/AuthButtons";
+import AuthButtons from '@/components/AuthButtons';
+import Header from '@/components/Header';
+import Sidebar from '@/components/Sidebar';
+import UserDropdown from '@/components/UserDropdown';
+import { useFlashToast } from '@/hooks/use-flash-toast';
+import { usePage } from '@inertiajs/react';
+import { Toaster } from 'react-hot-toast';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     useFlashToast();
-    const { auth: { user } } = usePage<Props.SharedProps>().props;
+    const {
+        auth: { user },
+    } = usePage<Props.SharedProps>().props;
     const loggedIn = !!user;
 
     return (
@@ -39,18 +41,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             />
 
             {/* Desktop sidebar */}
-            <Sidebar />
+            <Sidebar user={user} loggedIn={loggedIn} />
 
             {/* Mobile header */}
-            <Header>
-                {loggedIn ? <UserDropdown user={user} /> : <AuthButtons />}
-            </Header>
+            <div className="md:hidden">
+                <Header>{loggedIn ? <UserDropdown user={user} /> : <AuthButtons />}</Header>
+            </div>
 
             {/* Main content */}
             <main className="md:pl-64">
-                <div className="px-4 py-8 sm:px-6 lg:px-8">
-                    {children}
-                </div>
+                <div className="px-4 py-8 sm:px-6 lg:px-8">{children}</div>
             </main>
         </div>
     );

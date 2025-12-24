@@ -5,7 +5,7 @@ export default function AuthButtons() {
         <div className="flex items-center gap-x-3">
             <Link
                 href="/login"
-                className="text-sm font-semibold leading-6 text-gray-900 hover:text-indigo-600 dark:text-gray-100 dark:hover:text-indigo-400"
+                className="text-sm leading-6 font-semibold text-gray-900 hover:text-indigo-600 dark:text-gray-100 dark:hover:text-indigo-400"
             >
                 Log in
             </Link>
