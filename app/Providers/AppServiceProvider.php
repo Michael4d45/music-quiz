@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,6 +24,68 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        if (config('logging.should_log_db')) {
+            DB::listen(function (QueryExecuted $query): void {
+                [$file, $line] = earliestAppCaller();
+
+                $sql = $query->toRawSql();
+
+                if (str_contains($sql, '"sessions"')) {
+                    return;
+                }
+
+                Log::channel('sql')->debug('sql', [
+                    'SQL' => $sql . ';',
+                    'execution_time' => $query->time . 'ms',
+                    'file' => $file !== null ? "{$file}:{$line}" : null,
+                ]);
+            });
+        }
+    }
+}
+
+// You can place this helper at the bottom of this file or in a separate helper file.
+if (! function_exists('earliestAppCaller')) {
+    /**
+     * @return array{0: string|null, 1: int|null}
+     */
+    function earliestAppCaller(): array
+    {
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $basePath = base_path();
+        $vendorPath = base_path('vendor');
+
+        $frames = [];
+        foreach ($trace as $frame) {
+            $file = $frame['file'] ?? null;
+            $line = $frame['line'] ?? null;
+            if (! $file || ! $line) {
+                continue;
+            }
+
+            $file = str_replace('\\', '/', $file);
+
+            if (str_starts_with($file, str_replace('\\', '/', $vendorPath))) {
+                continue;
+            }
+            if (str_starts_with($file, 'phar://')) {
+                continue;
+            }
+            if (! str_starts_with($file, str_replace('\\', '/', $basePath))) {
+                continue;
+            }
+            if (str_contains($file, '/bootstrap/cache/')) {
+                continue;
+            }
+
+            $frames[] = ['file' => $file, 'line' => $line];
+        }
+
+        if (empty($frames)) {
+            return [null, null];
+        }
+        $earliest = end($frames);
+
+        return [$earliest['file'], $earliest['line']];
     }
 }

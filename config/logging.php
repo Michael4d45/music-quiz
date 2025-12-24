@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -20,7 +21,7 @@ return [
     |
     */
 
-    'default' => env('LOG_CHANNEL', 'stack'),
+    'default' => env('LOG_CHANNEL', 'single'),
 
     /*
     |--------------------------------------------------------------------------
@@ -64,6 +65,15 @@ return [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
+            'formatter' => JsonFormatter::class,
+            'replace_placeholders' => true,
+        ],
+
+        'sql' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/sql.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'formatter' => JsonFormatter::class,
             'replace_placeholders' => true,
         ],
 
@@ -73,6 +83,7 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => env('LOG_DAILY_DAYS', 14),
             'replace_placeholders' => true,
+            'formatter' => JsonFormatter::class,
         ],
 
         'slack' => [
@@ -100,10 +111,11 @@ return [
             'driver' => 'monolog',
             'level' => env('LOG_LEVEL', 'debug'),
             'handler' => StreamHandler::class,
-            'handler_with' => [
+            'formatter' => JsonFormatter::class,
+            'formatter' => env('LOG_STDERR_FORMATTER'),
+            'with' => [
                 'stream' => 'php://stderr',
             ],
-            'formatter' => env('LOG_STDERR_FORMATTER'),
             'processors' => [PsrLogMessageProcessor::class],
         ],
 
@@ -131,4 +143,11 @@ return [
 
     ],
 
+    // Used in LogRequestResponse
+    'should_log_requests' => env('SHOULD_LOG_REQUESTS', false),
+
+    'should_log_responses' => env('SHOULD_LOG_RESPONSES', false),
+
+    // Used in AppServiceProvider
+    'should_log_db' => env('SHOULD_LOG_DB', false),
 ];

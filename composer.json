@@ -79,7 +79,13 @@
         ],
         "test": [
             "@php artisan config:clear --ansi",
-            "@php artisan test"
+            "@php ./vendor/bin/pest"
+        ],
+        "test:unit": [
+            "@php ./vendor/bin/pest --filter='@unit'"
+        ],
+        "test:feature": [
+            "@php ./vendor/bin/pest --filter='@feature'"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
