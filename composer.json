@@ -1,29 +1,50 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/blank-react-starter-kit",
+    "name": "michael4d45/music-quiz",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Music Quiz Application",
     "keywords": [
-        "laravel",
-        "framework"
+        "music",
+        "quiz",
+        "laravel"
     ],
-    "license": "MIT",
+    "license": "Proprietary",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/Michael4d45/Laravel-Resource-Checker.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Michael4d45/PHPUnit-Coverage-Treemap.git"
+        }
+    ],
     "require": {
         "php": "^8.5",
+        "filament/filament": "^4.3",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
-        "laravel/wayfinder": "^0.1.11"
+        "laravel/wayfinder": "^0.1.11",
+        "spatie/laravel-data": "^4.18"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
+        "larastan/larastan": "^3.6",
         "laravel/boost": "^1.8",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.24",
-        "laravel/sail": "^1.41",
+        "michael4d45/laravel-resource-checker": "*@dev",
+        "michael4d45/coverage-treemap": "@dev",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
-        "phpunit/phpunit": "^11.5.3"
+        "phpunit/phpunit": "^12.5",
+        "spatie/laravel-typescript-transformer": "^2.5",
+        "pestphp/pest": "^4.0",
+        "pestphp/pest-plugin-browser": "^4.0",
+        "pestphp/pest-plugin-laravel": "^4.0",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan-phpunit": "^2.0"
     },
     "autoload": {
         "psr-4": {
@@ -61,7 +82,8 @@
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi",
+            "@php artisan filament:upgrade"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
@@ -89,7 +111,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "phpstan/extension-installer": true
         }
     },
     "minimum-stability": "stable",

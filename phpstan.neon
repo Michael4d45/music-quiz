@@ -1,0 +1,12 @@
+parameters:
+    bootstrapFiles:
+        - vendor/autoload.php
+    paths:
+        - app/
+        - database/
+        - routes/
+
+    level: 9
+    checkUninitializedProperties: true
+    checkOctaneCompatibility: true
+    checkModelProperties: true
