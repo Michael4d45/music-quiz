@@ -13,8 +13,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table): void {
-            $table->boolean('is_admin')->default(false);
+        Schema::create('categories', function (Blueprint $table): void {
+            $table->uuid('id')->primary();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->string('icon_url')->nullable();
+            $table->integer('sort_order')->default(0);
+            $table->timestampsTz();
         });
     }
 
@@ -23,8 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table): void {
-            $table->dropColumn('is_admin');
-        });
+        Schema::dropIfExists('categories');
     }
 };
