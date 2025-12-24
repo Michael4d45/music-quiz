@@ -111,5 +111,10 @@
         "resources/js/**/*.ts",
         "resources/js/**/*.d.ts",
         "resources/js/**/*.tsx",
+    ],
+    "exclude": [
+        "resources/js/routes",
+        "resources/js/wayfinder",
+        "resources/js/actions"
     ]
 }
