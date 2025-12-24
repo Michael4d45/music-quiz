@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Users\Schemas;
 
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -33,6 +34,12 @@ class UserForm
 
                 Checkbox::make('is_admin')
                     ->label('Administrator'),
+                TextInput::make('id')->required()->disabled(),
+                DateTimePicker::make('email_verified_at'),
+                TextInput::make('remember_token'),
+                DateTimePicker::make('created_at')->disabled(),
+                DateTimePicker::make('updated_at')->disabled(),
+
             ]);
     }
 }

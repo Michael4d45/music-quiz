@@ -21,7 +21,7 @@ use Illuminate\Support\Carbon;
  * @property string $session_id
  * @property string|null $user_id
  * @property string|null $guest_name
- * @property string $role
+ * @property Role $role
  * @property int $current_total_score
  * @property bool $is_connected
  * @property Carbon $joined_at

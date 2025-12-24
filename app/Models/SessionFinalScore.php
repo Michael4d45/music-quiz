@@ -22,6 +22,7 @@ use Illuminate\Support\Carbon;
  * @property int $correct_answers
  * @property int|null $average_response_time_ms
  * @property int $longest_streak
+ * @property Carbon|null $updated_at
  * @property Carbon|null $created_at
  * @property-read GameSession $session
  * @property-read SessionParticipant $participant

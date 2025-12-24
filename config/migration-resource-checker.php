@@ -46,6 +46,44 @@ return [
         // 'pivot_table' => ['resources'], // Ignore only for resources
         // 'system_logs' => ['models', 'phpdoc'], // Ignore for models and PHPDoc but not resources
         // 'temp_data' => ['resources', 'models', 'phpdoc'], // Ignore for all components
+        'event_route' => ['resources', 'models', 'phpdoc'],
+        'spatial_ref_sys' => ['resources', 'models', 'phpdoc'],
+        'addr' => ['resources', 'models', 'phpdoc'],
+        'addrfeat' => ['resources', 'models', 'phpdoc'],
+        'bg' => ['resources', 'models', 'phpdoc'],
+        'county' => ['resources', 'models', 'phpdoc'],
+        'county_lookup' => ['resources', 'models', 'phpdoc'],
+        'countysub_lookup' => ['resources', 'models', 'phpdoc'],
+        'cousub' => ['resources', 'models', 'phpdoc'],
+        'direction_lookup' => ['resources', 'models', 'phpdoc'],
+        'edges' => ['resources', 'models', 'phpdoc'],
+        'faces' => ['resources', 'models', 'phpdoc'],
+        'featnames' => ['resources', 'models', 'phpdoc'],
+        'geocode_settings' => ['resources', 'models', 'phpdoc'],
+        'geocode_settings_default' => ['resources', 'models', 'phpdoc'],
+        'loader_lookuptables' => ['resources', 'models', 'phpdoc'],
+        'loader_platform' => ['resources', 'models', 'phpdoc'],
+        'loader_variables' => ['resources', 'models', 'phpdoc'],
+        'pagc_gaz' => ['resources', 'models', 'phpdoc'],
+        'pagc_lex' => ['resources', 'models', 'phpdoc'],
+        'pagc_rules' => ['resources', 'models', 'phpdoc'],
+        'place' => ['resources', 'models', 'phpdoc'],
+        'place_lookup' => ['resources', 'models', 'phpdoc'],
+        'secondary_unit_lookup' => ['resources', 'models', 'phpdoc'],
+        'state' => ['resources', 'models', 'phpdoc'],
+        'state_lookup' => ['resources', 'models', 'phpdoc'],
+        'street_type_lookup' => ['resources', 'models', 'phpdoc'],
+        'tabblock' => ['resources', 'models', 'phpdoc'],
+        'tabblock20' => ['resources', 'models', 'phpdoc'],
+        'tract' => ['resources', 'models', 'phpdoc'],
+        'zcta5' => ['resources', 'models', 'phpdoc'],
+        'zip_lookup' => ['resources', 'models', 'phpdoc'],
+        'zip_lookup_all' => ['resources', 'models', 'phpdoc'],
+        'zip_lookup_base' => ['resources', 'models', 'phpdoc'],
+        'zip_state' => ['resources', 'models', 'phpdoc'],
+        'zip_state_loc' => ['resources', 'models', 'phpdoc'],
+        'layer' => ['resources', 'models', 'phpdoc'],
+        'topology' => ['resources', 'models', 'phpdoc'],
     ],
 
     /*
@@ -63,6 +101,7 @@ return [
     |
     */
     'ignored_fields' => [
+        'id' => ['models'],
         'created_at' => ['models'],
         'updated_at' => ['models'],
         'deleted_at' => ['models'],
@@ -81,6 +120,9 @@ return [
     'column_type_mappings' => [
         'id' => 'int',
         'int' => 'int',
+        'int2' => 'int',
+        'int4' => 'int',
+        'int8' => 'int',
         'bigint' => 'int',
         'bigIncrements' => 'int',
         'increments' => 'int',
@@ -114,16 +156,20 @@ return [
         'rememberToken' => 'string',
 
         'binary' => 'resource',
+        'bytea' => 'resource',
 
         'tinyint' => 'bool',
+        'bool' => 'bool',
         'boolean' => 'bool',
 
         'decimal' => 'float',
         'float' => 'float',
+        'float8' => 'float',
         'double' => 'float',
 
         'timestamp' => 'Carbon',
         'timestampTz' => 'Carbon',
+        'timestamptz' => 'Carbon',
         'date' => 'Carbon',
         'dateTime' => 'Carbon',
         'dateTimeTz' => 'Carbon',

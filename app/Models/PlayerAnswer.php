@@ -23,6 +23,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $response_time_ms
  * @property int|null $points_awarded
  * @property bool $host_override
+ * @property Carbon|null $updated_at
  * @property Carbon|null $created_at
  * @property-read SessionRound $round
  * @property-read SessionParticipant $participant

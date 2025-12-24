@@ -24,6 +24,7 @@ use Illuminate\Support\Carbon;
  * @property string $scoring_rule_id
  * @property string|null $playlist_id
  * @property int $max_players
+ * @property Carbon|null $updated_at
  * @property Carbon|null $created_at
  * @property Carbon|null $started_at
  * @property Carbon|null $ended_at

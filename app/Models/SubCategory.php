@@ -20,6 +20,7 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string|null $description
  * @property int $sort_order
+ * @property Carbon|null $updated_at
  * @property Carbon|null $created_at
  * @property-read Category $category
  * @property-read Collection<array-key, MusicTrack> $musicTracks

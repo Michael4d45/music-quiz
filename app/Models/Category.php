@@ -19,7 +19,8 @@ use Illuminate\Support\Carbon;
  * @property string|null $description
  * @property string|null $icon_url
  * @property int $sort_order
- * @property Carbon $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $created_at
  * @property-read Collection<array-key, SubCategory> $subCategories
  * @property-read Collection<array-key, UserStatistic> $userStatistics
  */

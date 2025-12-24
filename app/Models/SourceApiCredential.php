@@ -16,7 +16,7 @@ use Illuminate\Support\Carbon;
  *
  * @property string $id
  * @property string $source_id
- * @property string|null $credential_type
+ * @property CredentialType|null $credential_type
  * @property string $encrypted_value
  * @property Carbon|null $expires_at
  * @property Carbon|null $created_at

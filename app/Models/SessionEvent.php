@@ -16,9 +16,10 @@ use Illuminate\Support\Carbon;
  *
  * @property string $id
  * @property string $session_id
- * @property string|null $event_type
+ * @property EventType|null $event_type
  * @property string|null $participant_id
  * @property array<string, mixed>|null $payload
+ * @property Carbon|null $updated_at
  * @property Carbon|null $created_at
  * @property-read GameSession $session
  * @property-read SessionParticipant|null $participant

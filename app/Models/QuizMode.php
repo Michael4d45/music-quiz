@@ -19,6 +19,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $description
  * @property bool $allows_host_override
  * @property bool $requires_manual_scoring
+ * @property Carbon|null $updated_at
  * @property Carbon|null $created_at
  * @property-read Collection<array-key, GameSession> $gameSessions
  */

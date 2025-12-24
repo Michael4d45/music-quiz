@@ -22,6 +22,7 @@ use Illuminate\Support\Carbon;
  * @property bool $requires_authentication
  * @property bool $is_active
  * @property int $priority
+ * @property Carbon|null $updated_at
  * @property Carbon|null $created_at
  * @property-read Collection<array-key, SourceApiCredential> $apiCredentials
  * @property-read Collection<array-key, MusicTrack> $primaryTracks

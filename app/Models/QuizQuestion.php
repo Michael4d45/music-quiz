@@ -18,13 +18,14 @@ use Illuminate\Support\Carbon;
  *
  * @property string $id
  * @property string|null $track_id
- * @property string $question_type
+ * @property QuestionType $question_type
  * @property string|null $prompt_text
  * @property string $correct_answer
  * @property int $base_points
  * @property int|null $media_start_seconds
  * @property int|null $media_end_seconds
  * @property int $difficulty_level
+ * @property Carbon|null $updated_at
  * @property Carbon|null $created_at
  * @property-read MusicTrack|null $track
  * @property-read Collection<array-key, AnswerVariant> $answerVariants

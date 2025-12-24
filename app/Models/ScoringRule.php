@@ -21,6 +21,7 @@ use Illuminate\Support\Carbon;
  * @property int|null $max_time_ms
  * @property bool $streak_bonus_enabled
  * @property float $streak_multiplier
+ * @property Carbon|null $updated_at
  * @property Carbon|null $created_at
  * @property-read Collection<array-key, GameSession> $gameSessions
  */
