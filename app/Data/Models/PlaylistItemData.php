@@ -19,9 +19,9 @@ class PlaylistItemData extends Data
         public Carbon $added_at,
         /** @var PlaylistData $playlist */
         #[AutoWhenLoadedLazy]
-        public PlaylistData|Lazy $playlist,
+        public Lazy|PlaylistData $playlist,
         /** @var QuizQuestionData $question */
         #[AutoWhenLoadedLazy]
-        public QuizQuestionData|Lazy $question,
+        public Lazy|QuizQuestionData $question,
     ) {}
 }

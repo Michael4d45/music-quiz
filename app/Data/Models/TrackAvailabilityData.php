@@ -18,7 +18,7 @@ class TrackAvailabilityData extends Data
         public bool $is_available,
         public Carbon|null $last_checked_at,
         /** @var TrackSourceLinkData $track_source_link */
-        #[AutoWhenLoadedLazy("trackSourceLink")]
-        public TrackSourceLinkData|Lazy $track_source_link,
+        #[AutoWhenLoadedLazy('trackSourceLink')]
+        public Lazy|TrackSourceLinkData $track_source_link,
     ) {}
 }

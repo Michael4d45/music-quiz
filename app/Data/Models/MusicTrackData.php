@@ -25,16 +25,16 @@ class MusicTrackData extends Data
         public Carbon|null $created_at,
         public Carbon|null $updated_at,
         /** @var SubCategoryData $sub_category */
-        #[AutoWhenLoadedLazy("subCategory")]
-        public SubCategoryData|Lazy $sub_category,
+        #[AutoWhenLoadedLazy('subCategory')]
+        public Lazy|SubCategoryData $sub_category,
         /** @var MusicSourceData $primary_source */
-        #[AutoWhenLoadedLazy("primarySource")]
-        public MusicSourceData|Lazy $primary_source,
+        #[AutoWhenLoadedLazy('primarySource')]
+        public Lazy|MusicSourceData $primary_source,
         /** @var Collection<array-key,TrackSourceLinkData> $source_links */
-        #[AutoWhenLoadedLazy("sourceLinks")]
+        #[AutoWhenLoadedLazy('sourceLinks')]
         public Collection|Lazy $source_links,
         /** @var Collection<array-key,QuizQuestionData> $quiz_questions */
-        #[AutoWhenLoadedLazy("quizQuestions")]
+        #[AutoWhenLoadedLazy('quizQuestions')]
         public Collection|Lazy $quiz_questions,
     ) {}
 }

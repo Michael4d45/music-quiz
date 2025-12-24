@@ -21,7 +21,7 @@ class QuizModeData extends Data
         public Carbon|null $created_at,
         public Carbon|null $updated_at,
         /** @var Collection<array-key,GameSessionData> $game_sessions */
-        #[AutoWhenLoadedLazy("gameSessions")]
+        #[AutoWhenLoadedLazy('gameSessions')]
         public Collection|Lazy $game_sessions,
     ) {}
 }

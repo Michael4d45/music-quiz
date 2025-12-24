@@ -26,15 +26,15 @@ class PlayerAnswerData extends Data
         public Carbon|null $updated_at,
         /** @var SessionRoundData $round */
         #[AutoWhenLoadedLazy]
-        public SessionRoundData|Lazy $round,
+        public Lazy|SessionRoundData $round,
         /** @var SessionParticipantData $participant */
         #[AutoWhenLoadedLazy]
-        public SessionParticipantData|Lazy $participant,
+        public Lazy|SessionParticipantData $participant,
         /** @var MultipleChoiceOptionData|null $selected_option */
-        #[AutoWhenLoadedLazy("selectedOption")]
-        public MultipleChoiceOptionData|Lazy|null $selected_option,
+        #[AutoWhenLoadedLazy('selectedOption')]
+        public Lazy|MultipleChoiceOptionData|null $selected_option,
         /** @var AnswerVariantData|null $matched_variant */
-        #[AutoWhenLoadedLazy("matchedVariant")]
+        #[AutoWhenLoadedLazy('matchedVariant')]
         public AnswerVariantData|Lazy|null $matched_variant,
     ) {}
 }

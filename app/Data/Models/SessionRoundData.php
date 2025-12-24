@@ -25,10 +25,10 @@ class SessionRoundData extends Data
         public GameSessionData|Lazy $session,
         /** @var QuizQuestionData $question */
         #[AutoWhenLoadedLazy]
-        public QuizQuestionData|Lazy $question,
+        public Lazy|QuizQuestionData $question,
         /** @var SessionParticipantData|null $first_buzzer */
-        #[AutoWhenLoadedLazy("firstBuzzer")]
-        public SessionParticipantData|Lazy|null $first_buzzer,
+        #[AutoWhenLoadedLazy('firstBuzzer')]
+        public Lazy|SessionParticipantData|null $first_buzzer,
         /** @var Collection<array-key,PlayerAnswerData> $answers */
         #[AutoWhenLoadedLazy]
         public Collection|Lazy $answers,

@@ -28,6 +28,6 @@ class SessionFinalScoreData extends Data
         public GameSessionData|Lazy $session,
         /** @var SessionParticipantData $participant */
         #[AutoWhenLoadedLazy]
-        public SessionParticipantData|Lazy $participant,
+        public Lazy|SessionParticipantData $participant,
     ) {}
 }

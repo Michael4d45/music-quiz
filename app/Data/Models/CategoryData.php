@@ -21,10 +21,10 @@ class CategoryData extends Data
         public Carbon|null $created_at,
         public Carbon|null $updated_at,
         /** @var Collection<array-key,SubCategoryData> $sub_categories */
-        #[AutoWhenLoadedLazy("subCategories")]
+        #[AutoWhenLoadedLazy('subCategories')]
         public Collection|Lazy $sub_categories,
         /** @var Collection<array-key,UserStatisticData> $user_statistics */
-        #[AutoWhenLoadedLazy("userStatistics")]
+        #[AutoWhenLoadedLazy('userStatistics')]
         public Collection|Lazy $user_statistics,
     ) {}
 }

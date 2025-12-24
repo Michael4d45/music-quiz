@@ -28,16 +28,16 @@ class GameSessionData extends Data
         public Carbon|null $updated_at,
         /** @var UserData $host */
         #[AutoWhenLoadedLazy]
-        public UserData|Lazy $host,
+        public Lazy|UserData $host,
         /** @var QuizModeData $quiz_mode */
-        #[AutoWhenLoadedLazy("quizMode")]
-        public QuizModeData|Lazy $quiz_mode,
+        #[AutoWhenLoadedLazy('quizMode')]
+        public Lazy|QuizModeData $quiz_mode,
         /** @var ScoringRuleData $scoring_rule */
-        #[AutoWhenLoadedLazy("scoringRule")]
-        public ScoringRuleData|Lazy $scoring_rule,
+        #[AutoWhenLoadedLazy('scoringRule')]
+        public Lazy|ScoringRuleData $scoring_rule,
         /** @var PlaylistData|null $playlist */
         #[AutoWhenLoadedLazy]
-        public PlaylistData|Lazy|null $playlist,
+        public Lazy|PlaylistData|null $playlist,
         /** @var Collection<array-key,SessionParticipantData> $participants */
         #[AutoWhenLoadedLazy]
         public Collection|Lazy $participants,
@@ -48,7 +48,7 @@ class GameSessionData extends Data
         #[AutoWhenLoadedLazy]
         public Collection|Lazy $events,
         /** @var Collection<array-key,SessionFinalScoreData> $final_scores */
-        #[AutoWhenLoadedLazy("finalScores")]
+        #[AutoWhenLoadedLazy('finalScores')]
         public Collection|Lazy $final_scores,
     ) {}
 }

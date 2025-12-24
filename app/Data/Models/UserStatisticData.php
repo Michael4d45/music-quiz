@@ -24,9 +24,9 @@ class UserStatisticData extends Data
         public Carbon|null $updated_at,
         /** @var UserData $user */
         #[AutoWhenLoadedLazy]
-        public UserData|Lazy $user,
+        public Lazy|UserData $user,
         /** @var CategoryData|null $favorite_category */
-        #[AutoWhenLoadedLazy("favoriteCategory")]
+        #[AutoWhenLoadedLazy('favoriteCategory')]
         public CategoryData|Lazy|null $favorite_category,
     ) {}
 }

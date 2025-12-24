@@ -22,6 +22,6 @@ class SourceApiCredentialData extends Data
         public Carbon|null $updated_at,
         /** @var MusicSourceData $source */
         #[AutoWhenLoadedLazy]
-        public MusicSourceData|Lazy $source,
+        public Lazy|MusicSourceData $source,
     ) {}
 }

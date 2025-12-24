@@ -26,6 +26,6 @@ class SessionEventData extends Data
         public GameSessionData|Lazy $session,
         /** @var SessionParticipantData|null $participant */
         #[AutoWhenLoadedLazy]
-        public SessionParticipantData|Lazy|null $participant,
+        public Lazy|SessionParticipantData|null $participant,
     ) {}
 }

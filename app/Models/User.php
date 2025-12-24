@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
@@ -27,7 +29,7 @@ use Illuminate\Support\Carbon;
  * @property-read Collection<array-key, SessionParticipant> $participants
  * @property-read Collection<array-key, UserStatistic> $statistics
  */
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, HasUuids, Notifiable;
@@ -66,5 +68,35 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_admin' => 'boolean',
         ];
+    }
+
+    /**
+     * Get all game sessions hosted by this user.
+     *
+     * @return HasMany<GameSession, $this>
+     */
+    public function gameSessions(): HasMany
+    {
+        return $this->hasMany(GameSession::class, 'host_id');
+    }
+
+    /**
+     * Get all session participations for this user.
+     *
+     * @return HasMany<SessionParticipant, $this>
+     */
+    public function participants(): HasMany
+    {
+        return $this->hasMany(SessionParticipant::class, 'user_id');
+    }
+
+    /**
+     * Get all statistics for this user.
+     *
+     * @return HasMany<UserStatistic, $this>
+     */
+    public function statistics(): HasMany
+    {
+        return $this->hasMany(UserStatistic::class, 'user_id');
     }
 }

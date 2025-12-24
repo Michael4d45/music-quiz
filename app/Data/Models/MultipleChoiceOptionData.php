@@ -19,9 +19,9 @@ class MultipleChoiceOptionData extends Data
         public int|null $sort_order,
         /** @var QuizQuestionData $question */
         #[AutoWhenLoadedLazy]
-        public QuizQuestionData|Lazy $question,
+        public Lazy|QuizQuestionData $question,
         /** @var Collection<array-key,PlayerAnswerData> $player_answers */
-        #[AutoWhenLoadedLazy("playerAnswers")]
+        #[AutoWhenLoadedLazy('playerAnswers')]
         public Collection|Lazy $player_answers,
     ) {}
 }

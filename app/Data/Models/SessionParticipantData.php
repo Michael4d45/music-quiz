@@ -28,12 +28,12 @@ class SessionParticipantData extends Data
         public GameSessionData|Lazy $session,
         /** @var UserData|null $user */
         #[AutoWhenLoadedLazy]
-        public UserData|Lazy|null $user,
+        public Lazy|UserData|null $user,
         /** @var Collection<array-key,PlayerAnswerData> $answers */
         #[AutoWhenLoadedLazy]
         public Collection|Lazy $answers,
         /** @var SessionFinalScoreData|null $final_score */
-        #[AutoWhenLoadedLazy("finalScore")]
-        public SessionFinalScoreData|Lazy|null $final_score,
+        #[AutoWhenLoadedLazy('finalScore')]
+        public Lazy|SessionFinalScoreData|null $final_score,
     ) {}
 }

@@ -24,13 +24,13 @@ class MusicSourceData extends Data
         public Carbon|null $created_at,
         public Carbon|null $updated_at,
         /** @var Collection<array-key,SourceApiCredentialData> $api_credentials */
-        #[AutoWhenLoadedLazy("apiCredentials")]
+        #[AutoWhenLoadedLazy('apiCredentials')]
         public Collection|Lazy $api_credentials,
         /** @var Collection<array-key,MusicTrackData> $primary_tracks */
-        #[AutoWhenLoadedLazy("primaryTracks")]
+        #[AutoWhenLoadedLazy('primaryTracks')]
         public Collection|Lazy $primary_tracks,
         /** @var Collection<array-key,TrackSourceLinkData> $track_source_links */
-        #[AutoWhenLoadedLazy("trackSourceLinks")]
+        #[AutoWhenLoadedLazy('trackSourceLinks')]
         public Collection|Lazy $track_source_links,
     ) {}
 }

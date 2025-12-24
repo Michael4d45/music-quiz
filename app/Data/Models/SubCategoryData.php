@@ -24,7 +24,7 @@ class SubCategoryData extends Data
         #[AutoWhenLoadedLazy]
         public CategoryData|Lazy $category,
         /** @var Collection<array-key,MusicTrackData> $music_tracks */
-        #[AutoWhenLoadedLazy("musicTracks")]
+        #[AutoWhenLoadedLazy('musicTracks')]
         public Collection|Lazy $music_tracks,
     ) {}
 }

@@ -27,18 +27,18 @@ class QuizQuestionData extends Data
         public Carbon|null $updated_at,
         /** @var MusicTrackData|null $track */
         #[AutoWhenLoadedLazy]
-        public MusicTrackData|Lazy|null $track,
+        public Lazy|MusicTrackData|null $track,
         /** @var Collection<array-key,AnswerVariantData> $answer_variants */
-        #[AutoWhenLoadedLazy("answerVariants")]
+        #[AutoWhenLoadedLazy('answerVariants')]
         public Collection|Lazy $answer_variants,
         /** @var Collection<array-key,MultipleChoiceOptionData> $multiple_choice_options */
-        #[AutoWhenLoadedLazy("multipleChoiceOptions")]
+        #[AutoWhenLoadedLazy('multipleChoiceOptions')]
         public Collection|Lazy $multiple_choice_options,
         /** @var Collection<array-key,SessionRoundData> $session_rounds */
-        #[AutoWhenLoadedLazy("sessionRounds")]
+        #[AutoWhenLoadedLazy('sessionRounds')]
         public Collection|Lazy $session_rounds,
         /** @var Collection<array-key,PlaylistItemData> $playlist_items */
-        #[AutoWhenLoadedLazy("playlistItems")]
+        #[AutoWhenLoadedLazy('playlistItems')]
         public Collection|Lazy $playlist_items,
     ) {}
 }

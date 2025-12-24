@@ -23,12 +23,12 @@ class PlaylistData extends Data
         public Carbon|null $updated_at,
         /** @var UserData $user */
         #[AutoWhenLoadedLazy]
-        public UserData|Lazy $user,
+        public Lazy|UserData $user,
         /** @var Collection<array-key,PlaylistItemData> $items */
         #[AutoWhenLoadedLazy]
         public Collection|Lazy $items,
         /** @var Collection<array-key,GameSessionData> $game_sessions */
-        #[AutoWhenLoadedLazy("gameSessions")]
+        #[AutoWhenLoadedLazy('gameSessions')]
         public Collection|Lazy $game_sessions,
     ) {}
 }

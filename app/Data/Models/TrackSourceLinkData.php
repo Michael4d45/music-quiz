@@ -28,10 +28,10 @@ class TrackSourceLinkData extends Data
         public Carbon|null $updated_at,
         /** @var MusicTrackData $track */
         #[AutoWhenLoadedLazy]
-        public MusicTrackData|Lazy $track,
+        public Lazy|MusicTrackData $track,
         /** @var MusicSourceData $source */
         #[AutoWhenLoadedLazy]
-        public MusicSourceData|Lazy $source,
+        public Lazy|MusicSourceData $source,
         /** @var Collection<array-key,TrackAvailabilityData> $availabilities */
         #[AutoWhenLoadedLazy]
         public Collection|Lazy $availabilities,
