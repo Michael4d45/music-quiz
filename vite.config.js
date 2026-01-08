@@ -28,8 +28,8 @@ export default defineConfig({
             registerType: 'autoUpdate',
             includeAssets: ['favicon.ico', 'robots.txt', 'pwa-192x192.png', 'pwa-512x512.png'],
             manifest: {
-                name: 'Laravel React PWA',
-                short_name: 'ReactPWA',
+                name: 'Music Quiz',
+                short_name: 'Music Quiz',
                 start_url: '/',
                 display: 'standalone',
                 background_color: '#ffffff',

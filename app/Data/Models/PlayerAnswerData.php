@@ -7,7 +7,7 @@ namespace App\Data\Models;
 use Illuminate\Support\Carbon;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Lazy;
 
 class PlayerAnswerData extends Data
 {
@@ -26,15 +26,15 @@ class PlayerAnswerData extends Data
         public Carbon|null $updated_at,
         /** @var SessionRoundData $round */
         #[AutoWhenLoadedLazy]
-        public Optional|SessionRoundData $round,
+        public Lazy|SessionRoundData $round,
         /** @var SessionParticipantData $participant */
         #[AutoWhenLoadedLazy]
-        public Optional|SessionParticipantData $participant,
+        public Lazy|SessionParticipantData $participant,
         /** @var MultipleChoiceOptionData|null $selected_option */
         #[AutoWhenLoadedLazy('selectedOption')]
-        public Optional|MultipleChoiceOptionData|null $selected_option,
+        public Lazy|MultipleChoiceOptionData|null $selected_option,
         /** @var AnswerVariantData|null $matched_variant */
         #[AutoWhenLoadedLazy('matchedVariant')]
-        public AnswerVariantData|Optional|null $matched_variant,
+        public AnswerVariantData|Lazy|null $matched_variant,
     ) {}
 }

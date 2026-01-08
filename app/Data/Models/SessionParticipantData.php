@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Lazy;
 
 class SessionParticipantData extends Data
 {
@@ -25,15 +25,15 @@ class SessionParticipantData extends Data
         public Carbon|null $buzzed_in_at,
         /** @var GameSessionData $session */
         #[AutoWhenLoadedLazy]
-        public GameSessionData|Optional $session,
+        public GameSessionData|Lazy $session,
         /** @var UserData|null $user */
         #[AutoWhenLoadedLazy]
-        public Optional|UserData|null $user,
+        public Lazy|UserData|null $user,
         /** @var Collection<array-key,PlayerAnswerData> $answers */
         #[AutoWhenLoadedLazy]
-        public Collection|Optional $answers,
+        public Collection|Lazy $answers,
         /** @var SessionFinalScoreData|null $final_score */
         #[AutoWhenLoadedLazy('finalScore')]
-        public Optional|SessionFinalScoreData|null $final_score,
+        public Lazy|SessionFinalScoreData|null $final_score,
     ) {}
 }

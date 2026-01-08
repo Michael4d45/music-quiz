@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Lazy;
 
 class QuizModeData extends Data
 {
@@ -22,6 +22,6 @@ class QuizModeData extends Data
         public Carbon|null $updated_at,
         /** @var Collection<array-key,GameSessionData> $game_sessions */
         #[AutoWhenLoadedLazy('gameSessions')]
-        public Collection|Optional $game_sessions,
+        public Collection|Lazy $game_sessions,
     ) {}
 }

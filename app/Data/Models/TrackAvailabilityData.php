@@ -7,7 +7,7 @@ namespace App\Data\Models;
 use Illuminate\Support\Carbon;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Lazy;
 
 class TrackAvailabilityData extends Data
 {
@@ -19,6 +19,6 @@ class TrackAvailabilityData extends Data
         public Carbon|null $last_checked_at,
         /** @var TrackSourceLinkData $track_source_link */
         #[AutoWhenLoadedLazy('trackSourceLink')]
-        public Optional|TrackSourceLinkData $track_source_link,
+        public Lazy|TrackSourceLinkData $track_source_link,
     ) {}
 }

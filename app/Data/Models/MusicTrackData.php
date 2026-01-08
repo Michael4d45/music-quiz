@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Lazy;
 
 class MusicTrackData extends Data
 {
@@ -27,18 +27,18 @@ class MusicTrackData extends Data
         public Carbon|null $updated_at,
         /** @var UserData|null $user */
         #[AutoWhenLoadedLazy]
-        public Optional|UserData|null $user,
+        public Lazy|UserData|null $user,
         /** @var SubCategoryData $sub_category */
         #[AutoWhenLoadedLazy('subCategory')]
-        public Optional|SubCategoryData $sub_category,
+        public Lazy|SubCategoryData $sub_category,
         /** @var MusicSourceData $primary_source */
         #[AutoWhenLoadedLazy('primarySource')]
-        public Optional|MusicSourceData $primary_source,
+        public Lazy|MusicSourceData $primary_source,
         /** @var Collection<array-key,TrackSourceLinkData> $source_links */
         #[AutoWhenLoadedLazy('sourceLinks')]
-        public Collection|Optional $source_links,
+        public Collection|Lazy $source_links,
         /** @var Collection<array-key,QuizQuestionData> $quiz_questions */
         #[AutoWhenLoadedLazy('quizQuestions')]
-        public Collection|Optional $quiz_questions,
+        public Collection|Lazy $quiz_questions,
     ) {}
 }

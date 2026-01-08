@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Lazy;
 
 class GameSessionData extends Data
 {
@@ -28,27 +28,27 @@ class GameSessionData extends Data
         public Carbon|null $updated_at,
         /** @var UserData $host */
         #[AutoWhenLoadedLazy]
-        public Optional|UserData $host,
+        public Lazy|UserData $host,
         /** @var QuizModeData $quiz_mode */
         #[AutoWhenLoadedLazy('quizMode')]
-        public Optional|QuizModeData $quiz_mode,
+        public Lazy|QuizModeData $quiz_mode,
         /** @var ScoringRuleData $scoring_rule */
         #[AutoWhenLoadedLazy('scoringRule')]
-        public Optional|ScoringRuleData $scoring_rule,
+        public Lazy|ScoringRuleData $scoring_rule,
         /** @var PlaylistData|null $playlist */
         #[AutoWhenLoadedLazy]
-        public Optional|PlaylistData|null $playlist,
+        public Lazy|PlaylistData|null $playlist,
         /** @var Collection<array-key,SessionParticipantData> $participants */
         #[AutoWhenLoadedLazy]
-        public Collection|Optional $participants,
+        public Collection|Lazy $participants,
         /** @var Collection<array-key,SessionRoundData> $rounds */
         #[AutoWhenLoadedLazy]
-        public Collection|Optional $rounds,
+        public Collection|Lazy $rounds,
         /** @var Collection<array-key,SessionEventData> $events */
         #[AutoWhenLoadedLazy]
-        public Collection|Optional $events,
+        public Collection|Lazy $events,
         /** @var Collection<array-key,SessionFinalScoreData> $final_scores */
         #[AutoWhenLoadedLazy('finalScores')]
-        public Collection|Optional $final_scores,
+        public Collection|Lazy $final_scores,
     ) {}
 }

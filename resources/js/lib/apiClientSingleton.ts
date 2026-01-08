@@ -346,7 +346,7 @@ class ApiClientSingleton {
                     });
                 }),
                 Effect.catchTag('ParseError', (e) => {
-                    // Don't log - callers handle the error via tagged union result
+                    console.error('ParseError:', e);
                     return Effect.succeed({
                         _tag: 'ParseError' as const,
                         message: JSON.stringify(e),

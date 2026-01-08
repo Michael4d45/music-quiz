@@ -7,7 +7,7 @@ namespace App\Data\Models;
 use Illuminate\Support\Carbon;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Lazy;
 
 class PlaylistItemData extends Data
 {
@@ -19,9 +19,9 @@ class PlaylistItemData extends Data
         public Carbon $added_at,
         /** @var PlaylistData $playlist */
         #[AutoWhenLoadedLazy]
-        public Optional|PlaylistData $playlist,
+        public Lazy|PlaylistData $playlist,
         /** @var QuizQuestionData $question */
         #[AutoWhenLoadedLazy]
-        public Optional|QuizQuestionData $question,
+        public Lazy|QuizQuestionData $question,
     ) {}
 }

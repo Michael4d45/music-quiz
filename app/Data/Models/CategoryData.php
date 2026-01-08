@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Lazy;
 
 class CategoryData extends Data
 {
@@ -22,9 +22,9 @@ class CategoryData extends Data
         public Carbon|null $updated_at,
         /** @var Collection<array-key,SubCategoryData> $sub_categories */
         #[AutoWhenLoadedLazy('subCategories')]
-        public Collection|Optional $sub_categories,
+        public Collection|Lazy $sub_categories,
         /** @var Collection<array-key,UserStatisticData> $user_statistics */
         #[AutoWhenLoadedLazy('userStatistics')]
-        public Collection|Optional $user_statistics,
+        public Collection|Lazy $user_statistics,
     ) {}
 }

@@ -8,6 +8,7 @@ export async function homeLoader() {
     if (result._tag === 'Success') {
         return result.data;
     }
+    console.error(result);
     // Return empty data on error (e.g., not authenticated)
     return {
         statistic: null,
@@ -17,8 +18,8 @@ export async function homeLoader() {
 }
 
 export function HomePage() {
-    const { user, logout } = useAuth();
-    const data = useLoaderData() as HomeResponse;
+    const { user } = useAuth();
+    const data = useLoaderData<HomeResponse>();
     const isGuest = user?.is_guest ?? false;
 
     if (!user || isGuest) {

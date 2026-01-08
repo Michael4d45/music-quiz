@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Lazy;
 
 class SessionRoundData extends Data
 {
@@ -22,15 +22,15 @@ class SessionRoundData extends Data
         public string|null $first_buzzer_id,
         /** @var GameSessionData $session */
         #[AutoWhenLoadedLazy]
-        public GameSessionData|Optional $session,
+        public GameSessionData|Lazy $session,
         /** @var QuizQuestionData $question */
         #[AutoWhenLoadedLazy]
-        public Optional|QuizQuestionData $question,
+        public Lazy|QuizQuestionData $question,
         /** @var SessionParticipantData|null $first_buzzer */
         #[AutoWhenLoadedLazy('firstBuzzer')]
-        public Optional|SessionParticipantData|null $first_buzzer,
+        public Lazy|SessionParticipantData|null $first_buzzer,
         /** @var Collection<array-key,PlayerAnswerData> $answers */
         #[AutoWhenLoadedLazy]
-        public Collection|Optional $answers,
+        public Collection|Lazy $answers,
     ) {}
 }

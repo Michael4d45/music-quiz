@@ -8,7 +8,7 @@ use App\Enums\EventType;
 use Illuminate\Support\Carbon;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Lazy;
 
 class SessionEventData extends Data
 {
@@ -23,9 +23,9 @@ class SessionEventData extends Data
         public Carbon|null $updated_at,
         /** @var GameSessionData $session */
         #[AutoWhenLoadedLazy]
-        public GameSessionData|Optional $session,
+        public GameSessionData|Lazy $session,
         /** @var SessionParticipantData|null $participant */
         #[AutoWhenLoadedLazy]
-        public Optional|SessionParticipantData|null $participant,
+        public Lazy|SessionParticipantData|null $participant,
     ) {}
 }

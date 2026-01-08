@@ -10,7 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Lazy;
 
 class QuizQuestionData extends Data
 {
@@ -30,21 +30,21 @@ class QuizQuestionData extends Data
         public Carbon|null $updated_at,
         /** @var UserData|null $user */
         #[AutoWhenLoadedLazy]
-        public Optional|UserData|null $user,
+        public Lazy|UserData|null $user,
         /** @var MusicTrackData|null $track */
         #[AutoWhenLoadedLazy]
-        public Optional|MusicTrackData|null $track,
+        public Lazy|MusicTrackData|null $track,
         /** @var Collection<array-key,AnswerVariantData> $answer_variants */
         #[AutoWhenLoadedLazy('answerVariants')]
-        public Collection|Optional $answer_variants,
+        public Collection|Lazy $answer_variants,
         /** @var Collection<array-key,MultipleChoiceOptionData> $multiple_choice_options */
         #[AutoWhenLoadedLazy('multipleChoiceOptions')]
-        public Collection|Optional $multiple_choice_options,
+        public Collection|Lazy $multiple_choice_options,
         /** @var Collection<array-key,SessionRoundData> $session_rounds */
         #[AutoWhenLoadedLazy('sessionRounds')]
-        public Collection|Optional $session_rounds,
+        public Collection|Lazy $session_rounds,
         /** @var Collection<array-key,PlaylistItemData> $playlist_items */
         #[AutoWhenLoadedLazy('playlistItems')]
-        public Collection|Optional $playlist_items,
+        public Collection|Lazy $playlist_items,
     ) {}
 }

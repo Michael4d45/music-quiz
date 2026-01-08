@@ -7,7 +7,7 @@ namespace App\Data\Models;
 use Illuminate\Support\Carbon;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Lazy;
 
 class SessionFinalScoreData extends Data
 {
@@ -25,9 +25,9 @@ class SessionFinalScoreData extends Data
         public Carbon|null $updated_at,
         /** @var GameSessionData $session */
         #[AutoWhenLoadedLazy]
-        public GameSessionData|Optional $session,
+        public GameSessionData|Lazy $session,
         /** @var SessionParticipantData $participant */
         #[AutoWhenLoadedLazy]
-        public Optional|SessionParticipantData $participant,
+        public Lazy|SessionParticipantData $participant,
     ) {}
 }

@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Optional;
+use Spatie\LaravelData\Lazy;
 
 class PlaylistData extends Data
 {
@@ -23,12 +23,12 @@ class PlaylistData extends Data
         public Carbon|null $updated_at,
         /** @var UserData $user */
         #[AutoWhenLoadedLazy]
-        public Optional|UserData $user,
+        public Lazy|UserData $user,
         /** @var Collection<array-key,PlaylistItemData> $items */
         #[AutoWhenLoadedLazy]
-        public Collection|Optional $items,
+        public Collection|Lazy $items,
         /** @var Collection<array-key,GameSessionData> $game_sessions */
         #[AutoWhenLoadedLazy('gameSessions')]
-        public Collection|Optional $game_sessions,
+        public Collection|Lazy $game_sessions,
     ) {}
 }
