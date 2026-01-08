@@ -38,6 +38,7 @@ use App\Actions\Sessions\ShowSessionResults;
 use App\Actions\Sessions\StartGame;
 use App\Actions\Statistics\ShowLeaderboard;
 use App\Actions\Statistics\ShowStatistics;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/user', ShowUser::class)->middleware('auth:sanctum')->name(
@@ -45,16 +46,23 @@ Route::get('/user', ShowUser::class)->middleware('auth:sanctum')->name(
 );
 
 // Create token for already authenticated user (used for OAuth callbacks and session auth)
-// No middleware - action handles auth check and returns JSON 401 for unauthenticated
-Route::get('/token', CreateToken::class)->name('api.token');
+// Needs web middleware to access session (e.g., when logging in via Filament)
+// Action handles auth check and returns JSON 401 for unauthenticated
+Route::get('/token', CreateToken::class)->middleware('web')->name('api.token');
 
 // Retrieve OAuth token from session after successful callback (uses session, not bearer token)
 Route::get('/oauth-token', GetOAuthToken::class)->middleware('web')->name(
     'api.oauth-token',
 );
 
-Route::post('/login', Login::class)->name('api.login');
-Route::post('/register', Register::class)->name('api.register');
+// Login and register need web middleware to create sessions for Filament
+Route::post('/login', Login::class)
+    ->middleware('web')
+    ->withoutMiddleware(VerifyCsrfToken::class)
+    ->name('api.login');
+Route::post('/register', Register::class)
+    ->middleware('web')
+    ->name('api.register');
 Route::post('/password-reset', ResetPassword::class)->name(
     'api.password.reset',
 );
