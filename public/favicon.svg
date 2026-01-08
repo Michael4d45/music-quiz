@@ -1,0 +1,23 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="headGradient" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#FF5F55"/>
+      <stop offset="100%" stop-color="#B31B12"/>
+    </radialGradient>
+
+    <linearGradient id="stemGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D3241A"/>
+      <stop offset="100%" stop-color="#8E120A"/>
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(85, 140)">
+    <path d="M 32.5 -130
+             C 91 -104, 104 -52, 39 0
+             C 65 -26, 71.5 -65, 28.6 -78"
+          fill="url(#stemGradient)" stroke-linejoin="round"/>
+
+    <!-- Note head in front -->
+    <ellipse cx="0" cy="11.7" rx="39" ry="32.5" transform="rotate(-25)" fill="url(#headGradient)"/>
+  </g>
+</svg>

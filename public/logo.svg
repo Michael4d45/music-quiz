@@ -1,0 +1,29 @@
+<svg width="800" height="200" viewBox="0 0 800 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="headGradient" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#FF5F55"/>
+      <stop offset="100%" stop-color="#B31B12"/>
+    </radialGradient>
+
+    <linearGradient id="stemGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D3241A"/>
+      <stop offset="100%" stop-color="#8E120A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- musical note (from favicon.svg), scaled and positioned -->
+  <g transform="translate(40,150) scale(1.45)">
+    <path d="M 22 -100
+             C 70 -80, 80 -40, 30 0
+             C 50 -20, 55 -50, 22 -60"
+          fill="url(#stemGradient)" stroke-linejoin="round"/>
+
+    <ellipse cx="0" cy="9" rx="30" ry="25" transform="rotate(-25)" fill="url(#headGradient)"/>
+  </g>
+
+  <!-- text -->
+  <text x="140" y="150" font-family="Inter, Roboto, Arial, sans-serif" font-size="120" font-weight="700" fill="#0A0A0A">Music Quiz</text>
+
+  <!-- small accent under text -->
+  <rect x="140" y="157" width="330" height="6" rx="3" fill="#FF5F55" opacity="0.85"/>
+</svg>
