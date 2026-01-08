@@ -16,7 +16,7 @@ class SessionFinalScoresTable
         return $table
             ->modifyQueryUsing(fn($query) => $query->with([
                 'session',
-                'participant',
+                'participant.user',
             ]))
             ->columns([
                 TextColumn::make('id')
@@ -29,8 +29,14 @@ class SessionFinalScoresTable
                     ->sortable()
                     ->toggleable(),
 
-                TextColumn::make('participant.user.name')
+                TextColumn::make('participant.guest_name')
                     ->label('Participant')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('participant.user.name')
+                    ->label('User')
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
@@ -81,9 +87,7 @@ class SessionFinalScoresTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->recordActions([])
             ->toolbarActions([
                 BulkActionGroup::make([

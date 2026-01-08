@@ -15,6 +15,8 @@ class SystemInfoWidget extends BaseWidget
 {
     protected string|null $heading = 'System Information';
 
+    protected null|string $pollingInterval = '60s';
+
     protected function getStats(): array
     {
         $laravelVersion = app()->version();

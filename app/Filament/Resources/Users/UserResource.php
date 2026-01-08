@@ -7,6 +7,12 @@ namespace App\Filament\Resources\Users;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
+use App\Filament\Resources\Users\RelationManagers\GameSessionsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\MusicTracksRelationManager;
+use App\Filament\Resources\Users\RelationManagers\ParticipantsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\PlaylistsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\QuizQuestionsRelationManager;
+use App\Filament\Resources\Users\RelationManagers\StatisticsRelationManager;
 use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\Tables\UsersTable;
 use App\Models\User;
@@ -41,7 +47,14 @@ class UserResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            GameSessionsRelationManager::class,
+            ParticipantsRelationManager::class,
+            StatisticsRelationManager::class,
+            PlaylistsRelationManager::class,
+            QuizQuestionsRelationManager::class,
+            MusicTracksRelationManager::class,
+        ];
     }
 
     public static function table(Table $table): Table

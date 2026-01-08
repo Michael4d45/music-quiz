@@ -62,8 +62,8 @@ format_sql_query() {
 
     # Check if pg_format is available
     if command -v pg_format &>/dev/null; then
-        # Use pg_format for proper SQL formatting
-        formatted_sql=$(echo "$sql" | pg_format -N - 2>/dev/null || echo "$sql")
+        # Use pg_format for proper SQL formatting, then remove statement number comments
+        formatted_sql=$(echo "$sql" | pg_format -N - 2>/dev/null | grep -v '^[[:space:]]*-- Statement #' || echo "$sql")
 
         # Check if pygmentize is available for syntax highlighting
         if command -v pygmentize &>/dev/null; then
@@ -162,6 +162,10 @@ format_log_entry() {
     if [ "$events_count" -gt 0 ]; then
         echo -e "  ${BLUE}Timeline:${NC}"
 
+        # Initialize SQL query counter (using a temp file to persist across subshell)
+        local sql_counter_file=$(mktemp)
+        echo "0" > "$sql_counter_file"
+
         # Extract events as newline-separated JSON, sort by timestamp, then format
         echo "$entry" | jq -c '.context.events[]?' 2>/dev/null | \
         jq -s 'sort_by(.timestamp)' | \
@@ -189,8 +193,28 @@ format_log_entry() {
             esac
 
             if [ "$msg" = "sql" ] && [ -n "$sql" ]; then
+                # Increment SQL query counter (read, increment, write back)
+                sql_query_num=$(cat "$sql_counter_file")
+                sql_query_num=$((sql_query_num + 1))
+                echo "$sql_query_num" > "$sql_counter_file"
+
+                # Extract SQL metadata
+                execution_time=$(echo "$event_json" | jq -r '.context.execution_time // ""')
+                file=$(echo "$event_json" | jq -r '.context.file // ""')
+
                 # Format SQL query with syntax highlighting
-                echo -e "  ${event_color}┌─ ${time_formatted} [${level_display}] SQL Query${NC}"
+                echo -e "  ${event_color}┌─ ${time_formatted} [${level_display}] SQL Query #${sql_query_num}${NC}"
+                
+                # Display metadata
+                if [ -n "$execution_time" ] || [ -n "$file" ]; then
+                    echo -e "  ${event_color}│${NC}"
+                    if [ -n "$execution_time" ]; then
+                        echo -e "  ${event_color}│${NC}   ${GREEN}Execution Time:${NC} ${execution_time}"
+                    fi
+                    if [ -n "$file" ]; then
+                        echo -e "  ${event_color}│${NC}   ${GREEN}File:${NC} ${file}"
+                    fi
+                fi
                 echo -e "  ${event_color}│${NC}"
 
                 # Format SQL with basic syntax highlighting
@@ -357,6 +381,9 @@ format_log_entry() {
                 echo -e "  ${event_color}└─${NC} ${GRAY}($timestamp_full)${NC}"
             fi
         done
+        
+        # Clean up temp file
+        [ -f "$sql_counter_file" ] && rm -f "$sql_counter_file"
     fi
 
     # Show exception details if present

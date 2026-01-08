@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Http\Middleware\LoggingHelper;
 use App\Models\PersonalAccessToken;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
@@ -27,8 +28,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Sanctum::usePersonalAccessTokenModel(PersonalAccessToken::class);
+        $shouldIgnoreRoute = LoggingHelper::shouldIgnoreRoute(request());
 
-        if (config()->boolean('logging.should_log_db')) {
+        if (config()->boolean('logging.should_log_db') && !$shouldIgnoreRoute) {
             DB::listen(static function (QueryExecuted $query): void {
                 [$file, $line] = earliest_app_caller();
 

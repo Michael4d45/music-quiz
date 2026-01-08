@@ -150,6 +150,7 @@ return [
         '*.[js|css|html|png|svg|jpg|jpeg|gif|woff|woff2|ttf|eot]',
         '*.js.map',
         '_boost/browser-logs',
+        'livewire/update',
     ],
 
     /*
@@ -183,6 +184,8 @@ return [
         'verification_code',
         'otp',
         'pin',
+        'html',
+        'auth',
     ],
 
     /*

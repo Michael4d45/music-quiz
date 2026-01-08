@@ -19,7 +19,7 @@ class PlayerAnswersTable
         return $table
             ->modifyQueryUsing(fn($query) => $query->with([
                 'round.session',
-                'participant',
+                'participant.user',
                 'selectedOption',
                 'matchedVariant',
             ]))
@@ -44,8 +44,14 @@ class PlayerAnswersTable
                     ->sortable()
                     ->toggleable(),
 
-                TextColumn::make('participant.user.name')
+                TextColumn::make('participant.guest_name')
                     ->label('Participant')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('participant.user.name')
+                    ->label('User')
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
@@ -108,15 +114,20 @@ class PlayerAnswersTable
             ])
             ->filters([
                 SelectFilter::make('round_id')
-                    ->label('Round')
-                    ->relationship('round.session.room_code', 'room_code')
-                    ->searchable()
-                    ->preload(),
-                SelectFilter::make('participant_id')
-                    ->label('Participant')
-                    ->relationship('participant.user.name', 'name')
-                    ->searchable()
-                    ->preload(),
+                    ->label('Session')
+                    ->options(
+                        fn() => \App\Models\SessionRound::query()
+                            ->with('session')
+                            ->get()
+                            ->mapWithKeys(fn($round) => [
+                                $round->id =>
+                                    $round->session->room_code
+                                    . ' - Round '
+                                    . $round->round_number,
+                            ])
+                            ->sort(),
+                    )
+                    ->searchable(),
                 TernaryFilter::make('is_correct')
                     ->label('Correctness')
                     ->placeholder('All')
