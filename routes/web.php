@@ -24,6 +24,7 @@ Route::get('/login', function () {
 
 // Catch-all route to serve the React SPA
 // React Router handles client-side routing for all paths
-Route::get('/{any?}', function () {
+// Admin routes (/admin/*) are handled by Filament and take precedence
+Route::get('/{any}', function () {
     return view('app');
-})->where('any', '.*')->name('home');
+})->where('any', '(?!admin).*')->name('home');

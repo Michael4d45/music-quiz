@@ -106,6 +106,9 @@ class HandleGoogleCallback
             Auth::login($user);
             $token = $user->createToken('oauth-token')->plainTextToken;
 
+            // Regenerate session ID to prevent session fixation attacks
+            session()->regenerate(true);
+
             // Store token and user in session for secure retrieval
             session()->put('oauth_token', $token);
             session()->put('oauth_user', $user->toArray());

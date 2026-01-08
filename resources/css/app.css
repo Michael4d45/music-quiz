@@ -5,6 +5,8 @@
 @source '../../storage/framework/views/*.php'; */
 @source '../**/*.blade.php';
 
+@source '../js/**/*';
+
 @custom-variant dark (&:is(.dark *));
 
 @theme {
@@ -159,517 +161,535 @@
     --info: var(--color-info-500);
 }
 
-body {
-    background-color: var(--bg-primary);
-    color: var(--secondary);
-}
-
-/* Headings */
-h1 {
-    font-size: 1.875rem;
-    line-height: 2.25rem;
-    font-weight: 700;
-    color: var(--secondary);
-}
-
-h2 {
-    font-size: 1.5rem;
-    line-height: 2rem;
-    font-weight: 600;
-    color: var(--secondary);
-}
-
-h3 {
-    font-size: 1.25rem;
-    line-height: 1.75rem;
-    font-weight: 600;
-    color: var(--secondary);
-}
-
-h4 {
-    font-size: 1.125rem;
-    line-height: 1.75rem;
-    font-weight: 500;
-    color: var(--secondary);
-}
-
-/* Links - uses primary color variables */
-a {
-    color: var(--primary);
-}
-
-a:hover {
-    color: var(--primary-hover);
-}
-
-/* Form inputs - base styles with primary color focus */
-input[type='text'],
-input[type='email'],
-input[type='password'],
-input[type='number'],
-input[type='search'],
-input[type='tel'],
-input[type='url'],
-textarea,
-select {
-    display: block;
-    width: 100%;
-    appearance: none;
-    border-radius: 0.375rem;
-    border-width: 1px;
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
-    outline: 2px solid transparent;
-    outline-offset: 2px;
-    border-color: var(--secondary-border);
-    background-color: var(--bg-card);
-    color: var(--secondary);
-}
-
-input[type='text']::placeholder,
-input[type='email']::placeholder,
-input[type='password']::placeholder,
-input[type='number']::placeholder,
-input[type='search']::placeholder,
-input[type='tel']::placeholder,
-input[type='url']::placeholder,
-textarea::placeholder,
-select::placeholder {
-    color: var(--color-secondary-400);
-}
-
-/* Input focus states - uses primary color */
-input:focus,
-textarea:focus,
-select:focus {
-    border-color: var(--primary-focus);
-    box-shadow: 0 0 0 1px var(--primary-focus);
-}
-
-/* Disabled inputs */
-input:disabled,
-textarea:disabled,
-select:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-    background-color: var(--secondary-bg);
-}
-
-/* Checkboxes and radio buttons - uses primary color */
-input[type='checkbox'],
-input[type='radio'] {
-    height: 1rem;
-    width: 1rem;
-    border-radius: 0.25rem;
-    border-width: 1px;
-    border-color: var(--secondary-border);
-    background-color: var(--bg-card);
-    color: var(--primary);
-    --tw-ring-color: var(--primary);
-}
-
-input[type='checkbox']:focus,
-input[type='radio']:focus {
-    outline: 2px solid transparent;
-    outline-offset: 2px;
-    --tw-ring-offset-width: 0px;
-    --tw-ring-width: 2px;
-    --tw-ring-offset-color: transparent;
-}
-
-/* Labels */
-label {
-    display: block;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    font-weight: 500;
-    color: var(--secondary);
-}
-
-/* Buttons - base styles */
-button,
-[type='button'],
-[type='submit'],
-[type='reset'] {
-    @apply inline-flex items-center justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50;
-    --tw-ring-color: var(--primary);
-}
-
-/* Primary button - uses primary color variables */
-button.btn-primary,
-[type='submit']:not([class*='btn-']) {
-    background-color: var(--primary);
-    color: white;
-}
-
-button.btn-primary:hover,
-[type='submit']:not([class*='btn-']):hover {
-    background-color: var(--primary-hover);
-}
-
-/* Secondary button - uses secondary color variables */
-button.btn-secondary,
-a.btn-secondary {
-    @apply inline-flex items-center justify-center rounded-md border px-4 py-2 text-sm font-medium shadow-sm transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none;
-    background-color: var(--secondary-bg);
-    color: var(--secondary);
-    border-color: var(--secondary-border);
-    --tw-ring-color: var(--primary);
-}
-
-button.btn-secondary:hover,
-a.btn-secondary:hover {
-    background-color: var(--secondary-hover);
-    color: white;
-}
-
-.dark button.btn-secondary:hover,
-.dark a.btn-secondary:hover {
-    color: var(--color-secondary-900);
-}
-
-/* Danger button - uses danger color variables */
-button.btn-danger {
-    background-color: var(--danger);
-    color: white;
-}
-
-button.btn-danger:hover {
-    background-color: var(--danger-light);
-}
-
-/* Outline button - uses gray colors for border and text */
-button.btn-outline {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 0.375rem;
-    border-width: 1px;
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    font-weight: 500;
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
-    outline: 2px solid transparent;
-    outline-offset: 2px;
-    background-color: transparent;
-    color: var(--secondary);
-    border-color: var(--secondary-border);
-    --tw-ring-color: var(--primary);
-}
-
-button.btn-outline:focus {
-    --tw-ring-offset-width: 2px;
-    --tw-ring-width: 2px;
-    --tw-ring-offset-color: transparent;
-}
-
-button.btn-outline:hover {
-    background-color: var(--secondary-bg);
-    color: var(--secondary-hover);
-}
-
-/* Error messages - uses danger color variables */
-.error,
-.text-error {
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    color: var(--danger);
-}
-
-/* Success messages - uses success color variables */
-.success,
-.text-success {
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    color: var(--success);
-}
-
-/* Cards */
-.card {
-    border-radius: 0.5rem;
-    padding: 1.5rem;
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-    background-color: var(--bg-card);
-}
-
-/* Background utilities */
-.bg-primary {
-    background-color: var(--bg-primary);
-}
-
-.bg-secondary {
-    background-color: var(--bg-secondary);
-}
-
-.bg-secondary-bg {
-    background-color: var(--secondary-bg);
-}
-
-.bg-card {
-    background-color: var(--bg-card);
-}
-
-/* Border utilities */
-.border-secondary {
-    border-color: var(--secondary-border);
-}
-
-/* Text color utilities */
-.text-secondary {
-    color: var(--secondary);
-}
-
-/* Semantic button utilities */
-.btn-success {
-    background-color: var(--success);
-    color: white;
-}
-
-.btn-success:hover {
-    background-color: var(--success-light);
-}
-
-.btn-info {
-    background-color: var(--info);
-    color: white;
-}
-
-.btn-info:hover {
-    background-color: var(--color-info-500);
-}
-
-/* Hover utilities */
-.hover-bg-secondary {
-    transition: background-color 0.2s;
-}
-
-.hover-bg-secondary:hover {
-    background-color: var(--secondary-bg);
-}
-
-/* Text utilities for muted/secondary text */
-.text-muted {
-    color: var(--color-secondary-500);
-}
-
-.dark .text-muted {
-    color: var(--color-secondary-400);
-}
-
-/* Navigation item utilities */
-.nav-item {
-    color: var(--secondary);
-    transition: all 0.2s;
-}
-
-.nav-item:hover {
-    background-color: var(--secondary-bg);
-    color: var(--primary);
-}
-
-/* Status badge utilities */
-.badge-warning {
-    background-color: var(--color-warning-100);
-    color: var(--color-warning-800);
-}
-
-.dark .badge-warning {
-    background-color: var(--color-warning-900);
-    color: var(--color-warning-200);
-}
-
-.badge-success {
-    background-color: var(--color-success-100);
-    color: var(--color-success-800);
-}
-
-.dark .badge-success {
-    background-color: var(--color-success-900);
-    color: var(--color-success-200);
-}
-
-.badge-info {
-    background-color: var(--color-info-100);
-    color: var(--color-info-800);
-}
-
-.dark .badge-info {
-    background-color: var(--color-info-900);
-    color: var(--color-info-200);
-}
-
-/* Code blocks */
-code {
-    border-radius: 0.25rem;
-    padding: 0.125rem 0.375rem;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    background-color: var(--secondary-bg);
-    color: var(--secondary);
-}
-
-pre {
-    overflow-x: auto;
-    border-radius: 0.5rem;
-    padding: 1rem;
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-    background-color: var(--secondary-bg);
-}
-
-pre code {
-    background-color: transparent;
-    padding: 0;
-}
-
-/* Horizontal rule */
-hr {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-    border-width: 1px 0 0 0;
-    border-color: var(--secondary-border);
-    border-style: solid;
-}
-
-/* Lists */
-ul,
-ol {
-    @apply list-inside space-y-1;
-}
-
-ul,
-ol {
-    @apply list-none;
-}
-
-/* Reset list styles for navigation and role="list" */
-nav ul,
-nav ol,
-ul[role='list'],
-ol[role='list'] {
-    @apply list-none;
-}
-
-/* Blockquote */
-blockquote {
-    border-left-width: 4px;
-    border-left-color: var(--secondary-border);
-    padding-left: 1rem;
-    color: var(--color-secondary-500);
-    font-style: italic;
-}
-
-/* Select Components - Base styles with dark mode support */
-.select-trigger {
-    @apply w-full border px-3 py-2 text-left transition-colors;
-    border-color: var(--secondary-border);
-    background-color: white;
-    color: var(--secondary);
-}
-
-.dark .select-trigger {
-    background-color: var(--secondary-bg);
-    border-color: var(--secondary-border);
-    color: var(--secondary);
-}
-
-.select-trigger:hover {
-    border-color: var(--primary);
-}
-
-.select-dropdown {
-    @apply absolute z-50 mt-1 w-full border;
-    border-color: var(--secondary-border);
-    background-color: white;
-}
-
-.dark .select-dropdown {
-    background-color: var(--secondary-bg);
-    border-color: var(--secondary-border);
-}
-
-.select-list {
-    @apply max-h-60 overflow-y-auto;
-}
-
-.select-item {
-    @apply cursor-pointer px-3 py-2 transition-colors;
-}
-
-.select-item:hover {
-    background-color: var(--color-secondary-100);
-}
-
-.dark .select-item:hover {
-    background-color: var(--color-secondary-700);
-}
-
-.select-item-selected {
-    background-color: var(--color-secondary-100);
-}
-
-.dark .select-item-selected {
-    background-color: var(--color-secondary-700);
-}
-
-.select-search {
-    @apply w-full border-b px-2 py-1;
-    border-color: var(--secondary-border);
-    background-color: white;
-    color: var(--secondary);
-}
-
-.dark .select-search {
-    background-color: var(--secondary-bg);
-    border-color: var(--secondary-border);
-    color: var(--secondary);
-}
-
-.select-search:focus {
-    outline: none;
-    border-color: var(--primary-focus);
-}
-
-.select-no-results {
-    @apply px-3 py-2 text-sm;
-    color: var(--color-secondary-500);
-}
-
-.dark .select-no-results {
-    color: var(--color-secondary-400);
-}
-
-.select-clear {
-    @apply absolute top-2 right-2 px-2 py-1 text-lg leading-none transition-colors;
-    color: var(--color-secondary-500);
-}
-
-.select-clear:hover {
-    color: var(--danger);
-}
-
-.dark .select-clear {
-    color: var(--color-secondary-400);
-}
-
-.dark .select-clear:hover {
-    color: var(--danger-light);
-}
-
-/* Mobile: Slightly larger text for better readability */
-@media (max-width: 767px) {
-    html {
+@layer base {
+    body {
+        background-color: var(--bg-primary);
+        color: var(--secondary);
+    }
+
+    /* Headings */
+    h1 {
+        font-size: 1.875rem;
+        line-height: 2.25rem;
+        font-weight: 700;
+        color: var(--secondary);
+    }
+
+    h2 {
+        font-size: 1.5rem;
+        line-height: 2rem;
+        font-weight: 600;
+        color: var(--secondary);
+    }
+
+    h3 {
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+        font-weight: 600;
+        color: var(--secondary);
+    }
+
+    h4 {
         font-size: 1.125rem;
-        /* 18px instead of default 16px */
+        line-height: 1.75rem;
+        font-weight: 500;
+        color: var(--secondary);
+    }
+
+    /* Links - uses primary color variables */
+    a {
+        color: var(--primary);
+    }
+
+    a:hover {
+        color: var(--primary-hover);
+    }
+
+    /* Form inputs - base styles with primary color focus */
+    input[type='text'],
+    input[type='email'],
+    input[type='password'],
+    input[type='number'],
+    input[type='search'],
+    input[type='tel'],
+    input[type='url'],
+    textarea,
+    select {
+        display: block;
+        width: 100%;
+        appearance: none;
+        border-radius: 0.375rem;
+        border-width: 1px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 150ms;
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+        border-color: var(--secondary-border);
+        background-color: var(--bg-card);
+        color: var(--secondary);
+    }
+
+    input[type='text']::placeholder,
+    input[type='email']::placeholder,
+    input[type='password']::placeholder,
+    input[type='number']::placeholder,
+    input[type='search']::placeholder,
+    input[type='tel']::placeholder,
+    input[type='url']::placeholder,
+    textarea::placeholder,
+    select::placeholder {
+        color: var(--color-secondary-400);
+    }
+
+    .dark input[type='text']::placeholder,
+    .dark input[type='email']::placeholder,
+    .dark input[type='password']::placeholder,
+    .dark input[type='number']::placeholder,
+    .dark input[type='search']::placeholder,
+    .dark input[type='tel']::placeholder,
+    .dark input[type='url']::placeholder,
+    .dark textarea::placeholder,
+    .dark select::placeholder {
+        color: var(--color-secondary-500);
+    }
+
+    /* Input focus states - uses primary color */
+    input:focus,
+    textarea:focus,
+    select:focus {
+        border-color: var(--primary-focus);
+        box-shadow: 0 0 0 1px var(--primary-focus);
+    }
+
+    /* Disabled inputs */
+    input:disabled,
+    textarea:disabled,
+    select:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+        background-color: var(--secondary-bg);
+    }
+
+    /* Checkboxes and radio buttons - uses primary color */
+    input[type='checkbox'],
+    input[type='radio'] {
+        height: 1rem;
+        width: 1rem;
+        border-radius: 0.25rem;
+        border-width: 1px;
+        border-color: var(--secondary-border);
+        background-color: var(--bg-card);
+        color: var(--primary);
+        --tw-ring-color: var(--primary);
+    }
+
+    input[type='checkbox']:focus,
+    input[type='radio']:focus {
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+        --tw-ring-offset-width: 0px;
+        --tw-ring-width: 2px;
+        --tw-ring-offset-color: transparent;
+    }
+
+    /* Labels */
+    label {
+        display: block;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        font-weight: 500;
+        color: var(--secondary);
+    }
+
+    /* Buttons - base styles */
+    button,
+    [type='button'],
+    [type='submit'],
+    [type='reset'] {
+        @apply inline-flex items-center justify-center rounded-md border border-transparent px-4 py-2 text-sm font-medium shadow-sm transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50;
+        --tw-ring-color: var(--primary);
+    }
+
+    /* Primary button - uses primary color variables */
+    button.btn-primary,
+    [type='submit']:not([class*='btn-']) {
+        background-color: var(--primary);
+        color: white;
+    }
+
+    button.btn-primary:hover,
+    [type='submit']:not([class*='btn-']):hover {
+        background-color: var(--primary-hover);
+    }
+
+    /* Secondary button - uses secondary color variables */
+    button.btn-secondary,
+    a.btn-secondary {
+        @apply inline-flex items-center justify-center rounded-md border px-4 py-2 text-sm font-medium shadow-sm transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none;
+        background-color: var(--secondary-bg);
+        color: var(--secondary);
+        border-color: var(--secondary-border);
+        --tw-ring-color: var(--primary);
+    }
+
+    button.btn-secondary:hover,
+    a.btn-secondary:hover {
+        background-color: var(--secondary-hover);
+        color: white;
+    }
+
+    .dark button.btn-secondary:hover,
+    .dark a.btn-secondary:hover {
+        color: var(--color-secondary-900);
+    }
+
+    /* Danger button - uses danger color variables */
+    button.btn-danger {
+        background-color: var(--danger);
+        color: white;
+    }
+
+    button.btn-danger:hover {
+        background-color: var(--danger-light);
+    }
+
+    /* Outline button - uses gray colors for border and text */
+    button.btn-outline {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.375rem;
+        border-width: 1px;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        font-weight: 500;
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+        transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        transition-duration: 150ms;
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+        background-color: transparent;
+        color: var(--secondary);
+        border-color: var(--secondary-border);
+        --tw-ring-color: var(--primary);
+    }
+
+    button.btn-outline:focus {
+        --tw-ring-offset-width: 2px;
+        --tw-ring-width: 2px;
+        --tw-ring-offset-color: transparent;
+    }
+
+    button.btn-outline:hover {
+        background-color: var(--secondary-bg);
+        color: var(--secondary-hover);
+    }
+
+    /* Error messages - uses danger color variables */
+    .error,
+    .text-error {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        color: var(--danger);
+    }
+
+    /* Success messages - uses success color variables */
+    .success,
+    .text-success {
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        color: var(--success);
+    }
+
+    /* Cards */
+    .card {
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        background-color: var(--bg-card);
+    }
+
+    /* Background utilities */
+    .bg-primary {
+        background-color: var(--bg-primary);
+    }
+
+    .bg-secondary {
+        background-color: var(--bg-secondary);
+    }
+
+    .bg-secondary-bg {
+        background-color: var(--secondary-bg);
+    }
+
+    .bg-card {
+        background-color: var(--bg-card);
+    }
+
+    /* Border utilities */
+    .border-secondary {
+        border-color: var(--secondary-border);
+    }
+
+    /* Text color utilities */
+    .text-secondary {
+        color: var(--secondary);
+    }
+
+    /* Semantic button utilities */
+    .btn-success {
+        background-color: var(--success);
+        color: white;
+    }
+
+    .btn-success:hover {
+        background-color: var(--success-light);
+    }
+
+    .btn-info {
+        background-color: var(--info);
+        color: white;
+    }
+
+    .btn-info:hover {
+        background-color: var(--color-info-500);
+    }
+
+    /* Hover utilities */
+    .hover-bg-secondary {
+        transition: background-color 0.2s;
+    }
+
+    .hover-bg-secondary:hover {
+        background-color: var(--secondary-bg);
+    }
+
+    /* Text utilities for muted/secondary text */
+    .text-muted {
+        color: var(--color-secondary-500);
+    }
+
+    .dark .text-muted {
+        color: var(--color-secondary-400);
+    }
+
+    /* Navigation item utilities */
+    .nav-item {
+        color: var(--secondary);
+        transition: all 0.2s;
+    }
+
+    .nav-item:hover {
+        background-color: var(--secondary-bg);
+        color: var(--primary);
+    }
+
+    /* Status badge utilities */
+    .badge-warning {
+        background-color: var(--color-warning-100);
+        color: var(--color-warning-800);
+    }
+
+    .dark .badge-warning {
+        background-color: var(--color-warning-900);
+        color: var(--color-warning-200);
+    }
+
+    .badge-success {
+        background-color: var(--color-success-100);
+        color: var(--color-success-800);
+    }
+
+    .dark .badge-success {
+        background-color: var(--color-success-900);
+        color: var(--color-success-200);
+    }
+
+    .badge-info {
+        background-color: var(--color-info-100);
+        color: var(--color-info-800);
+    }
+
+    .dark .badge-info {
+        background-color: var(--color-info-900);
+        color: var(--color-info-200);
+    }
+
+    /* Code blocks */
+    code {
+        border-radius: 0.25rem;
+        padding: 0.125rem 0.375rem;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        background-color: var(--secondary-bg);
+        color: var(--secondary);
+    }
+
+    pre {
+        overflow-x: auto;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        background-color: var(--secondary-bg);
+    }
+
+    pre code {
+        background-color: transparent;
+        padding: 0;
+    }
+
+    /* Horizontal rule */
+    hr {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        border-width: 1px 0 0 0;
+        border-color: var(--secondary-border);
+        border-style: solid;
+    }
+
+    /* Lists */
+    ul,
+    ol {
+        @apply list-inside space-y-1;
+    }
+
+    ul,
+    ol {
+        @apply list-none;
+    }
+
+    /* Reset list styles for navigation and role="list" */
+    nav ul,
+    nav ol,
+    ul[role='list'],
+    ol[role='list'] {
+        @apply list-none;
+    }
+
+    /* Blockquote */
+    blockquote {
+        border-left-width: 4px;
+        border-left-color: var(--secondary-border);
+        padding-left: 1rem;
+        color: var(--color-secondary-500);
+        font-style: italic;
+    }
+
+    .dark blockquote {
+        color: var(--color-secondary-400);
+    }
+
+    /* Select Components - Base styles with dark mode support */
+    .select-trigger {
+        @apply w-full border px-3 py-2 text-left transition-colors;
+        border-color: var(--secondary-border);
+        background-color: white;
+        color: var(--secondary);
+    }
+
+    .dark .select-trigger {
+        background-color: var(--secondary-bg);
+        border-color: var(--secondary-border);
+        color: var(--secondary);
+    }
+
+    .select-trigger:hover {
+        border-color: var(--primary);
+    }
+
+    .select-dropdown {
+        @apply absolute z-50 mt-1 w-full border;
+        border-color: var(--secondary-border);
+        background-color: white;
+    }
+
+    .dark .select-dropdown {
+        background-color: var(--secondary-bg);
+        border-color: var(--secondary-border);
+    }
+
+    .select-list {
+        @apply max-h-60 overflow-y-auto;
+    }
+
+    .select-item {
+        @apply cursor-pointer px-3 py-2 transition-colors;
+    }
+
+    .select-item:hover {
+        background-color: var(--color-secondary-100);
+    }
+
+    .dark .select-item:hover {
+        background-color: var(--color-secondary-700);
+    }
+
+    .select-item-selected {
+        background-color: var(--color-secondary-100);
+    }
+
+    .dark .select-item-selected {
+        background-color: var(--color-secondary-700);
+    }
+
+    .select-search {
+        @apply w-full border-b px-2 py-1;
+        border-color: var(--secondary-border);
+        background-color: white;
+        color: var(--secondary);
+    }
+
+    .dark .select-search {
+        background-color: var(--secondary-bg);
+        border-color: var(--secondary-border);
+        color: var(--secondary);
+    }
+
+    .select-search:focus {
+        outline: none;
+        border-color: var(--primary-focus);
+    }
+
+    .select-no-results {
+        @apply px-3 py-2 text-sm;
+        color: var(--color-secondary-500);
+    }
+
+    .dark .select-no-results {
+        color: var(--color-secondary-400);
+    }
+
+    .select-clear {
+        @apply absolute top-2 right-2 px-2 py-1 text-lg leading-none transition-colors;
+        color: var(--color-secondary-500);
+    }
+
+    .select-clear:hover {
+        color: var(--danger);
+    }
+
+    .dark .select-clear {
+        color: var(--color-secondary-400);
+    }
+
+    .dark .select-clear:hover {
+        color: var(--danger-light);
+    }
+
+    /* Mobile: Slightly larger text for better readability */
+    @media (max-width: 767px) {
+        html {
+            font-size: 1.125rem;
+            /* 18px instead of default 16px */
+        }
     }
 }

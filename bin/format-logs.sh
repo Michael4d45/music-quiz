@@ -119,6 +119,39 @@ format_log_entry() {
     # Main log line
     echo -e "${color}${symbol} [$level]${NC} ${time_only} ${channel:+($channel)} ${message}"
 
+    # Special handling for User log entries
+    if [ "$message" = "User" ]; then
+        local user_id=$(echo "$entry" | jq -r '.context.id // empty')
+        local user_name=$(echo "$entry" | jq -r '.context.name // empty')
+        local user_email=$(echo "$entry" | jq -r '.context.email // empty')
+        local is_guest=$(echo "$entry" | jq -r '.context.is_guest // false')
+        local is_admin=$(echo "$entry" | jq -r '.context.is_admin // false')
+
+        if [ -n "$user_id" ]; then
+            echo -e "  ${CYAN}┌─ 👤 User Information${NC}"
+            echo -e "  ${CYAN}│${NC}   ${GREEN}ID:${NC} $user_id"
+
+            if [ -n "$user_name" ] && [ "$user_name" != "null" ]; then
+                echo -e "  ${CYAN}│${NC}   ${GREEN}Name:${NC} $user_name"
+            fi
+
+            if [ -n "$user_email" ] && [ "$user_email" != "null" ]; then
+                echo -e "  ${CYAN}│${NC}   ${GREEN}Email:${NC} $user_email"
+            fi
+
+            # Show flags with appropriate colors
+            if [ "$is_guest" = "true" ] || [ "$is_guest" = "1" ]; then
+                echo -e "  ${CYAN}│${NC}   ${YELLOW}Guest:${NC} Yes"
+            fi
+
+            if [ "$is_admin" = "true" ] || [ "$is_admin" = "1" ]; then
+                echo -e "  ${CYAN}│${NC}   ${MAGENTA}Admin:${NC} Yes"
+            fi
+
+            echo -e "  ${CYAN}└─${NC}"
+        fi
+    fi
+
     # Request info if available
     if [ -n "$request_id" ]; then
         echo -e "  ${GREEN}Request:${NC} ${request_id:0:8} ${method} ${path} ${status:+→ $status} ${duration:+(${duration}ms)}"
@@ -282,6 +315,38 @@ format_log_entry() {
                         echo "$exception_errors" | jq -r 'to_entries[] | "  \(.key): \(.value | join(", "))"' | while read -r error_line; do
                             echo -e "  ${event_color}│${NC}     ${RED}✗${NC} $error_line"
                         done
+                    fi
+                fi
+
+                echo -e "  ${event_color}└─${NC} ${GRAY}($timestamp_full)${NC}"
+            elif [ "$msg" = "User" ]; then
+                # Special handling for User log entries
+                local user_id=$(echo "$event_json" | jq -r '.context.id // empty')
+                local user_name=$(echo "$event_json" | jq -r '.context.name // empty')
+                local user_email=$(echo "$event_json" | jq -r '.context.email // empty')
+                local is_guest=$(echo "$event_json" | jq -r '.context.is_guest // false')
+                local is_admin=$(echo "$event_json" | jq -r '.context.is_admin // false')
+
+                echo -e "  ${event_color}┌─ ${time_formatted} [${level_display}] 👤 $msg${NC}"
+
+                if [ -n "$user_id" ] && [ "$user_id" != "null" ]; then
+                    echo -e "  ${event_color}│${NC}   ${GREEN}ID:${NC} $user_id"
+
+                    if [ -n "$user_name" ] && [ "$user_name" != "null" ]; then
+                        echo -e "  ${event_color}│${NC}   ${GREEN}Name:${NC} $user_name"
+                    fi
+
+                    if [ -n "$user_email" ] && [ "$user_email" != "null" ]; then
+                        echo -e "  ${event_color}│${NC}   ${GREEN}Email:${NC} $user_email"
+                    fi
+
+                    # Show flags with appropriate colors
+                    if [ "$is_guest" = "true" ] || [ "$is_guest" = "1" ]; then
+                        echo -e "  ${event_color}│${NC}   ${YELLOW}Guest:${NC} Yes"
+                    fi
+
+                    if [ "$is_admin" = "true" ] || [ "$is_admin" = "1" ]; then
+                        echo -e "  ${event_color}│${NC}   ${MAGENTA}Admin:${NC} Yes"
                     fi
                 fi
 

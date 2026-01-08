@@ -42,13 +42,13 @@ export function LeaderboardPage() {
                             <tr key={player.id}>
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span
-                                        className={`inline-flex h-8 w-8 items-center justify-center rounded-full ${
+                                        className={`inline-flex h-8 w-8 items-center justify-center rounded-full font-semibold ${
                                             index === 0
-                                                ? 'badge-warning'
+                                                ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
                                                 : index === 1
-                                                  ? 'bg-secondary-bg text-secondary'
+                                                  ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
                                                   : index === 2
-                                                    ? 'badge-warning'
+                                                    ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
                                                     : 'bg-secondary-bg text-muted'
                                         }`}
                                     >

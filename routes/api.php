@@ -66,7 +66,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/verify-email', VerifyEmail::class)->name(
         'api.verification.verify',
     );
-    Route::post('/logout', Logout::class)->name('api.logout');
+    // Logout needs web middleware (session + CSRF) to clear Redis sessions for Filament
+    Route::post('/logout', Logout::class)
+        ->middleware('web')
+        ->name('api.logout');
     Route::post('/confirm-password', ConfirmPassword::class)->name(
         'api.password.confirm',
     );
@@ -102,11 +105,19 @@ Route::get('/home', ShowHome::class)->name('api.home');
 
 // Browse routes (public)
 Route::get('/browse', ShowBrowse::class)->name('api.browse');
-Route::get('/browse/categories', ShowCategories::class)->name('api.browse.categories');
-Route::get('/browse/categories/{category}', ShowCategory::class)->name('api.browse.category');
+Route::get('/browse/categories', ShowCategories::class)->name(
+    'api.browse.categories',
+);
+Route::get('/browse/categories/{category}', ShowCategory::class)->name(
+    'api.browse.category',
+);
 Route::get('/browse/tracks', ShowTracks::class)->name('api.browse.tracks');
-Route::get('/browse/tracks/{track}', ShowTrack::class)->name('api.browse.track');
-Route::get('/browse/playlists', ShowPublicPlaylists::class)->name('api.browse.playlists');
+Route::get('/browse/tracks/{track}', ShowTrack::class)->name(
+    'api.browse.track',
+);
+Route::get('/browse/playlists', ShowPublicPlaylists::class)->name(
+    'api.browse.playlists',
+);
 
 // Leaderboard (public)
 Route::get('/leaderboard', ShowLeaderboard::class)->name('api.leaderboard');
@@ -115,27 +126,55 @@ Route::get('/leaderboard', ShowLeaderboard::class)->name('api.leaderboard');
 Route::middleware('auth:sanctum')->group(function () {
     // Playlists
     Route::get('/playlists', ShowPlaylists::class)->name('api.playlists.index');
-    Route::post('/playlists', CreatePlaylist::class)->name('api.playlists.store');
-    Route::get('/playlists/{playlist}', ShowPlaylist::class)->name('api.playlists.show');
-    Route::put('/playlists/{playlist}', UpdatePlaylist::class)->name('api.playlists.update');
+    Route::post('/playlists', CreatePlaylist::class)->name(
+        'api.playlists.store',
+    );
+    Route::get('/playlists/{playlist}', ShowPlaylist::class)->name(
+        'api.playlists.show',
+    );
+    Route::put('/playlists/{playlist}', UpdatePlaylist::class)->name(
+        'api.playlists.update',
+    );
 
     // Music Tracks
-    Route::get('/music-tracks', ShowMusicTracks::class)->name('api.music-tracks.index');
-    Route::post('/music-tracks', CreateMusicTrack::class)->name('api.music-tracks.store');
+    Route::get('/music-tracks', ShowMusicTracks::class)->name(
+        'api.music-tracks.index',
+    );
+    Route::post('/music-tracks', CreateMusicTrack::class)->name(
+        'api.music-tracks.store',
+    );
 
     // Quiz Questions
-    Route::get('/quiz-questions', ShowQuizQuestions::class)->name('api.quiz-questions.index');
-    Route::post('/quiz-questions', CreateQuizQuestion::class)->name('api.quiz-questions.store');
+    Route::get('/quiz-questions', ShowQuizQuestions::class)->name(
+        'api.quiz-questions.index',
+    );
+    Route::post('/quiz-questions', CreateQuizQuestion::class)->name(
+        'api.quiz-questions.store',
+    );
 
     // Game Sessions
-    Route::get('/active-games', ShowActiveGames::class)->name('api.active-games.index');
+    Route::get('/active-games', ShowActiveGames::class)->name(
+        'api.active-games.index',
+    );
     Route::post('/sessions', CreateSession::class)->name('api.sessions.store');
-    Route::post('/sessions/join', JoinSession::class)->name('api.sessions.join');
-    Route::get('/sessions/{roomCode}', ShowSessionLobby::class)->name('api.sessions.lobby');
-    Route::post('/sessions/{roomCode}/start', StartGame::class)->name('api.sessions.start');
-    Route::post('/sessions/{roomCode}/leave', LeaveSession::class)->name('api.sessions.leave');
-    Route::get('/sessions/{roomCode}/play', ShowSessionPlay::class)->name('api.sessions.play');
-    Route::get('/sessions/{roomCode}/results', ShowSessionResults::class)->name('api.sessions.results');
+    Route::post('/sessions/join', JoinSession::class)->name(
+        'api.sessions.join',
+    );
+    Route::get('/sessions/{roomCode}', ShowSessionLobby::class)->name(
+        'api.sessions.lobby',
+    );
+    Route::post('/sessions/{roomCode}/start', StartGame::class)->name(
+        'api.sessions.start',
+    );
+    Route::post('/sessions/{roomCode}/leave', LeaveSession::class)->name(
+        'api.sessions.leave',
+    );
+    Route::get('/sessions/{roomCode}/play', ShowSessionPlay::class)->name(
+        'api.sessions.play',
+    );
+    Route::get('/sessions/{roomCode}/results', ShowSessionResults::class)->name(
+        'api.sessions.results',
+    );
 
     // Statistics
     Route::get('/statistics', ShowStatistics::class)->name('api.statistics');
