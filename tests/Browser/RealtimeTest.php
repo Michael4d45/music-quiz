@@ -84,7 +84,7 @@ it('shows real-time notifications component for authenticated users', function (
 
     visit('/')
         ->assertNoJavaScriptErrors()
-        ->waitForText('Laravel React PWA', 10)
+        ->waitForText('Music Quiz', 10)
         ->waitForText('Logout', 10)
         ->assertSee('Real-time Updates')
         ->assertSee('No real-time messages yet');
@@ -93,7 +93,7 @@ it('shows real-time notifications component for authenticated users', function (
 it('hides real-time notifications for unauthenticated users', function (): void {
     visit('/')
         ->assertNoJavaScriptErrors()
-        ->waitForText('Laravel React PWA', 10)
+        ->waitForText('Music Quiz', 10)
         ->assertDontSee('Real-time Updates');
 });
 

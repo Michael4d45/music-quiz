@@ -253,6 +253,18 @@ const sessionsGroup = HttpApiGroup.make('sessions')
             .addSuccess(SessionResultsResponseSchema),
     );
 
+// Broadcasting endpoints (authenticated)
+const broadcastingGroup = HttpApiGroup.make('broadcasting').add(
+    HttpApiEndpoint.post('auth', '/api/broadcasting/auth')
+        .setPayload(
+            Schema.Struct({
+                socket_id: Schema.String,
+                channel_name: Schema.String,
+            }),
+        )
+        .addSuccess(Schema.Struct({ auth: Schema.String })),
+);
+
 // Statistics endpoints (authenticated)
 const statisticsGroup = HttpApiGroup.make('statistics').add(
     HttpApiEndpoint.get('show', '/api/statistics').addSuccess(
@@ -271,6 +283,7 @@ export const Api = HttpApi.make('BackendApi')
     .add(musicTracksGroup)
     .add(quizQuestionsGroup)
     .add(sessionsGroup)
+    .add(broadcastingGroup)
     .add(statisticsGroup)
     .addError(ValidationErrorSchema, { status: 422 })
     .addError(CsrfTokenExpiredErrorSchema, { status: 419 });
@@ -738,6 +751,18 @@ class ApiClientSingleton {
     async showSessionResults(roomCode: string) {
         const client = await this.getBaseAuthClient();
         return this.runEffect(client.sessions.results({ path: { roomCode } }));
+    }
+
+    /* ==========================================================================
+     * Broadcasting API Methods (Authenticated)
+     * ========================================================================== */
+    async authenticateBroadcasting(socketId: string, channelName: string) {
+        const client = await this.getBaseAuthClient();
+        return this.runEffect(
+            client.broadcasting.auth({
+                payload: { socket_id: socketId, channel_name: channelName },
+            }),
+        );
     }
 
     /* ==========================================================================

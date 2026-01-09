@@ -16,7 +16,7 @@ it('profile page loads without JS errors when authenticated', function (): void 
     $user = User::factory()->create();
     $this->actingAs($user);
 
-    visit('/profile')
+    visit_with_error_init('/profile')
         ->assertNoJavaScriptErrors()
         ->waitForText('Profile', 10)
         ->assertSee('Profile');

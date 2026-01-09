@@ -6,7 +6,7 @@
          defaultTimeLimit="30"
 >
     <extensions>
-        <bootstrap class="CoverageTreemap\CoverageTreemap\Extension">
+        <bootstrap class="CoverageTreemap\Extension">
             <parameter name="outputDirectory" value="reports/coverage-treemap" />
         </bootstrap>
     </extensions>
@@ -43,6 +43,7 @@
         <env name="APP_DEBUG" value="false"/>
         <env name="SHOULD_LOG_DB" value="false"/>
         <env name="SHOULD_LOG_REQUESTS" value="false"/>
+        <env name="SHOULD_LOG_USER" value="false"/>
         <env name="SHOULD_LOG_RESPONSES" value="false"/>
         <env name="SHOULD_LOG_VALIDATION_ERRORS" value="false"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
