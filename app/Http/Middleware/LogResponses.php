@@ -21,7 +21,9 @@ class LogResponses
         $response = $next($request);
 
         if (
-            !LoggingHelper::shouldIgnoreRoute($request) && ($user =
+            config()->boolean(
+                'logging.should_log_user',
+            ) && !LoggingHelper::shouldIgnoreRoute($request) && ($user =
                 $request->user())
         ) {
             Log::info('User', [
