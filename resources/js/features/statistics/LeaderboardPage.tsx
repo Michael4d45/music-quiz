@@ -20,19 +20,19 @@ export function LeaderboardPage() {
                 <table className="min-w-full divide-y divide-secondary">
                     <thead className="bg-secondary-bg">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-muted uppercase">
+                            <th className="px-6 py-3 text-center text-xs font-medium tracking-wider text-muted uppercase">
                                 Rank
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-muted uppercase">
                                 Player
                             </th>
-                            <th className="px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase">
+                            <th className="px-6 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase">
                                 Total Points
                             </th>
-                            <th className="px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase">
+                            <th className="px-6 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase">
                                 Games
                             </th>
-                            <th className="px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase">
+                            <th className="px-6 py-3 text-center text-xs font-medium tracking-wider text-gray-500 uppercase">
                                 Wins
                             </th>
                         </tr>
@@ -41,33 +41,42 @@ export function LeaderboardPage() {
                         {data.players.map((player, index) => (
                             <tr key={player.id}>
                                 <td className="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        className={`inline-flex h-8 w-8 items-center justify-center rounded-full font-semibold ${
-                                            index === 0
-                                                ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
-                                                : index === 1
-                                                  ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
-                                                  : index === 2
-                                                    ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
-                                                    : 'bg-secondary-bg text-muted'
-                                        }`}
-                                    >
-                                        {index + 1}
-                                    </span>
+                                    <div className="flex items-center justify-center">
+                                        <span
+                                            className={`inline-flex h-8 w-8 items-start justify-center rounded-full font-semibold pt-[0.155rem] pr-[0.01rem]                                                
+                                                ${index === 0
+                                                    ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
+                                                    : index === 1
+                                                        ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                                                        : index === 2
+                                                            ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
+                                                            : 'bg-secondary-bg text-muted'
+                                                }`}
+                                        >
+                                            {index + 1}
+                                        </span>
+                                    </div>
                                 </td>
+
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <span className="font-medium">
                                         {player.user?.name || 'Anonymous'}
                                     </span>
                                 </td>
-                                <td className="px-6 py-4 text-right font-semibold whitespace-nowrap">
-                                    {player.total_points.toLocaleString()}
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="flex items-center justify-center font-semibold">
+                                        {player.total_points.toLocaleString()}
+                                    </div>
                                 </td>
-                                <td className="px-6 py-4 text-right whitespace-nowrap">
-                                    {player.total_games_played}
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="flex items-center justify-center">
+                                        {player.total_games_played}
+                                    </div>
                                 </td>
-                                <td className="px-6 py-4 text-right whitespace-nowrap">
-                                    {player.total_wins}
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <div className="flex items-center justify-center">
+                                        {player.total_wins}
+                                    </div>
                                 </td>
                             </tr>
                         ))}
