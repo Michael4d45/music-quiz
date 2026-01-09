@@ -33,7 +33,6 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Purple,
             ])
             ->path('admin')
-            // ->viteTheme('resources/css/filament/admin/theme.css')
             ->spa()
             ->spaUrlExceptions([
                 '/',
