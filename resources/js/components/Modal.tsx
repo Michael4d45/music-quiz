@@ -59,23 +59,23 @@ export default function Modal({
             {/* Modal */}
             <div
                 className={cn(
-                    'relative w-full rounded-lg bg-card shadow-xl',
+                    'bg-card relative w-full rounded-lg shadow-xl',
                     sizeClasses[size],
                     className,
                 )}
             >
                 {/* Header */}
                 {(title || showCloseButton) && (
-                    <div className="flex items-center justify-between border-b border-secondary p-6">
+                    <div className="border-secondary flex items-center justify-between border-b p-6">
                         {title && (
-                            <h2 className="text-lg font-semibold text-secondary">
+                            <h2 className="text-secondary text-lg font-semibold">
                                 {title}
                             </h2>
                         )}
                         {showCloseButton && (
                             <button
                                 onClick={onClose}
-                                className="rounded-md p-1 text-secondary hover:bg-secondary-bg hover:text-secondary"
+                                className="text-secondary hover:bg-secondary-bg hover:text-secondary rounded-md p-1"
                             >
                                 <X className="h-5 w-5" />
                             </button>

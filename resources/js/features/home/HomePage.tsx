@@ -1,7 +1,8 @@
-import { ApiClient } from '@/lib/apiClientSingleton';
+import { RealtimeNotifications } from '@/components/realtime/RealtimeNotifications';
 import { useAuth } from '@/contexts/AuthContext';
-import { Link, useLoaderData } from 'react-router-dom';
+import { ApiClient } from '@/lib/apiClient';
 import { HomeResponse } from '@/types/effect-schemas';
+import { Link, useLoaderData } from 'react-router-dom';
 
 export async function homeLoader() {
     const result = await ApiClient.showHome();
@@ -27,14 +28,11 @@ export function HomePage() {
             <div className="mx-auto max-w-7xl">
                 <div className="flex h-screen flex-col items-center justify-center text-center">
                     <h1 className="text-4xl">Welcome to Music Quiz</h1>
-                    <p className="mt-4 text-lg text-muted">
+                    <p className="text-muted mt-4 text-lg">
                         Test your music knowledge with fun quiz games
                     </p>
                     <div className="mt-8 flex gap-4">
-                        <Link
-                            to="/login"
-                            className="btn-primary px-6 py-3"
-                        >
+                        <Link to="/login" className="btn-primary px-6 py-3">
                             Log in
                         </Link>
                         <Link
@@ -50,32 +48,26 @@ export function HomePage() {
     }
 
     return (
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-7xl space-y-8">
             <div className="mb-8">
                 <h1>Welcome back, {user.name}!</h1>
                 {data.statistic && (
                     <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
                         <div className="card p-4">
-                            <p className="text-sm text-muted">
-                                Games Played
-                            </p>
-                            <p className="text-2xl font-bold text-secondary">
+                            <p className="text-muted text-sm">Games Played</p>
+                            <p className="text-secondary text-2xl font-bold">
                                 {data.statistic.total_games_played}
                             </p>
                         </div>
                         <div className="card p-4">
-                            <p className="text-sm text-muted">
-                                Total Points
-                            </p>
-                            <p className="text-2xl font-bold text-secondary">
+                            <p className="text-muted text-sm">Total Points</p>
+                            <p className="text-secondary text-2xl font-bold">
                                 {data.statistic.total_points}
                             </p>
                         </div>
                         <div className="card p-4">
-                            <p className="text-sm text-muted">
-                                Best Streak
-                            </p>
-                            <p className="text-2xl font-bold text-secondary">
+                            <p className="text-muted text-sm">Best Streak</p>
+                            <p className="text-secondary text-2xl font-bold">
                                 {data.statistic.best_streak}
                             </p>
                         </div>
@@ -83,7 +75,7 @@ export function HomePage() {
                 )}
             </div>
 
-            <div className="mb-8 flex gap-4">
+            <div className="flex gap-4">
                 <Link to="/sessions/create" className="btn-primary px-6 py-3">
                     Create Game
                 </Link>
@@ -117,10 +109,10 @@ export function HomePage() {
                                 >
                                     <div className="flex items-center justify-between">
                                         <div>
-                                            <p className="font-medium text-secondary">
+                                            <p className="text-secondary font-medium">
                                                 Room: {session.room_code}
                                             </p>
-                                            <p className="text-sm text-muted">
+                                            <p className="text-muted text-sm">
                                                 {session.status}
                                             </p>
                                         </div>
@@ -135,9 +127,7 @@ export function HomePage() {
                     <h2 className="mb-4">Recent Playlists</h2>
                     {data.recent_playlists.length === 0 ? (
                         <div className="card">
-                            <p className="text-muted">
-                                No playlists yet
-                            </p>
+                            <p className="text-muted">No playlists yet</p>
                             <Link
                                 to="/playlists/create"
                                 className="mt-4 inline-block text-sm"
@@ -157,7 +147,7 @@ export function HomePage() {
                                         {playlist.name}
                                     </p>
                                     {playlist.description && (
-                                        <p className="mt-1 text-sm text-muted">
+                                        <p className="text-muted mt-1 text-sm">
                                             {playlist.description}
                                         </p>
                                     )}
@@ -167,6 +157,8 @@ export function HomePage() {
                     )}
                 </div>
             </div>
+
+            <RealtimeNotifications />
         </div>
     );
 }

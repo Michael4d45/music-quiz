@@ -1,4 +1,4 @@
-import { ApiClient } from '@/lib/apiClientSingleton';
+import { ApiClient } from '@/lib/apiClient';
 import { Link, useLoaderData } from 'react-router-dom';
 
 export async function playlistsLoader() {
@@ -29,17 +29,17 @@ export function PlaylistsPage() {
                     <Link
                         key={playlist.id}
                         to={`/playlists/${playlist.id}`}
-                        className="rounded-lg bg-card p-6 shadow transition-shadow hover:shadow-lg"
+                        className="bg-card rounded-lg p-6 shadow transition-shadow hover:shadow-lg"
                     >
                         <h2 className="text-xl font-semibold">
                             {playlist.name}
                         </h2>
                         {playlist.description && (
-                            <p className="mt-2 line-clamp-2 text-muted">
+                            <p className="text-muted mt-2 line-clamp-2">
                                 {playlist.description}
                             </p>
                         )}
-                        <div className="mt-4 flex items-center gap-4 text-sm text-muted">
+                        <div className="text-muted mt-4 flex items-center gap-4 text-sm">
                             <span>
                                 {playlist.is_public ? 'Public' : 'Private'}
                             </span>
@@ -51,7 +51,7 @@ export function PlaylistsPage() {
 
             {data.playlists.length === 0 && (
                 <div className="py-12 text-center">
-                    <p className="mb-4 text-muted">
+                    <p className="text-muted mb-4">
                         You don't have any playlists yet.
                     </p>
                     <Link

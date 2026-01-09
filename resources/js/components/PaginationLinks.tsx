@@ -33,7 +33,7 @@ export default function PaginationLinks({
 
     return (
         <div className="mt-6 flex items-center justify-between">
-            <div className="text-sm text-secondary">
+            <div className="text-secondary text-sm">
                 Showing {meta.from ?? 0} to {meta.to ?? 0} of {meta.total}{' '}
                 results
             </div>
@@ -57,7 +57,7 @@ export default function PaginationLinks({
                     .map((page, index, array) => (
                         <div key={page} className="flex items-center gap-2">
                             {index > 0 && array[index - 1] !== page - 1 && (
-                                <span className="px-2 text-muted">...</span>
+                                <span className="text-muted px-2">...</span>
                             )}
                             <PaginationLink
                                 to={createPageUrl(page)}
@@ -101,7 +101,10 @@ function PaginationLink({
     if (disabled || to === '#') {
         return (
             <span
-                className={cn(baseClasses, 'cursor-not-allowed text-muted opacity-50')}
+                className={cn(
+                    baseClasses,
+                    'text-muted cursor-not-allowed opacity-50',
+                )}
             >
                 {children}
             </span>

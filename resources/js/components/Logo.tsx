@@ -28,7 +28,8 @@ export default function Logo({
     const imgProps: React.ImgHTMLAttributes<HTMLImageElement> = {
         src: '/logo.svg',
         alt: 'Music Quiz Logo',
-        className: `${baseClasses} ${variantClasses[variant]} ${sizeClasses} ${className}`.trim(),
+        className:
+            `${baseClasses} ${variantClasses[variant]} ${sizeClasses} ${className}`.trim(),
     };
 
     if (!fill) {

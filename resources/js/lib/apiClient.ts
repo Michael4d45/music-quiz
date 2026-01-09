@@ -1,5 +1,7 @@
 import {
     ActiveGamesResponseSchema,
+    AuthenticateBroadcastingRequestSchema,
+    AuthenticateBroadcastingResponseSchema,
     AuthResponseSchema,
     BrowseResponseSchema,
     CategoriesResponseSchema,
@@ -38,7 +40,6 @@ import {
     HttpApiGroup,
     HttpClient,
     HttpClientRequest,
-    HttpClientResponse,
 } from '@effect/platform';
 import { Effect, Schema } from 'effect';
 
@@ -50,6 +51,7 @@ import { authManager } from './auth';
 
 export const ValidationErrorSchema = Schema.Struct({
     _tag: Schema.Literal('ValidationError'),
+    message: Schema.String,
     errors: Schema.Record({
         key: Schema.String,
         value: Schema.Array(Schema.String),
@@ -60,9 +62,28 @@ export type ValidationError = Schema.Schema.Type<typeof ValidationErrorSchema>;
 
 export const CsrfTokenExpiredErrorSchema = Schema.Struct({
     _tag: Schema.Literal('CsrfTokenExpiredError'),
+    message: Schema.String,
 });
 
-export type CsrfTokenExpiredError = Schema.Schema.Type<typeof CsrfTokenExpiredErrorSchema>;
+export type CsrfTokenExpiredError = Schema.Schema.Type<
+    typeof CsrfTokenExpiredErrorSchema
+>;
+
+export const AuthenticationErrorSchema = Schema.Struct({
+    _tag: Schema.Literal('AuthenticationError'),
+    message: Schema.String,
+});
+
+export type AuthenticationError = Schema.Schema.Type<
+    typeof AuthenticationErrorSchema
+>;
+
+export const NotFoundErrorSchema = Schema.Struct({
+    _tag: Schema.Literal('NotFoundError'),
+    message: Schema.String,
+});
+
+export type NotFoundError = Schema.Schema.Type<typeof NotFoundErrorSchema>;
 
 /* ============================================================================
  * API Definition
@@ -256,13 +277,8 @@ const sessionsGroup = HttpApiGroup.make('sessions')
 // Broadcasting endpoints (authenticated)
 const broadcastingGroup = HttpApiGroup.make('broadcasting').add(
     HttpApiEndpoint.post('auth', '/api/broadcasting/auth')
-        .setPayload(
-            Schema.Struct({
-                socket_id: Schema.String,
-                channel_name: Schema.String,
-            }),
-        )
-        .addSuccess(Schema.Struct({ auth: Schema.String })),
+        .setPayload(AuthenticateBroadcastingRequestSchema)
+        .addSuccess(AuthenticateBroadcastingResponseSchema),
 );
 
 // Statistics endpoints (authenticated)
@@ -286,7 +302,9 @@ export const Api = HttpApi.make('BackendApi')
     .add(broadcastingGroup)
     .add(statisticsGroup)
     .addError(ValidationErrorSchema, { status: 422 })
-    .addError(CsrfTokenExpiredErrorSchema, { status: 419 });
+    .addError(CsrfTokenExpiredErrorSchema, { status: 419 })
+    .addError(AuthenticationErrorSchema, { status: 401 })
+    .addError(NotFoundErrorSchema, { status: 404 });
 
 /* ============================================================================
  * Form-Friendly Result
@@ -294,31 +312,33 @@ export const Api = HttpApi.make('BackendApi')
  */
 const baseUrl = ''; // Empty string to use relative paths
 
+// Base transform that always adds Accept header
+const withJsonAccept = HttpClient.mapRequest(
+    HttpClientRequest.setHeader('Accept', 'application/json'),
+);
+
+// Base client with common configuration
 const baseClient = HttpApiClient.make(Api, {
     baseUrl,
-    transformClient: (client) => {
-        return client.pipe(
-            HttpClient.mapRequest(HttpClientRequest.setHeader('Accept', 'application/json')),
-        );
-    },
+    transformClient: (client) => client.pipe(withJsonAccept),
 });
 
+// Auth client - adds bearer token on top of base
 const baseAuthClient = HttpApiClient.make(Api, {
     baseUrl,
     transformClient: (client) => {
         const token = authManager.getToken();
         if (token) {
             return client.pipe(
+                withJsonAccept,
                 HttpClient.mapRequest(HttpClientRequest.bearerToken(token)),
-                HttpClient.mapRequest(
-                    HttpClientRequest.setHeader('Accept', 'application/json'),
-                ),
             );
         }
-        return client;
+        return client.pipe(withJsonAccept);
     },
 });
 
+// CSRF client - adds CSRF token on top of base
 const baseCsrfClient = HttpApiClient.make(Api, {
     baseUrl,
     transformClient: (client) => {
@@ -328,22 +348,22 @@ const baseCsrfClient = HttpApiClient.make(Api, {
                 ?.getAttribute('content') || null;
         if (csrfToken) {
             return client.pipe(
+                withJsonAccept,
                 HttpClient.mapRequest(
                     HttpClientRequest.setHeader('X-CSRF-TOKEN', csrfToken),
                 ),
-                HttpClient.mapRequest(
-                    HttpClientRequest.setHeader('Accept', 'application/json'),
-                ),
             );
         }
-        return client;
+        return client.pipe(withJsonAccept);
     },
 });
 
+// Auth + CSRF client - combines both auth and CSRF on top of base
 const baseAuthCsrfClient = HttpApiClient.make(Api, {
     baseUrl,
     transformClient: (client) => {
-        let transformed = client;
+        let transformed = client.pipe(withJsonAccept);
+
         const token = authManager.getToken();
         if (token) {
             transformed = transformed.pipe(
@@ -359,11 +379,9 @@ const baseAuthCsrfClient = HttpApiClient.make(Api, {
                 HttpClient.mapRequest(
                     HttpClientRequest.setHeader('X-CSRF-TOKEN', csrfToken),
                 ),
-                HttpClient.mapRequest(
-                    HttpClientRequest.setHeader('Accept', 'application/json'),
-                ),
             );
         }
+
         return transformed;
     },
 });
@@ -376,6 +394,15 @@ type BaseClientType = Effect.Effect.Success<typeof baseClient>;
 type BaseAuthClientType = Effect.Effect.Success<typeof baseAuthClient>;
 type BaseCsrfClientType = Effect.Effect.Success<typeof baseCsrfClient>;
 type BaseAuthCsrfClientType = Effect.Effect.Success<typeof baseAuthCsrfClient>;
+
+type ErrorsType =
+    | HttpApiDecodeError
+    | ValidationError
+    | CsrfTokenExpiredError
+    | HttpClientError
+    | ParseError
+    | AuthenticationError
+    | NotFoundError;
 
 /* ============================================================================
  * Singleton Client
@@ -428,11 +455,8 @@ class ApiClientSingleton {
     }
 
     private runEffect<A>(
-        effect: Effect.Effect<
-            A,
-            HttpApiDecodeError | ValidationError | CsrfTokenExpiredError | HttpClientError | ParseError,
-            HttpClient.HttpClient
-        >,
+        effect: Effect.Effect<A, ErrorsType>,
+        context: string,
     ) {
         return Effect.runPromise(
             effect.pipe(
@@ -443,17 +467,30 @@ class ApiClientSingleton {
                 Effect.catchTag('ValidationError', (e) => {
                     return Effect.succeed({
                         _tag: 'ValidationError' as const,
+                        message: e.message,
                         errors: e.errors,
                     });
                 }),
                 Effect.catchTag('CsrfTokenExpiredError', (e) => {
                     return Effect.succeed({
                         _tag: 'CsrfTokenExpiredError' as const,
-                        message: 'CSRF token mismatch.',
+                        message: e.message,
+                    });
+                }),
+                Effect.catchTag('AuthenticationError', (e) => {
+                    return Effect.succeed({
+                        _tag: 'AuthenticationError' as const,
+                        message: e.message,
+                    });
+                }),
+                Effect.catchTag('NotFoundError', (e) => {
+                    return Effect.succeed({
+                        _tag: 'NotFoundError' as const,
+                        message: e.message,
                     });
                 }),
                 Effect.catchTag('ParseError', (e) => {
-                    console.error(e);
+                    console.error(context, e);
                     return Effect.succeed({
                         _tag: 'ParseError' as const,
                         message: e.toString(),
@@ -478,11 +515,7 @@ class ApiClientSingleton {
      * - Offline: Return cached data if available
      */
     private async runEffectWithCache<A>(
-        effect: Effect.Effect<
-            A,
-            HttpApiDecodeError | ValidationError | CsrfTokenExpiredError | HttpClientError | ParseError,
-            HttpClient.HttpClient
-        >,
+        effect: Effect.Effect<A, ErrorsType>,
         cacheKey: string,
     ) {
         // If offline, try to return cached data
@@ -502,7 +535,7 @@ class ApiClientSingleton {
         }
 
         // Online: fetch fresh data
-        const result = await this.runEffect(effect);
+        const result = await this.runEffect(effect, cacheKey);
 
         // Cache successful responses
         if (result._tag === 'Success') {
@@ -518,24 +551,24 @@ class ApiClientSingleton {
     async login(payload: LoginRequest) {
         // Login needs web middleware (session + CSRF) to create sessions for Filament
         const client = await this.getBaseCsrfClient();
-        return this.runEffect(client.auth.login({ payload }));
+        return this.runEffect(client.auth.login({ payload }), 'login');
     }
 
     async register(payload: RegisterRequest) {
         // Register needs web middleware (session + CSRF) to create sessions for Filament
         const client = await this.getBaseCsrfClient();
-        return this.runEffect(client.auth.register({ payload }));
+        return this.runEffect(client.auth.register({ payload }), 'register');
     }
 
     async showUser() {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.users.show());
+        return this.runEffect(client.users.show(), 'showUser');
     }
 
     async logout() {
         // Logout needs web middleware (session + CSRF) to clear Redis sessions for Filament
         const client = await this.getBaseAuthCsrfClient();
-        const result = await this.runEffect(client.auth.logout());
+        const result = await this.runEffect(client.auth.logout(), 'logout');
         // Clear cached data on logout to prevent data leakage
         await apiCache.clear();
         return result;
@@ -543,17 +576,24 @@ class ApiClientSingleton {
 
     async disconnectGoogle() {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.auth.disconnectGoogle());
+        return this.runEffect(
+            client.auth.disconnectGoogle(),
+            'disconnectGoogle',
+        );
     }
 
     async showContent() {
         const client = await this.getBaseClient();
-        return this.runEffectWithCache(client.content.show(), 'content_list');
+        return this.runEffectWithCache(
+            client.content.show(),
+            'content_list',
+            'showContent',
+        );
     }
 
     async showHome() {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.home.show());
+        return this.runEffect(client.home.show(), 'showHome');
     }
 
     /**
@@ -562,7 +602,7 @@ class ApiClientSingleton {
      */
     async fetchOAuthToken() {
         const client = await this.getBaseClient();
-        return this.runEffect(client.auth.oauthToken());
+        return this.runEffect(client.auth.oauthToken(), 'fetchOAuthToken');
     }
 
     /**
@@ -571,7 +611,7 @@ class ApiClientSingleton {
      */
     async fetchSessionToken() {
         const client = await this.getBaseClient();
-        return this.runEffect(client.auth.sessionToken());
+        return this.runEffect(client.auth.sessionToken(), 'fetchSessionToken');
     }
 
     /**
@@ -619,7 +659,7 @@ class ApiClientSingleton {
 
     async showTracks(search?: string) {
         const client = await this.getBaseClient();
-        return this.runEffect(client.browse.tracks());
+        return this.runEffect(client.browse.tracks(), 'showTracks');
     }
 
     async showTrack(id: string) {
@@ -651,19 +691,25 @@ class ApiClientSingleton {
      * ========================================================================== */
     async listPlaylists() {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.playlists.list());
+        return this.runEffect(client.playlists.list(), 'listPlaylists');
     }
 
     async createPlaylist(
         payload: Schema.Schema.Type<typeof CreatePlaylistRequestSchema>,
     ) {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.playlists.create({ payload }));
+        return this.runEffect(
+            client.playlists.create({ payload }),
+            'createPlaylist',
+        );
     }
 
     async showPlaylist(id: string) {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.playlists.show({ path: { id } }));
+        return this.runEffect(
+            client.playlists.show({ path: { id } }),
+            'showPlaylist',
+        );
     }
 
     async updatePlaylist(
@@ -673,6 +719,7 @@ class ApiClientSingleton {
         const client = await this.getBaseAuthClient();
         return this.runEffect(
             client.playlists.update({ path: { id }, payload }),
+            'updatePlaylist',
         );
     }
 
@@ -681,14 +728,17 @@ class ApiClientSingleton {
      * ========================================================================== */
     async listMusicTracks() {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.musicTracks.list());
+        return this.runEffect(client.musicTracks.list(), 'listMusicTracks');
     }
 
     async createMusicTrack(
         payload: Schema.Schema.Type<typeof CreateMusicTrackRequestSchema>,
     ) {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.musicTracks.create({ payload }));
+        return this.runEffect(
+            client.musicTracks.create({ payload }),
+            'createMusicTrack',
+        );
     }
 
     /* ==========================================================================
@@ -696,14 +746,17 @@ class ApiClientSingleton {
      * ========================================================================== */
     async listQuizQuestions() {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.quizQuestions.list());
+        return this.runEffect(client.quizQuestions.list(), 'listQuizQuestions');
     }
 
     async createQuizQuestion(
         payload: Schema.Schema.Type<typeof CreateQuizQuestionRequestSchema>,
     ) {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.quizQuestions.create({ payload }));
+        return this.runEffect(
+            client.quizQuestions.create({ payload }),
+            'createQuizQuestion',
+        );
     }
 
     /* ==========================================================================
@@ -711,46 +764,72 @@ class ApiClientSingleton {
      * ========================================================================== */
     async listActiveGames() {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.sessions.activeGames());
+        return this.runEffect(client.sessions.activeGames(), 'listActiveGames');
     }
 
     async createSession(
         payload: Schema.Schema.Type<typeof CreateSessionRequestSchema>,
     ) {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.sessions.create({ payload }));
+        return this.runEffect(
+            client.sessions.create({ payload }),
+            'createSession',
+        );
     }
 
     async joinSession(
         payload: Schema.Schema.Type<typeof JoinSessionRequestSchema>,
     ) {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.sessions.join({ payload }));
+        return this.runEffect(client.sessions.join({ payload }), 'joinSession');
     }
 
     async showSessionLobby(roomCode: string) {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.sessions.lobby({ path: { roomCode } }));
+        return this.runEffect(
+            client.sessions.lobby({ path: { roomCode } }),
+            'showSessionLobby',
+        );
     }
 
     async startSession(roomCode: string) {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.sessions.start({ path: { roomCode } }));
+        return this.runEffect(
+            client.sessions.start({ path: { roomCode } }),
+            'startSession',
+        );
     }
 
     async leaveSession(roomCode: string) {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.sessions.leave({ path: { roomCode } }));
+        return this.runEffect(
+            client.sessions.leave({ path: { roomCode } }),
+            'leaveSession',
+        );
     }
 
     async showSessionPlay(roomCode: string) {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.sessions.play({ path: { roomCode } }));
+        return this.runEffect(
+            client.sessions.play({ path: { roomCode } }),
+            'showSessionPlay',
+        );
     }
 
     async showSessionResults(roomCode: string) {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.sessions.results({ path: { roomCode } }));
+        return this.runEffect(
+            client.sessions.results({ path: { roomCode } }),
+            'showSessionResults',
+        );
+    }
+
+    /* ==========================================================================
+     * Statistics API Methods (Authenticated)
+     * ========================================================================== */
+    async showStatistics() {
+        const client = await this.getBaseAuthClient();
+        return this.runEffect(client.statistics.show(), 'showStatistics');
     }
 
     /* ==========================================================================
@@ -762,15 +841,8 @@ class ApiClientSingleton {
             client.broadcasting.auth({
                 payload: { socket_id: socketId, channel_name: channelName },
             }),
+            'authenticateBroadcasting',
         );
-    }
-
-    /* ==========================================================================
-     * Statistics API Methods (Authenticated)
-     * ========================================================================== */
-    async showStatistics() {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(client.statistics.show());
     }
 }
 

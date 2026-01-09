@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\RealtimeConnectionsWidget;
 use App\Filament\Widgets\RecentStatsWidget;
 use App\Filament\Widgets\SystemInfoWidget;
 use Filament\Http\Middleware\Authenticate;
@@ -57,6 +58,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 RecentStatsWidget::class,
                 SystemInfoWidget::class,
+                RealtimeConnectionsWidget::class,
             ])
             ->unsavedChangesAlerts()
             ->middleware([

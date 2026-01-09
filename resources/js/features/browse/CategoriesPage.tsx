@@ -1,4 +1,4 @@
-import { ApiClient } from '@/lib/apiClientSingleton';
+import { ApiClient } from '@/lib/apiClient';
 import { Link, useLoaderData } from 'react-router-dom';
 
 export async function categoriesLoader() {
@@ -21,13 +21,13 @@ export function CategoriesPage() {
                     <Link
                         key={category.id}
                         to={`/browse/categories/${category.id}`}
-                        className="rounded-lg bg-card p-6 shadow transition-shadow hover:shadow-lg"
+                        className="bg-card rounded-lg p-6 shadow transition-shadow hover:shadow-lg"
                     >
                         <h2 className="text-xl font-semibold">
                             {category.name}
                         </h2>
                         {category.description && (
-                            <p className="mt-2 text-muted">
+                            <p className="text-muted mt-2">
                                 {category.description}
                             </p>
                         )}

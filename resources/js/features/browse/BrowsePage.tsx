@@ -1,4 +1,4 @@
-import { ApiClient } from '@/lib/apiClientSingleton';
+import { ApiClient } from '@/lib/apiClient';
 import { Link, useLoaderData } from 'react-router-dom';
 
 export async function browseLoader() {
@@ -24,7 +24,7 @@ export function BrowsePage() {
                         <Link
                             key={category.id}
                             to={`/browse/categories/${category.id}`}
-                            className="rounded-lg bg-card p-4 shadow transition-shadow hover:shadow-lg"
+                            className="bg-card rounded-lg p-4 shadow transition-shadow hover:shadow-lg"
                         >
                             <h3 className="font-medium">{category.name}</h3>
                             {category.description && (
@@ -47,12 +47,12 @@ export function BrowsePage() {
                         <Link
                             key={playlist.id}
                             to={`/playlists/${playlist.id}`}
-                            className="rounded-lg bg-card p-4 shadow transition-shadow hover:shadow-lg"
+                            className="bg-card rounded-lg p-4 shadow transition-shadow hover:shadow-lg"
                         >
                             <h3 className="truncate font-medium">
                                 {playlist.name}
                             </h3>
-                            <p className="text-sm text-muted">
+                            <p className="text-muted text-sm">
                                 {playlist.play_count} plays
                             </p>
                         </Link>
@@ -68,7 +68,7 @@ export function BrowsePage() {
                         <Link
                             key={track.id}
                             to={`/browse/tracks/${track.id}`}
-                            className="rounded-lg bg-card p-4 shadow transition-shadow hover:shadow-lg"
+                            className="bg-card rounded-lg p-4 shadow transition-shadow hover:shadow-lg"
                         >
                             <h3 className="truncate font-medium">
                                 {track.title}

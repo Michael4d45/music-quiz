@@ -1,9 +1,9 @@
 import Logo from '@/components/Logo';
 import NavigationList from '@/components/NavigationList';
 import UserActions from '@/components/UserActions';
-import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 interface HeaderProps {
     children?: React.ReactNode;
@@ -14,17 +14,17 @@ export default function Header({ children }: HeaderProps) {
 
     return (
         <>
-            <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-secondary bg-card px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+            <div className="border-secondary bg-card sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
                 <button
                     type="button"
-                    className="-m-2.5 p-2.5 text-secondary lg:hidden"
+                    className="text-secondary -m-2.5 p-2.5 lg:hidden"
                     onClick={() => setSidebarOpen(true)}
                 >
                     <span className="sr-only">Open sidebar</span>
                     <Menu className="h-6 w-6" />
                 </button>
 
-                <div className="h-6 w-px border-secondary bg-secondary lg:hidden" />
+                <div className="border-secondary bg-secondary h-6 w-px lg:hidden" />
 
                 <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
                     <div className="flex items-center gap-x-4 lg:gap-x-6">
@@ -53,12 +53,14 @@ export default function Header({ children }: HeaderProps) {
                                     className="-m-2.5 p-2.5"
                                     onClick={() => setSidebarOpen(false)}
                                 >
-                                    <span className="sr-only">Close sidebar</span>
+                                    <span className="sr-only">
+                                        Close sidebar
+                                    </span>
                                     <X className="h-6 w-6 text-white" />
                                 </button>
                             </div>
 
-                            <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-card px-6 pb-4">
+                            <div className="bg-card flex grow flex-col gap-y-5 overflow-y-auto px-6 pb-4">
                                 <div className="flex h-16 shrink-0 items-center">
                                     <Link
                                         to="/"

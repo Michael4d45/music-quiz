@@ -50,16 +50,14 @@ export default function Toggle({
                 className={cn(
                     'relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors focus-within:ring-2 focus-within:ring-offset-2 focus-within:outline-none',
                     'focus-within:ring-(--primary)',
-                    isChecked
-                        ? 'bg-(--primary)'
-                        : 'bg-(--secondary-border)',
+                    isChecked ? 'bg-(--primary)' : 'bg-(--secondary-border)',
                     props.disabled && 'cursor-not-allowed opacity-50',
                     className,
                 )}
             >
                 <span
                     className={cn(
-                        'inline-block h-4 w-4 transform rounded-full bg-card transition-transform',
+                        'bg-card inline-block h-4 w-4 transform rounded-full transition-transform',
                         isChecked ? 'translate-x-6' : 'translate-x-1',
                     )}
                 />
@@ -68,7 +66,7 @@ export default function Toggle({
                 <label
                     htmlFor={toggleId}
                     className={cn(
-                        'ml-3 cursor-pointer text-sm font-medium text-secondary',
+                        'text-secondary ml-3 cursor-pointer text-sm font-medium',
                         labelClassName,
                     )}
                 >
