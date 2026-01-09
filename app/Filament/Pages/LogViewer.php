@@ -103,7 +103,7 @@ class LogViewer extends Page implements HasTable
                             return '';
                         }
                         $context = $record['context'] ?? [];
-                        if (empty($context) || !is_array($context)) {
+                        if (!is_array($context) || $context === []) {
                             return '';
                         }
 
@@ -218,7 +218,7 @@ class LogViewer extends Page implements HasTable
                 Action::make('settings')
                     ->label('Settings')
                     ->icon('heroicon-o-cog-6-tooth')
-                    ->form([
+                    ->schema([
                         TextInput::make('maxLines')
                             ->label('Max Lines to Load')
                             ->numeric()
@@ -266,7 +266,7 @@ class LogViewer extends Page implements HasTable
         // Collect all lines first
         foreach ($lines as $line) {
             $line = is_string($line) ? trim($line) : '';
-            if (empty($line)) {
+            if ($line === '') {
                 continue;
             }
             $allLines[] = $line;
@@ -409,7 +409,7 @@ class LogViewer extends Page implements HasTable
         // Collect all lines first
         foreach ($lines as $line) {
             $line = is_string($line) ? trim($line) : '';
-            if (empty($line)) {
+            if ($line === '') {
                 continue;
             }
             $allLines[] = $line;

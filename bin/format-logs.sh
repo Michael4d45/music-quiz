@@ -200,19 +200,33 @@ format_log_entry() {
 
                 # Extract SQL metadata
                 execution_time=$(echo "$event_json" | jq -r '.context.execution_time // ""')
-                file=$(echo "$event_json" | jq -r '.context.file // ""')
-
+                file_type=$(echo "$event_json" | jq -r '.context.file | type' 2>/dev/null || echo "string")
+                
                 # Format SQL query with syntax highlighting
                 echo -e "  ${event_color}┌─ ${time_formatted} [${level_display}] SQL Query #${sql_query_num}${NC}"
                 
                 # Display metadata
-                if [ -n "$execution_time" ] || [ -n "$file" ]; then
+                if [ -n "$execution_time" ] || [ "$file_type" != "null" ]; then
                     echo -e "  ${event_color}│${NC}"
                     if [ -n "$execution_time" ]; then
                         echo -e "  ${event_color}│${NC}   ${GREEN}Execution Time:${NC} ${execution_time}"
                     fi
-                    if [ -n "$file" ]; then
-                        echo -e "  ${event_color}│${NC}   ${GREEN}File:${NC} ${file}"
+                    if [ "$file_type" != "null" ]; then
+                        if [ "$file_type" = "array" ]; then
+                            # Handle array of trace lines
+                            echo -e "  ${event_color}│${NC}   ${GREEN}File:${NC}"
+                            echo "$event_json" | jq -r '.context.file[]?' 2>/dev/null | while IFS= read -r trace_line; do
+                                if [ -n "$trace_line" ]; then
+                                    echo -e "  ${event_color}│${NC}      ${GRAY}${trace_line}${NC}"
+                                fi
+                            done
+                        else
+                            # Handle string (backward compatibility)
+                            file=$(echo "$event_json" | jq -r '.context.file // ""')
+                            if [ -n "$file" ]; then
+                                echo -e "  ${event_color}│${NC}   ${GREEN}File:${NC} ${file}"
+                            fi
+                        fi
                     fi
                 fi
                 echo -e "  ${event_color}│${NC}"
