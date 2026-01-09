@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3682ed9b9bc8119d7021ef478a4c1211",
+    "content-hash": "c119463f3c59217dc5a75c02da4ef652",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -12331,23 +12331,22 @@
         },
         {
             "name": "michael4d45/coverage-treemap",
-            "version": "dev-master",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Michael4d45/PHPUnit-Coverage-Treemap.git",
-                "reference": "f800d90d95fb7b3c4156e2f525337e0194cab023"
+                "reference": "1bf8787e1001c5941625811d03438c3ca13a2f84"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Michael4d45/PHPUnit-Coverage-Treemap/zipball/f800d90d95fb7b3c4156e2f525337e0194cab023",
-                "reference": "f800d90d95fb7b3c4156e2f525337e0194cab023",
+                "url": "https://api.github.com/repos/Michael4d45/PHPUnit-Coverage-Treemap/zipball/1bf8787e1001c5941625811d03438c3ca13a2f84",
+                "reference": "1bf8787e1001c5941625811d03438c3ca13a2f84",
                 "shasum": ""
             },
             "require": {
                 "php": "^8.3",
                 "phpunit/phpunit": "^11.0 || ^12.0"
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "resources": {
@@ -12356,11 +12355,18 @@
             },
             "autoload": {
                 "psr-4": {
-                    "CoverageTreemap\\CoverageTreemap\\": "src/CoverageTreemap/"
+                    "CoverageTreemap\\": "src/CoverageTreemap/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael4d45",
+                    "email": "michael4d45@gmail.com"
+                }
             ],
             "description": "PHPUnit extension that generates an interactive squarified treemap visualization of code coverage",
             "keywords": [
@@ -12371,29 +12377,27 @@
                 "visualization"
             ],
             "support": {
-                "source": "https://github.com/Michael4d45/PHPUnit-Coverage-Treemap/tree/master",
-                "issues": "https://github.com/Michael4d45/PHPUnit-Coverage-Treemap/issues"
+                "issues": "https://github.com/Michael4d45/PHPUnit-Coverage-Treemap/issues",
+                "source": "https://github.com/Michael4d45/PHPUnit-Coverage-Treemap/tree/v1.0.0"
             },
-            "time": "2025-12-06T22:11:50+00:00"
+            "time": "2026-01-09T14:21:22+00:00"
         },
         {
             "name": "michael4d45/laravel-resource-checker",
-            "version": "dev-main",
+            "version": "v1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Michael4d45/Laravel-Resource-Checker.git",
-                "reference": "11b95ecd3b721743d430115763e71ea6065d94cb"
+                "reference": "c1a967732c800185bc4117b7f6441fdc35069c73"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Michael4d45/Laravel-Resource-Checker/zipball/11b95ecd3b721743d430115763e71ea6065d94cb",
-                "reference": "11b95ecd3b721743d430115763e71ea6065d94cb",
+                "url": "https://api.github.com/repos/Michael4d45/Laravel-Resource-Checker/zipball/c1a967732c800185bc4117b7f6441fdc35069c73",
+                "reference": "c1a967732c800185bc4117b7f6441fdc35069c73",
                 "shasum": ""
             },
             "require": {
-                "illuminate/console": "^10.0|^11.0|^12.0",
-                "illuminate/support": "^10.0|^11.0|^12.0",
-                "laravel/framework": "^12.0",
+                "laravel/framework": "^10.0|^11.0|^12.0",
                 "nikic/php-parser": "^4.0|^5.0",
                 "php": "^8.1"
             },
@@ -12401,7 +12405,6 @@
                 "larastan/larastan": "^3.8",
                 "laravel/pint": "^1.0"
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
@@ -12415,21 +12418,22 @@
                     "Michael4d45\\LaravelResourceChecker\\": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
             "authors": [
                 {
                     "name": "Michael4d45",
-                    "email": "your-email@example.com"
+                    "email": "michael4d45@gmail.com"
                 }
             ],
             "description": "A Laravel package to check migrations against Filament resources and models",
             "support": {
-                "source": "https://github.com/Michael4d45/Laravel-Resource-Checker/tree/main",
-                "issues": "https://github.com/Michael4d45/Laravel-Resource-Checker/issues"
+                "issues": "https://github.com/Michael4d45/Laravel-Resource-Checker/issues",
+                "source": "https://github.com/Michael4d45/Laravel-Resource-Checker/tree/v1.0.0"
             },
-            "time": "2025-11-15T21:49:13+00:00"
+            "time": "2026-01-09T14:17:50+00:00"
         },
         {
             "name": "mockery/mockery",
@@ -15364,10 +15368,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "michael4d45/coverage-treemap": 20,
-        "michael4d45/laravel-resource-checker": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
