@@ -40,8 +40,6 @@ class CreateMusicTrackRequest extends Data
         public string|null $album_name = null,
 
         #[IntegerType]
-        #[Min(1900)]
-        #[Max(2100)]
         public int|null $release_year = null,
 
         #[StringType]

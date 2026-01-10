@@ -443,6 +443,10 @@
         background-color: var(--bg-popover);
     }
 
+    .bg-accent {
+        background-color: var(--secondary-bg);
+    }
+
     /* Border utilities */
     .border-secondary {
         border-color: var(--secondary-border);
@@ -479,6 +483,14 @@
 
     .hover-bg-secondary:hover {
         background-color: var(--secondary-bg);
+    }
+
+    .hover\:bg-accent:hover {
+        background-color: var(--color-secondary-100);
+    }
+
+    .dark .hover\:bg-accent:hover {
+        background-color: var(--color-secondary-700);
     }
 
     /* Text utilities for muted/secondary text */

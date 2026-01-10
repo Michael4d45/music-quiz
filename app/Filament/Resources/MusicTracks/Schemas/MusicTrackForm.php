@@ -25,11 +25,7 @@ class MusicTrackForm
 
             TextInput::make('album_name')->label('Album')->maxLength(255),
 
-            TextInput::make('release_year')
-                ->label('Release Year')
-                ->numeric()
-                ->minValue(1900)
-                ->maxValue(date('Y') + 1),
+            TextInput::make('release_year')->label('Release Year')->numeric(),
 
             TextInput::make('genre')->maxLength(255),
 

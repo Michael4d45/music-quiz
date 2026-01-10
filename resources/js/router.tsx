@@ -28,6 +28,10 @@ import {
     createPlaylistLoader,
 } from './features/playlists/CreatePlaylistPage';
 import {
+    PlaylistDetailPage,
+    playlistDetailLoader,
+} from './features/playlists/PlaylistDetailPage';
+import {
     MusicTracksPage,
     musicTracksLoader,
 } from './features/music-tracks/MusicTracksPage';
@@ -130,6 +134,12 @@ export const router = createBrowserRouter([
                 path: 'playlists',
                 element: <PlaylistsPage />,
                 loader: playlistsLoader,
+                errorElement: <ErrorPage />,
+            },
+            {
+                path: 'playlists/:id',
+                element: <PlaylistDetailPage />,
+                loader: playlistDetailLoader,
                 errorElement: <ErrorPage />,
             },
             {

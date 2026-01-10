@@ -147,3 +147,21 @@ it('returns user playlists for session creation', function () {
         ]
     ]);
 });
+
+it('returns playlist details for viewing', function () {
+    $user = User::factory()->create();
+    $token = $user->createToken('test-token')->plainTextToken;
+
+    $playlist = Playlist::factory()->create(['user_id' => $user->id]);
+
+    $response = $this->withToken($token)->getJson("/api/playlists/{$playlist->id}");
+
+    $response->assertSuccessful()->assertJsonStructure([
+        'playlist' => [
+            'id',
+            'name',
+            'user_id',
+            'items'
+        ]
+    ]);
+});

@@ -204,8 +204,6 @@ export function CreateMusicTrackPage() {
                                 type="number"
                                 id="release_year"
                                 name="release_year"
-                                min="1900"
-                                max="2100"
                                 className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
                             />
                             {errors.release_year && (

@@ -24,8 +24,8 @@ export default function Logo({
     // When fill is true, use classes to fill parent and maintain aspect ratio
     const sizeClasses = fill ? 'w-full h-full object-contain' : '';
 
-    // Only set width/height attributes and styles when not filling
-    const imgProps: React.ImgHTMLAttributes<HTMLImageElement> = {
+    // Set up image props with proper typing
+    const imgProps: React.ImgHTMLAttributes<HTMLImageElement> & { style?: React.CSSProperties } = {
         src: '/logo.svg',
         alt: 'Music Quiz Logo',
         className:
@@ -35,10 +35,6 @@ export default function Logo({
     if (!fill) {
         imgProps.width = width;
         imgProps.height = height;
-        (imgProps as any).style = {
-            width: `${width}px`,
-            height: `${height}px`,
-        };
     }
 
     return <img {...imgProps} />;

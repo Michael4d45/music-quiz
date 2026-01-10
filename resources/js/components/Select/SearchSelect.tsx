@@ -198,8 +198,8 @@ function getAvailableOptions(
     // Static options - filter by search query
     return searchQuery
       ? options.filter(opt =>
-          opt.label.toLowerCase().includes(searchQuery.toLowerCase())
-        )
+        opt.label.toLowerCase().includes(searchQuery.toLowerCase())
+      )
       : options;
   }
   // API options - use search results
@@ -209,24 +209,24 @@ function getAvailableOptions(
 // ===== MAIN COMPONENT =====
 
 export default function SearchSelect(props: SearchSelectProps) {
-  // Extract common props that exist on all variants
-  const name = (props as any).name;
-  const placeholder = (props as any).placeholder ?? 'Search...';
-  const disabled = (props as any).disabled ?? false;
-  const className = (props as any).className ?? '';
-  const multiSelect = (props as any).multiSelect ?? false;
-  const onChange = (props as any).onChange;
-  const onSearch = (props as any).onSearch;
+  // Extract the discriminant property first (it's safe to access)
+  const multiSelect = props.multiSelect ?? false;
 
-  // Data source props
-  const options = (props as any).options;
-  const apiClient = (props as any).apiClient;
-  const limit = (props as any).limit ?? 20;
-  const debounceMs = (props as any).debounceMs ?? 300;
-
-  // Value props
-  const controlledValue = (props as any).value;
-  const defaultValue = (props as any).defaultValue;
+  // Now we can safely destructure based on the discriminant
+  const {
+    name,
+    placeholder = 'Search...',
+    disabled = false,
+    className = '',
+    onChange,
+    onSearch,
+    options,
+    apiClient,
+    limit = 20,
+    debounceMs = 300,
+    value: controlledValue,
+    defaultValue,
+  } = props;
 
   // ===== STATE =====
 
@@ -356,9 +356,13 @@ export default function SearchSelect(props: SearchSelectProps) {
     setHighlightedIndex(-1);
   };
 
+  const clearSelection = () => {
+    handleValueChange(multiSelect ? [] : null);
+  };
+
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
-    handleValueChange(multiSelect ? [] : null);
+    clearSelection();
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -411,7 +415,7 @@ export default function SearchSelect(props: SearchSelectProps) {
 
       case 'Backspace':
         if (!searchQuery && selectedOptions.length > 0) {
-          handleClear(e as any);
+          clearSelection();
         }
         break;
     }
@@ -588,9 +592,8 @@ export default function SearchSelect(props: SearchSelectProps) {
                   onMouseEnter={() => setHighlightedIndex(index)}
                 >
                   {multiSelect && (
-                    <span className={`inline-block w-4 h-4 mr-2 border rounded ${
-                      isSelected ? 'bg-primary border-primary' : 'border-border'
-                    }`}>
+                    <span className={`inline-block w-4 h-4 mr-2 border rounded ${isSelected ? 'bg-primary border-primary' : 'border-border'
+                      }`}>
                       {isSelected && (
                         <svg className="w-4 h-4 text-primary-foreground" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />

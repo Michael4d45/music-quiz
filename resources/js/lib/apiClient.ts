@@ -256,7 +256,7 @@ const musicTracksGroup = HttpApiGroup.make('musicTracks')
     .add(
         HttpApiEndpoint.post('create', '/api/music-tracks')
             .setPayload(CreateMusicTrackRequestSchema)
-            .addSuccess(MusicTrackResponseSchema),
+            .addSuccess(MusicTrackResponseSchema, { status: 201 }),
     )
     .add(
         HttpApiEndpoint.get('userTracks', '/api/music-tracks/user').addSuccess(
@@ -276,7 +276,7 @@ const quizQuestionsGroup = HttpApiGroup.make('quizQuestions')
     .add(
         HttpApiEndpoint.post('create', '/api/quiz-questions')
             .setPayload(CreateQuizQuestionRequestSchema)
-            .addSuccess(QuizQuestionResponseSchema),
+            .addSuccess(QuizQuestionResponseSchema, { status: 201 }),
     );
 
 // Game Sessions endpoints (authenticated)
@@ -289,12 +289,12 @@ const sessionsGroup = HttpApiGroup.make('sessions')
     .add(
         HttpApiEndpoint.post('create', '/api/sessions')
             .setPayload(CreateSessionRequestSchema)
-            .addSuccess(SessionLobbyResponseSchema),
+            .addSuccess(SessionLobbyResponseSchema, { status: 201 }),
     )
     .add(
         HttpApiEndpoint.post('join', '/api/sessions/join')
             .setPayload(JoinSessionRequestSchema)
-            .addSuccess(SessionLobbyResponseSchema),
+            .addSuccess(SessionLobbyResponseSchema, { status: 201 }),
     )
     .add(
         HttpApiEndpoint.get('lobby', '/api/sessions/:roomCode')
