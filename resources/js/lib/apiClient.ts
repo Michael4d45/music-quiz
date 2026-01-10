@@ -234,7 +234,7 @@ const quizQuestionsGroup = HttpApiGroup.make('quizQuestions')
 // Game Sessions endpoints (authenticated)
 const sessionsGroup = HttpApiGroup.make('sessions')
     .add(
-        HttpApiEndpoint.get('activeGames', '/api/active-games').addSuccess(
+        HttpApiEndpoint.get('activeGames', '/api/sessions/active-games').addSuccess(
             ActiveGamesResponseSchema,
         ),
     )
@@ -587,7 +587,6 @@ class ApiClientSingleton {
         return this.runEffectWithCache(
             client.content.show(),
             'content_list',
-            'showContent',
         );
     }
 

@@ -4,12 +4,31 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Realtime connection model
+ *
+ * @property string $id
+ * @property string $socket_id
+ * @property string $user_id
+ * @property string $channel_name
+ * @property string|null $ip_address
+ * @property array<string, string> $user_agent
+ * @property Carbon $connected_at
+ * @property Carbon|null $disconnected_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property User $user
+ */
 class RealtimeConnection extends Model
 {
+    use HasUuids;
+
     protected $fillable = [
         'socket_id',
         'user_id',

@@ -1,7 +1,25 @@
 import { ApiClient } from '@/lib/apiClient';
-import { Link, useLoaderData } from 'react-router-dom';
+import { authManager } from '@/lib/auth';
+import { Link, redirect, useLoaderData } from 'react-router-dom';
 
 export async function activeGamesLoader() {
+    let user = authManager.getUser();
+    let token = authManager.getToken();
+
+    // Try to restore from session if no local token
+    if (!user || !token) {
+        const result = await ApiClient.fetchSessionToken();
+        if (result._tag === 'Success') {
+            authManager.setAuthData(result.data.token, result.data.user);
+            user = result.data.user;
+            token = result.data.token;
+        }
+    }
+
+    if (!user || !token) {
+        return redirect('/login');
+    }
+
     const result = await ApiClient.listActiveGames();
     if (result._tag === 'Success') {
         return result.data;

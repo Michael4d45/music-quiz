@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Events\TestRealtimeEvent;
 use App\Models\User;
-use Illuminate\Support\Facades\Event;
 
 beforeEach(function () {
     setup_log_capture('realtime.log');
