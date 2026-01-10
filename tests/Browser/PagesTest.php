@@ -120,6 +120,24 @@ it('statistics page loads without JS errors', function (): void {
     visit('/statistics')->assertNoJavaScriptErrors();
 });
 
+it('create playlist page loads without JS errors', function (): void {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    visit('/playlists/create')->assertNoJavaScriptErrors();
+});
+
+it('create music track page loads without JS errors', function (): void {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    visit('/music-tracks/create')->assertNoJavaScriptErrors();
+});
+
+it('create quiz question page loads without JS errors', function (): void {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+    visit('/quiz-questions/create')->assertNoJavaScriptErrors();
+});
+
 it('browse tracks page loads without JS errors', function (): void {
     visit('/browse/tracks')->assertNoJavaScriptErrors();
 });
@@ -142,22 +160,58 @@ it('can navigate through all sidebar menu items without 404 errors', function ()
     $page = visit('/')->assertNoJavaScriptErrors();
 
     // Test Browse section
-    $page->click('Browse')->waitForText('Browse', 5)->assertNoJavaScriptErrors();
-    $page->click('Categories')->waitForText('Categories', 5)->assertNoJavaScriptErrors();
-    $page->click('Tracks')->waitForText('Browse Tracks', 5)->assertNoJavaScriptErrors();
-    $page->click('Public Playlists')->waitForText('Public Playlists', 5)->assertNoJavaScriptErrors();
+    $page
+        ->click('Browse')
+        ->waitForText('Browse', 5)
+        ->assertNoJavaScriptErrors();
+    $page
+        ->click('Categories')
+        ->waitForText('Categories', 5)
+        ->assertNoJavaScriptErrors();
+    $page
+        ->click('Tracks')
+        ->waitForText('Browse Tracks', 5)
+        ->assertNoJavaScriptErrors();
+    $page
+        ->click('Public Playlists')
+        ->waitForText('Public Playlists', 5)
+        ->assertNoJavaScriptErrors();
 
     // Test Games section
-    $page->click('Active Games')->waitForText('Active Games', 5)->assertNoJavaScriptErrors();
-    $page->click('Create Game')->waitForText('Create New Game', 5)->assertNoJavaScriptErrors();
-    $page->click('Join Game')->waitForText('Join a Game', 5)->assertNoJavaScriptErrors();
+    $page
+        ->click('Active Games')
+        ->waitForText('Active Games', 5)
+        ->assertNoJavaScriptErrors();
+    $page
+        ->click('Create Game')
+        ->waitForText('Create New Game', 5)
+        ->assertNoJavaScriptErrors();
+    $page
+        ->click('Join Game')
+        ->waitForText('Join a Game', 5)
+        ->assertNoJavaScriptErrors();
 
     // Test Playlists section
-    $page->click('My Playlists')->waitForText('My Playlists', 5)->assertNoJavaScriptErrors();
-    $page->click('My Music Tracks')->waitForText('My Music Tracks', 5)->assertNoJavaScriptErrors();
-    $page->click('My Quiz Questions')->waitForText('My Quiz Questions', 5)->assertNoJavaScriptErrors();
+    $page
+        ->click('My Playlists')
+        ->waitForText('My Playlists', 5)
+        ->assertNoJavaScriptErrors();
+    $page
+        ->click('My Music Tracks')
+        ->waitForText('My Music Tracks', 5)
+        ->assertNoJavaScriptErrors();
+    $page
+        ->click('My Quiz Questions')
+        ->waitForText('My Quiz Questions', 5)
+        ->assertNoJavaScriptErrors();
 
     // Test Statistics section
-    $page->click('My Statistics')->waitForText('My Statistics', 5)->assertNoJavaScriptErrors();
-    $page->click('Leaderboard')->waitForText('Leaderboard', 5)->assertNoJavaScriptErrors();
+    $page
+        ->click('My Statistics')
+        ->waitForText('My Statistics', 5)
+        ->assertNoJavaScriptErrors();
+    $page
+        ->click('Leaderboard')
+        ->waitForText('Leaderboard', 5)
+        ->assertNoJavaScriptErrors();
 });

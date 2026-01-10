@@ -20,6 +20,18 @@ Route::prefix('browse')->group(function () {
 // Leaderboard (public)
 Route::get('leaderboard', \App\Actions\Statistics\ShowLeaderboard::class);
 
+// Subcategories (public)
+Route::get('sub-categories', \App\Actions\SubCategories\ShowSubCategories::class);
+
+// Music sources (public)
+Route::get('music-sources', \App\Actions\MusicSources\ShowMusicSources::class);
+
+// Quiz modes (public)
+Route::get('quiz-modes', \App\Actions\QuizModes\ShowQuizModes::class);
+
+// Scoring rules (public)
+Route::get('scoring-rules', \App\Actions\ScoringRules\ShowScoringRules::class);
+
 // Authenticated routes
 Route::middleware('auth:sanctum')->group(function () {
     // Playlists endpoints
@@ -28,12 +40,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', \App\Actions\Playlists\CreatePlaylist::class);
         Route::get('/{id}', \App\Actions\Playlists\ShowPlaylist::class);
         Route::put('/{id}', \App\Actions\Playlists\UpdatePlaylist::class);
+        Route::get('user/list', \App\Actions\Playlists\ShowUserPlaylists::class);
     });
 
     // Music tracks endpoints
     Route::prefix('music-tracks')->group(function () {
         Route::get('/', \App\Actions\MusicTracks\ShowMusicTracks::class);
         Route::post('/', \App\Actions\MusicTracks\CreateMusicTrack::class);
+        Route::get('user', \App\Actions\MusicTracks\ShowUserMusicTracks::class);
     });
 
     // Quiz questions endpoints

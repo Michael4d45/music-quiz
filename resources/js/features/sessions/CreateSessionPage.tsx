@@ -1,6 +1,6 @@
 import { ApiClient } from '@/lib/apiClient';
 import { authManager } from '@/lib/auth';
-import { redirect, useNavigate } from 'react-router-dom';
+import { redirect, useNavigate, useLoaderData } from 'react-router-dom';
 import { useState } from 'react';
 import { CreateSessionRequestSchema } from '@/types/effect-schemas';
 
@@ -22,30 +22,50 @@ export async function createSessionLoader() {
         return redirect('/login');
     }
 
-    // In a real app, you'd fetch available quiz modes, scoring rules, and playlists
-    return {};
+    // Fetch available quiz modes, scoring rules, and user playlists
+    try {
+        const [quizModesResult, scoringRulesResult, playlistsResult] = await Promise.all([
+            ApiClient.showQuizModes(),
+            ApiClient.showScoringRules(),
+            ApiClient.showUserPlaylists(),
+        ]);
+
+        return {
+            quizModes: quizModesResult._tag === 'Success' ? quizModesResult.data.quiz_modes : [],
+            scoringRules: scoringRulesResult._tag === 'Success' ? scoringRulesResult.data.scoring_rules : [],
+            playlists: playlistsResult._tag === 'Success' ? playlistsResult.data.playlists : [],
+        };
+    } catch (error) {
+        console.error('Error loading session data:', error);
+        return {
+            quizModes: [],
+            scoringRules: [],
+            playlists: [],
+        };
+    }
 }
 
 export function CreateSessionPage() {
     const navigate = useNavigate();
+    const loaderData = useLoaderData();
     const [isCreating, setIsCreating] = useState(false);
-    const [formData, setFormData] = useState({
-        quiz_mode_id: '',
-        scoring_rule_id: '',
-        playlist_id: '',
-        max_players: 10,
-    });
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const quizModes = loaderData?.quizModes || [];
+    const scoringRules = loaderData?.scoringRules || [];
+    const playlists = loaderData?.playlists || [];
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         setIsCreating(true);
         try {
+            const formData = new FormData(e.currentTarget);
+
             const payload = {
-                quiz_mode_id: formData.quiz_mode_id || 'default-quiz-mode-id', // Would be dynamic
-                scoring_rule_id: formData.scoring_rule_id || 'default-scoring-rule-id', // Would be dynamic
-                playlist_id: formData.playlist_id || null,
-                max_players: formData.max_players,
+                quiz_mode_id: formData.get('quiz_mode_id') as string,
+                scoring_rule_id: formData.get('scoring_rule_id') as string,
+                playlist_id: formData.get('playlist_id') as string || null,
+                max_players: parseInt(formData.get('max_players') as string) || 10,
             };
 
             const result = await ApiClient.createSession(payload);
@@ -75,12 +95,50 @@ export function CreateSessionPage() {
                         <input
                             type="number"
                             id="max_players"
+                            name="max_players"
                             min="1"
                             max="50"
-                            value={formData.max_players}
-                            onChange={(e) => setFormData(prev => ({ ...prev, max_players: parseInt(e.target.value) }))}
+                            defaultValue={10}
                             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
                         />
+                    </div>
+
+                    <div className="mb-6">
+                        <label htmlFor="quiz_mode_id" className="block text-sm font-medium mb-2">
+                            Quiz Mode *
+                        </label>
+                        <select
+                            id="quiz_mode_id"
+                            name="quiz_mode_id"
+                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                            required
+                        >
+                            <option value="">Select a quiz mode</option>
+                            {quizModes.map((mode: any) => (
+                                <option key={mode.id} value={mode.id}>
+                                    {mode.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="mb-6">
+                        <label htmlFor="scoring_rule_id" className="block text-sm font-medium mb-2">
+                            Scoring Rule *
+                        </label>
+                        <select
+                            id="scoring_rule_id"
+                            name="scoring_rule_id"
+                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                            required
+                        >
+                            <option value="">Select a scoring rule</option>
+                            {scoringRules.map((rule: any) => (
+                                <option key={rule.id} value={rule.id}>
+                                    {rule.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="mb-6">
@@ -89,12 +147,15 @@ export function CreateSessionPage() {
                         </label>
                         <select
                             id="playlist_id"
-                            value={formData.playlist_id}
-                            onChange={(e) => setFormData(prev => ({ ...prev, playlist_id: e.target.value }))}
+                            name="playlist_id"
                             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
                         >
                             <option value="">No playlist</option>
-                            {/* Would populate with user's playlists */}
+                            {playlists.map((playlist: any) => (
+                                <option key={playlist.id} value={playlist.id}>
+                                    {playlist.name}
+                                </option>
+                            ))}
                         </select>
                     </div>
 

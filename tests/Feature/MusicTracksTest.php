@@ -88,3 +88,23 @@ it('returns unauthorized when not authenticated', function () {
 
     $response->assertUnauthorized();
 });
+
+it('returns user music tracks for quiz questions', function () {
+    $user = User::factory()->create();
+    $token = $user->createToken('test-token')->plainTextToken;
+
+    $track = MusicTrack::factory()->create(['user_id' => $user->id]);
+
+    $response = $this->withToken($token)->getJson('/api/music-tracks/user');
+
+    $response->assertSuccessful()->assertJsonStructure([
+        'tracks' => [
+            '*' => [
+                'id',
+                'title',
+                'artist_name',
+                'user_id'
+            ]
+        ]
+    ]);
+});

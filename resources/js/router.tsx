@@ -24,13 +24,25 @@ import {
     playlistsLoader,
 } from './features/playlists/PlaylistsPage';
 import {
+    CreatePlaylistPage,
+    createPlaylistLoader,
+} from './features/playlists/CreatePlaylistPage';
+import {
     MusicTracksPage,
     musicTracksLoader,
 } from './features/music-tracks/MusicTracksPage';
 import {
+    CreateMusicTrackPage,
+    createMusicTrackLoader,
+} from './features/music-tracks/CreateMusicTrackPage';
+import {
     QuizQuestionsPage,
     quizQuestionsLoader,
 } from './features/quiz-questions/QuizQuestionsPage';
+import {
+    CreateQuizQuestionPage,
+    createQuizQuestionLoader,
+} from './features/quiz-questions/CreateQuizQuestionPage';
 import { ProfilePage, profileLoader } from './features/profile/ProfilePage';
 import {
     ActiveGamesPage,
@@ -120,6 +132,12 @@ export const router = createBrowserRouter([
                 loader: playlistsLoader,
                 errorElement: <ErrorPage />,
             },
+            {
+                path: 'playlists/create',
+                element: <CreatePlaylistPage />,
+                loader: createPlaylistLoader,
+                errorElement: <ErrorPage />,
+            },
             // Music tracks routes
             {
                 path: 'music-tracks',
@@ -127,11 +145,23 @@ export const router = createBrowserRouter([
                 loader: musicTracksLoader,
                 errorElement: <ErrorPage />,
             },
+            {
+                path: 'music-tracks/create',
+                element: <CreateMusicTrackPage />,
+                loader: createMusicTrackLoader,
+                errorElement: <ErrorPage />,
+            },
             // Quiz questions routes
             {
                 path: 'quiz-questions',
                 element: <QuizQuestionsPage />,
                 loader: quizQuestionsLoader,
+                errorElement: <ErrorPage />,
+            },
+            {
+                path: 'quiz-questions/create',
+                element: <CreateQuizQuestionPage />,
+                loader: createQuizQuestionLoader,
                 errorElement: <ErrorPage />,
             },
             // Sessions routes

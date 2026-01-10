@@ -128,3 +128,22 @@ it('returns unauthorized when not authenticated', function () {
 
     $response->assertUnauthorized();
 });
+
+it('returns user playlists for session creation', function () {
+    $user = User::factory()->create();
+    $token = $user->createToken('test-token')->plainTextToken;
+
+    $playlist = Playlist::factory()->create(['user_id' => $user->id]);
+
+    $response = $this->withToken($token)->getJson('/api/playlists/user/list');
+
+    $response->assertSuccessful()->assertJsonStructure([
+        'playlists' => [
+            '*' => [
+                'id',
+                'name',
+                'user_id'
+            ]
+        ]
+    ]);
+});

@@ -174,6 +174,40 @@ const browseGroup = HttpApiGroup.make('browse')
         ),
     );
 
+// Subcategories and music sources (public)
+const subCategoriesGroup = HttpApiGroup.make('subCategories').add(
+    HttpApiEndpoint.get('index', '/api/sub-categories').addSuccess(
+        Schema.Struct({
+            sub_categories: Schema.Array(Schema.Any),
+        }),
+    ),
+);
+
+const musicSourcesGroup = HttpApiGroup.make('musicSources').add(
+    HttpApiEndpoint.get('index', '/api/music-sources').addSuccess(
+        Schema.Struct({
+            music_sources: Schema.Array(Schema.Any),
+        }),
+    ),
+);
+
+// Quiz modes and scoring rules (public)
+const quizModesGroup = HttpApiGroup.make('quizModes').add(
+    HttpApiEndpoint.get('index', '/api/quiz-modes').addSuccess(
+        Schema.Struct({
+            quiz_modes: Schema.Array(Schema.Any),
+        }),
+    ),
+);
+
+const scoringRulesGroup = HttpApiGroup.make('scoringRules').add(
+    HttpApiEndpoint.get('index', '/api/scoring-rules').addSuccess(
+        Schema.Struct({
+            scoring_rules: Schema.Array(Schema.Any),
+        }),
+    ),
+);
+
 // Leaderboard (public)
 const leaderboardGroup = HttpApiGroup.make('leaderboard').add(
     HttpApiEndpoint.get('show', '/api/leaderboard').addSuccess(
@@ -203,6 +237,13 @@ const playlistsGroup = HttpApiGroup.make('playlists')
             .setPath(Schema.Struct({ id: Schema.String }))
             .setPayload(CreatePlaylistRequestSchema)
             .addSuccess(PlaylistResponseSchema),
+    )
+    .add(
+        HttpApiEndpoint.get('userPlaylists', '/api/playlists/user/list').addSuccess(
+            Schema.Struct({
+                playlists: Schema.Array(Schema.Any),
+            }),
+        ),
     );
 
 // Music Tracks endpoints (authenticated)
@@ -216,6 +257,13 @@ const musicTracksGroup = HttpApiGroup.make('musicTracks')
         HttpApiEndpoint.post('create', '/api/music-tracks')
             .setPayload(CreateMusicTrackRequestSchema)
             .addSuccess(MusicTrackResponseSchema),
+    )
+    .add(
+        HttpApiEndpoint.get('userTracks', '/api/music-tracks/user').addSuccess(
+            Schema.Struct({
+                tracks: Schema.Array(Schema.Any),
+            }),
+        ),
     );
 
 // Quiz Questions endpoints (authenticated)
@@ -294,6 +342,10 @@ export const Api = HttpApi.make('BackendApi')
     .add(contentGroup)
     .add(homeGroup)
     .add(browseGroup)
+    .add(subCategoriesGroup)
+    .add(musicSourcesGroup)
+    .add(quizModesGroup)
+    .add(scoringRulesGroup)
     .add(leaderboardGroup)
     .add(playlistsGroup)
     .add(musicTracksGroup)
@@ -686,6 +738,29 @@ class ApiClientSingleton {
     }
 
     /* ==========================================================================
+     * Public Data API Methods
+     * ========================================================================== */
+    async showSubCategories() {
+        const client = await this.getBaseClient();
+        return this.runEffect(client.subCategories.index(), 'showSubCategories');
+    }
+
+    async showMusicSources() {
+        const client = await this.getBaseClient();
+        return this.runEffect(client.musicSources.index(), 'showMusicSources');
+    }
+
+    async showQuizModes() {
+        const client = await this.getBaseClient();
+        return this.runEffect(client.quizModes.index(), 'showQuizModes');
+    }
+
+    async showScoringRules() {
+        const client = await this.getBaseClient();
+        return this.runEffect(client.scoringRules.index(), 'showScoringRules');
+    }
+
+    /* ==========================================================================
      * Playlists API Methods (Authenticated)
      * ========================================================================== */
     async listPlaylists() {
@@ -756,6 +831,19 @@ class ApiClientSingleton {
             client.quizQuestions.create({ payload }),
             'createQuizQuestion',
         );
+    }
+
+    /* ==========================================================================
+     * User Data API Methods (Authenticated)
+     * ========================================================================== */
+    async showUserMusicTracks() {
+        const client = await this.getBaseAuthClient();
+        return this.runEffect(client.musicTracks.userTracks(), 'showUserMusicTracks');
+    }
+
+    async showUserPlaylists() {
+        const client = await this.getBaseAuthClient();
+        return this.runEffect(client.playlists.userPlaylists(), 'showUserPlaylists');
     }
 
     /* ==========================================================================

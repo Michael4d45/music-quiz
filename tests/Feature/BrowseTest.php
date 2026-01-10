@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Models\Category;
+use App\Models\MusicSource;
 use App\Models\MusicTrack;
 use App\Models\Playlist;
 use App\Models\SubCategory;
@@ -115,4 +116,34 @@ it('returns 404 for non-existent track', function () {
     $response = $this->getJson('/api/browse/tracks/99999');
 
     $response->assertNotFound();
+});
+
+it('returns subcategories', function () {
+    $subCategory = SubCategory::factory()->create();
+
+    $response = $this->getJson('/api/sub-categories');
+
+    $response->assertSuccessful()->assertJsonStructure([
+        'sub_categories' => [
+            '*' => [
+                'id',
+                'name'
+            ]
+        ]
+    ]);
+});
+
+it('returns music sources', function () {
+    $musicSource = MusicSource::factory()->create();
+
+    $response = $this->getJson('/api/music-sources');
+
+    $response->assertSuccessful()->assertJsonStructure([
+        'music_sources' => [
+            '*' => [
+                'id',
+                'name'
+            ]
+        ]
+    ]);
 });

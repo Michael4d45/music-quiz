@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Models\MusicTrack;
+use App\Models\QuizMode;
+use App\Models\ScoringRule;
 use App\Models\User;
 use App\Enums\QuestionType;
 
@@ -79,4 +81,34 @@ it('returns unauthorized when not authenticated', function () {
     $response = $this->getJson('/api/quiz-questions');
 
     $response->assertUnauthorized();
+});
+
+it('returns quiz modes', function () {
+    $quizMode = QuizMode::factory()->create();
+
+    $response = $this->getJson('/api/quiz-modes');
+
+    $response->assertSuccessful()->assertJsonStructure([
+        'quiz_modes' => [
+            '*' => [
+                'id',
+                'name'
+            ]
+        ]
+    ]);
+});
+
+it('returns scoring rules', function () {
+    $scoringRule = ScoringRule::factory()->create();
+
+    $response = $this->getJson('/api/scoring-rules');
+
+    $response->assertSuccessful()->assertJsonStructure([
+        'scoring_rules' => [
+            '*' => [
+                'id',
+                'name'
+            ]
+        ]
+    ]);
 });
