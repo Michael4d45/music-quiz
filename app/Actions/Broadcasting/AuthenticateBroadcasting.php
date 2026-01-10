@@ -17,17 +17,16 @@ class AuthenticateBroadcasting
     /**
      * Authenticate a broadcasting channel and track the connection
      */
-    public function __invoke(Request $request): JsonResponse
-    {
-        // Validate request data
-        $data = AuthenticateBroadcastingRequest::from($request->only([
-            'socket_id',
-            'channel_name',
-        ]));
-
+    public function __invoke(
+        AuthenticateBroadcastingRequest $data,
+        Request $request,
+    ): JsonResponse {
         $user = Auth::user();
         if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json([
+                '_tag' => 'AuthenticationError',
+                'message' => 'Unauthorized',
+            ], 401);
         }
 
         // Authenticate the channel

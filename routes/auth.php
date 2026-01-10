@@ -16,7 +16,10 @@ use App\Actions\Auth\VerifyEmail;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 
-Route::get('user', ShowUser::class)->middleware('api.auth')->name('api.user');
+Route::get('user', ShowUser::class)->middleware([
+    'api.auth',
+    'auth:sanctum',
+])->name('api.user');
 
 // Create token for already authenticated user (used for OAuth callbacks and session auth)
 // Needs web middleware to access session (e.g., when logging in via Filament)
