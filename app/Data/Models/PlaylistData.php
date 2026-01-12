@@ -16,18 +16,18 @@ class PlaylistData extends Data
         public string $id,
         public string $user_id,
         public string $name,
-        public string|null $description,
+        public ?string $description,
         public bool $is_public,
         public int $play_count,
-        public Carbon|null $created_at,
-        public Carbon|null $updated_at,
-        /** @var UserData $user */
+        public ?Carbon $created_at,
+        public ?Carbon $updated_at,
+        /** @var UserData|Lazy $user */
         #[AutoWhenLoadedLazy]
         public Lazy|UserData $user,
-        /** @var Collection<array-key,PlaylistItemData> $items */
+        /** @var Collection<array-key,PlaylistItemData>|Lazy $items */
         #[AutoWhenLoadedLazy]
         public Collection|Lazy $items,
-        /** @var Collection<array-key,GameSessionData> $game_sessions */
+        /** @var Collection<array-key,GameSessionData>|Lazy $game_sessions */
         #[AutoWhenLoadedLazy('gameSessions')]
         public Collection|Lazy $game_sessions,
     ) {}

@@ -16,11 +16,11 @@ class MultipleChoiceOptionData extends Data
         public string $question_id,
         public string $option_text,
         public bool $is_correct,
-        public int|null $sort_order,
-        /** @var QuizQuestionData $question */
+        public ?int $sort_order,
+        /** @var QuizQuestionData|Lazy $question */
         #[AutoWhenLoadedLazy]
         public Lazy|QuizQuestionData $question,
-        /** @var Collection<array-key,PlayerAnswerData> $player_answers */
+        /** @var Collection<array-key,PlayerAnswerData>|Lazy $player_answers */
         #[AutoWhenLoadedLazy('playerAnswers')]
         public Collection|Lazy $player_answers,
     ) {}

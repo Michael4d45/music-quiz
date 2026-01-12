@@ -1,7 +1,7 @@
 import { ApiClient } from '@/lib/apiClient';
 import { authManager } from '@/lib/auth';
 import { redirect, useLoaderData } from 'react-router-dom';
-import { StatisticsResponse } from '@/types/effect-schemas';
+import { StatisticsResponse } from '@/schemas/App/Data/Response';
 
 export async function statisticsLoader() {
     let user = authManager.getUser();

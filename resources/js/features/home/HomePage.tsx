@@ -1,7 +1,7 @@
 import { RealtimeNotifications } from '@/components/realtime/RealtimeNotifications';
 import { useAuth } from '@/contexts/AuthContext';
 import { ApiClient } from '@/lib/apiClient';
-import { HomeResponse } from '@/types/effect-schemas';
+import { HomeResponse } from '@/schemas/App/Data/Response';
 import { Link, useLoaderData } from 'react-router-dom';
 
 export async function homeLoader() {

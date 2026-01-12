@@ -2,7 +2,7 @@ import { ApiClient } from '@/lib/apiClient';
 import { authManager } from '@/lib/auth';
 import { redirect, useNavigate, useLoaderData } from 'react-router-dom';
 import { useState } from 'react';
-import { CreateSessionRequestSchema } from '@/types/effect-schemas';
+import { CreateSessionRequestSchema } from '@/schemas/App/Data/Requests';
 
 export async function createSessionLoader() {
     let user = authManager.getUser();

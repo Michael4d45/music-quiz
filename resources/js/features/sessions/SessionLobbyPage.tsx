@@ -1,7 +1,7 @@
 import { ApiClient } from '@/lib/apiClient';
 import { authManager } from '@/lib/auth';
 import { useLoaderData, useParams, useNavigate } from 'react-router-dom';
-import { SessionLobbyResponse } from '@/types/effect-schemas';
+import { SessionLobbyResponse } from '@/schemas/App/Data/Response';
 import { useEffect, useState } from 'react';
 
 export async function sessionLobbyLoader({ params }: any) {

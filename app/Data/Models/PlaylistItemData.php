@@ -17,10 +17,10 @@ class PlaylistItemData extends Data
         public string $question_id,
         public int $sort_order,
         public Carbon $added_at,
-        /** @var PlaylistData $playlist */
+        /** @var PlaylistData|Lazy $playlist */
         #[AutoWhenLoadedLazy]
         public Lazy|PlaylistData $playlist,
-        /** @var QuizQuestionData $question */
+        /** @var QuizQuestionData|Lazy $question */
         #[AutoWhenLoadedLazy]
         public Lazy|QuizQuestionData $question,
     ) {}

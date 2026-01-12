@@ -1,6 +1,6 @@
 import { ApiClient } from '@/lib/apiClient';
 import { Link, useLoaderData } from 'react-router-dom';
-import { PlaylistsResponse } from '@/types/effect-schemas';
+import { PlaylistsResponse } from '@/schemas/App/Data/Response';
 
 export async function publicPlaylistsLoader() {
     const result = await ApiClient.showPublicPlaylists();

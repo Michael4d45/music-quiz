@@ -1,7 +1,7 @@
 import { ApiClient } from '@/lib/apiClient';
 import { authManager } from '@/lib/auth';
 import { redirect, useLoaderData, useParams, Link } from 'react-router-dom';
-import { PlaylistResponse } from '@/types/effect-schemas';
+import { PlaylistResponse } from '@/schemas/App/Data/Response';
 
 export async function playlistDetailLoader({ params }: any) {
     let user = authManager.getUser();
@@ -71,24 +71,24 @@ export function PlaylistDetailPage() {
                                                 Question {index + 1}
                                             </span>
                                             <span className="bg-muted text-xs px-2 py-1 rounded">
-                                                {(item.question as any).question_type}
+                                                {(item.question).question_type}
                                             </span>
                                             <span className="bg-muted text-xs px-2 py-1 rounded">
-                                                {(item.question as any).base_points} points
+                                                {(item.question).base_points} points
                                             </span>
                                         </div>
 
-                                        {(item.question as any).prompt_text && (
-                                            <p className="text-sm mb-2">{(item.question as any).prompt_text}</p>
+                                        {(item.question).prompt_text && (
+                                            <p className="text-sm mb-2">{(item.question).prompt_text}</p>
                                         )}
 
                                         <p className="font-medium">
-                                            Answer: {(item.question as any).correct_answer}
+                                            Answer: {(item.question).correct_answer}
                                         </p>
 
-                                        {(item.question as any).track && (
+                                        {(item.question).track && (
                                             <p className="text-sm text-muted mt-2">
-                                                From: {(item.question as any).track.title} by {(item.question as any).track.artist_name}
+                                                From: {(item.question).track.title} by {(item.question).track.artist_name}
                                             </p>
                                         )}
                                     </div>

@@ -15,16 +15,16 @@ class SessionEventData extends Data
     public function __construct(
         public string $id,
         public string $session_id,
-        public EventType|null $event_type,
-        public string|null $participant_id,
+        public ?EventType $event_type,
+        public ?string $participant_id,
         /** @var array<string, mixed>|null $payload */
-        public array|null $payload,
-        public Carbon|null $created_at,
-        public Carbon|null $updated_at,
-        /** @var GameSessionData $session */
+        public ?array $payload,
+        public ?Carbon $created_at,
+        public ?Carbon $updated_at,
+        /** @var GameSessionData|Lazy $session */
         #[AutoWhenLoadedLazy]
         public GameSessionData|Lazy $session,
-        /** @var SessionParticipantData|null $participant */
+        /** @var SessionParticipantData|null|Lazy $participant */
         #[AutoWhenLoadedLazy]
         public Lazy|SessionParticipantData|null $participant,
     ) {}

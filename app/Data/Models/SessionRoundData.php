@@ -17,19 +17,19 @@ class SessionRoundData extends Data
         public string $session_id,
         public int $round_number,
         public string $question_id,
-        public Carbon|null $started_at,
-        public Carbon|null $ended_at,
-        public string|null $first_buzzer_id,
-        /** @var GameSessionData $session */
+        public ?Carbon $started_at,
+        public ?Carbon $ended_at,
+        public ?string $first_buzzer_id,
+        /** @var GameSessionData|Lazy $session */
         #[AutoWhenLoadedLazy]
         public GameSessionData|Lazy $session,
-        /** @var QuizQuestionData $question */
+        /** @var QuizQuestionData|Lazy $question */
         #[AutoWhenLoadedLazy]
         public Lazy|QuizQuestionData $question,
-        /** @var SessionParticipantData|null $first_buzzer */
+        /** @var SessionParticipantData|null|Lazy $first_buzzer */
         #[AutoWhenLoadedLazy('firstBuzzer')]
         public Lazy|SessionParticipantData|null $first_buzzer,
-        /** @var Collection<array-key,PlayerAnswerData> $answers */
+        /** @var Collection<array-key,PlayerAnswerData>|Lazy $answers */
         #[AutoWhenLoadedLazy]
         public Collection|Lazy $answers,
     ) {}

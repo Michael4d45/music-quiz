@@ -17,15 +17,15 @@ class UserStatisticData extends Data
         public int $total_games_played,
         public int $total_wins,
         public int $total_points,
-        public float|null $average_score,
+        public ?float $average_score,
         public int $best_streak,
-        public string|null $favorite_category_id,
-        public Carbon|null $created_at,
-        public Carbon|null $updated_at,
-        /** @var UserData $user */
+        public ?string $favorite_category_id,
+        public ?Carbon $created_at,
+        public ?Carbon $updated_at,
+        /** @var UserData|Lazy $user */
         #[AutoWhenLoadedLazy]
         public Lazy|UserData $user,
-        /** @var CategoryData|null $favorite_category */
+        /** @var CategoryData|null|Lazy $favorite_category */
         #[AutoWhenLoadedLazy('favoriteCategory')]
         public CategoryData|Lazy|null $favorite_category,
     ) {}

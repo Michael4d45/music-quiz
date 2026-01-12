@@ -16,14 +16,14 @@ class SubCategoryData extends Data
         public string $id,
         public string $category_id,
         public string $name,
-        public string|null $description,
+        public ?string $description,
         public int $sort_order,
-        public Carbon|null $created_at,
-        public Carbon|null $updated_at,
-        /** @var CategoryData $category */
+        public ?Carbon $created_at,
+        public ?Carbon $updated_at,
+        /** @var CategoryData|Lazy $category */
         #[AutoWhenLoadedLazy]
         public CategoryData|Lazy $category,
-        /** @var Collection<array-key,MusicTrackData> $music_tracks */
+        /** @var Collection<array-key,MusicTrackData>|Lazy $music_tracks */
         #[AutoWhenLoadedLazy('musicTracks')]
         public Collection|Lazy $music_tracks,
     ) {}

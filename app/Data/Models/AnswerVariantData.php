@@ -14,11 +14,11 @@ class AnswerVariantData extends Data
     public function __construct(
         public string $id,
         public string $question_id,
-        public string|null $accepted_text,
-        /** @var QuizQuestionData $question */
+        public null|string $accepted_text,
+        /** @var QuizQuestionData|Lazy $question */
         #[AutoWhenLoadedLazy]
         public Lazy|QuizQuestionData $question,
-        /** @var Collection<array-key,PlayerAnswerData> $player_answers */
+        /** @var Collection<array-key,PlayerAnswerData>|Lazy $player_answers */
         #[AutoWhenLoadedLazy('playerAnswers')]
         public Collection|Lazy $player_answers,
     ) {}

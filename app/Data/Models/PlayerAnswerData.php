@@ -15,25 +15,25 @@ class PlayerAnswerData extends Data
         public string $id,
         public string $round_id,
         public string $participant_id,
-        public string|null $submitted_text,
-        public string|null $selected_option_id,
-        public string|null $matched_variant_id,
+        public ?string $submitted_text,
+        public ?string $selected_option_id,
+        public ?string $matched_variant_id,
         public bool $is_correct,
-        public int|null $response_time_ms,
-        public int|null $points_awarded,
+        public ?int $response_time_ms,
+        public ?int $points_awarded,
         public bool $host_override,
-        public Carbon|null $created_at,
-        public Carbon|null $updated_at,
-        /** @var SessionRoundData $round */
+        public ?Carbon $created_at,
+        public ?Carbon $updated_at,
+        /** @var SessionRoundData|Lazy $round */
         #[AutoWhenLoadedLazy]
         public Lazy|SessionRoundData $round,
-        /** @var SessionParticipantData $participant */
+        /** @var SessionParticipantData|Lazy $participant */
         #[AutoWhenLoadedLazy]
         public Lazy|SessionParticipantData $participant,
-        /** @var MultipleChoiceOptionData|null $selected_option */
+        /** @var MultipleChoiceOptionData|null|Lazy $selected_option */
         #[AutoWhenLoadedLazy('selectedOption')]
         public Lazy|MultipleChoiceOptionData|null $selected_option,
-        /** @var AnswerVariantData|null $matched_variant */
+        /** @var AnswerVariantData|null|Lazy $matched_variant */
         #[AutoWhenLoadedLazy('matchedVariant')]
         public AnswerVariantData|Lazy|null $matched_variant,
     ) {}

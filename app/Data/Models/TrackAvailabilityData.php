@@ -14,10 +14,10 @@ class TrackAvailabilityData extends Data
     public function __construct(
         public string $id,
         public string $track_source_link_id,
-        public string|null $country_code,
+        public ?string $country_code,
         public bool $is_available,
-        public Carbon|null $last_checked_at,
-        /** @var TrackSourceLinkData $track_source_link */
+        public ?Carbon $last_checked_at,
+        /** @var TrackSourceLinkData|Lazy $track_source_link */
         #[AutoWhenLoadedLazy('trackSourceLink')]
         public Lazy|TrackSourceLinkData $track_source_link,
     ) {}

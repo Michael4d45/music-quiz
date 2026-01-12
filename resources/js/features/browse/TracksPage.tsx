@@ -1,6 +1,6 @@
 import { ApiClient } from '@/lib/apiClient';
 import { Link, useLoaderData } from 'react-router-dom';
-import { TracksResponse } from '@/types/effect-schemas';
+import { TracksResponse } from '@/schemas/App/Data/Response';
 
 export async function tracksLoader() {
     const result = await ApiClient.showTracks();

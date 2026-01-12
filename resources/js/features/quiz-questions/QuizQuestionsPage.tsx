@@ -1,7 +1,7 @@
 import { ApiClient } from '@/lib/apiClient';
 import { authManager } from '@/lib/auth';
 import { Link, redirect, useLoaderData } from 'react-router-dom';
-import { QuizQuestionsResponse } from '@/types/effect-schemas';
+import { QuizQuestionsResponse } from '@/schemas/App/Data/Response';
 
 export async function quizQuestionsLoader() {
     let user = authManager.getUser();

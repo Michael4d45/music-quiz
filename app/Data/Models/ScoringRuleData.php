@@ -14,15 +14,15 @@ class ScoringRuleData extends Data
 {
     public function __construct(
         public string $id,
-        public string|null $name,
+        public ?string $name,
         public int $base_points,
-        public float|null $decay_factor,
-        public int|null $max_time_ms,
+        public ?float $decay_factor,
+        public ?int $max_time_ms,
         public bool $streak_bonus_enabled,
         public float $streak_multiplier,
-        public Carbon|null $created_at,
-        public Carbon|null $updated_at,
-        /** @var Collection<array-key,GameSessionData> $game_sessions */
+        public ?Carbon $created_at,
+        public ?Carbon $updated_at,
+        /** @var Collection<array-key,GameSessionData>|Lazy $game_sessions */
         #[AutoWhenLoadedLazy('gameSessions')]
         public Collection|Lazy $game_sessions,
     ) {}

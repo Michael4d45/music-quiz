@@ -2,7 +2,7 @@ import { ApiClient } from '@/lib/apiClient';
 import { authManager } from '@/lib/auth';
 import { redirect, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { CreateMusicTrackRequestSchema } from '@/types/effect-schemas';
+import { CreateMusicTrackRequestSchema } from '@/schemas/App/Data/Requests';
 import SearchSelect from '@/components/Select/SearchSelect';
 
 export async function createMusicTrackLoader() {

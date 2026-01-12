@@ -16,34 +16,34 @@ class QuizQuestionData extends Data
 {
     public function __construct(
         public string $id,
-        public string|null $user_id,
-        public string|null $track_id,
+        public ?string $user_id,
+        public ?string $track_id,
         public QuestionType $question_type,
-        public string|null $prompt_text,
+        public ?string $prompt_text,
         public string $correct_answer,
         public int $base_points,
-        public int|null $media_start_seconds,
-        public int|null $media_end_seconds,
+        public ?int $media_start_seconds,
+        public ?int $media_end_seconds,
         public int $difficulty_level,
         public Visibility $visibility,
-        public Carbon|null $created_at,
-        public Carbon|null $updated_at,
-        /** @var UserData|null $user */
+        public ?Carbon $created_at,
+        public ?Carbon $updated_at,
+        /** @var UserData|null|Lazy $user */
         #[AutoWhenLoadedLazy]
         public Lazy|UserData|null $user,
-        /** @var MusicTrackData|null $track */
+        /** @var MusicTrackData|null|Lazy $track */
         #[AutoWhenLoadedLazy]
         public Lazy|MusicTrackData|null $track,
-        /** @var Collection<array-key,AnswerVariantData> $answer_variants */
+        /** @var Collection<array-key,AnswerVariantData>|Lazy $answer_variants */
         #[AutoWhenLoadedLazy('answerVariants')]
         public Collection|Lazy $answer_variants,
-        /** @var Collection<array-key,MultipleChoiceOptionData> $multiple_choice_options */
+        /** @var Collection<array-key,MultipleChoiceOptionData>|Lazy $multiple_choice_options */
         #[AutoWhenLoadedLazy('multipleChoiceOptions')]
         public Collection|Lazy $multiple_choice_options,
-        /** @var Collection<array-key,SessionRoundData> $session_rounds */
+        /** @var Collection<array-key,SessionRoundData>|Lazy $session_rounds */
         #[AutoWhenLoadedLazy('sessionRounds')]
         public Collection|Lazy $session_rounds,
-        /** @var Collection<array-key,PlaylistItemData> $playlist_items */
+        /** @var Collection<array-key,PlaylistItemData>|Lazy $playlist_items */
         #[AutoWhenLoadedLazy('playlistItems')]
         public Collection|Lazy $playlist_items,
     ) {}

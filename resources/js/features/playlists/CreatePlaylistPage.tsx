@@ -2,7 +2,7 @@ import { ApiClient } from '@/lib/apiClient';
 import { authManager } from '@/lib/auth';
 import { redirect, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { CreatePlaylistRequestSchema } from '@/types/effect-schemas';
+import { CreatePlaylistRequestSchema } from '@/schemas/App/Data/Requests';
 
 export async function createPlaylistLoader() {
     let user = authManager.getUser();

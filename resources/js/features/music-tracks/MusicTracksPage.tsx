@@ -1,7 +1,7 @@
 import { ApiClient } from '@/lib/apiClient';
 import { authManager } from '@/lib/auth';
 import { Link, redirect, useLoaderData } from 'react-router-dom';
-import { MusicTracksResponse } from '@/types/effect-schemas';
+import { MusicTracksResponse } from '@/schemas/App/Data/Response';
 
 export async function musicTracksLoader() {
     let user = authManager.getUser();

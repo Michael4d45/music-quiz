@@ -4,8 +4,8 @@ import { authManager, AuthState } from '@/lib/auth';
 import {
     LoginRequest,
     RegisterRequest,
-    UserData,
-} from '@/types/effect-schemas';
+} from '@/schemas/App/Data/Requests';
+import { UserData } from '@/schemas/App/Data/Models';
 import {
     createContext,
     ReactNode,

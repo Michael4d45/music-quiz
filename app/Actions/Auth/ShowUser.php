@@ -15,6 +15,10 @@ class ShowUser
      */
     public function __invoke(AuthRequest $request): Response
     {
-        return response()->json(UserData::from($request->assertedUser()));
+        $user = $request->assertedUser();
+        $userData = UserData::from($user);
+        \Mago\inspect($userData->music_tracks);
+
+        return response()->json($userData);
     }
 }
