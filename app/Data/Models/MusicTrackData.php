@@ -14,17 +14,17 @@ class MusicTrackData extends Data
 {
     public function __construct(
         public string $id,
-        public ?string $user_id,
+        public null|string $user_id,
         public string $title,
         public string $artist_name,
-        public ?string $album_name,
-        public ?int $release_year,
-        public ?string $genre,
-        public ?int $duration_ms,
+        public null|string $album_name,
+        public null|int $release_year,
+        public null|string $genre,
+        public null|int $duration_ms,
         public string $sub_category_id,
         public string $primary_source_id,
-        public ?Carbon $created_at,
-        public ?Carbon $updated_at,
+        public null|Carbon $created_at,
+        public null|Carbon $updated_at,
         /** @var UserData|null|Lazy $user */
         #[AutoWhenLoadedLazy]
         public Lazy|UserData|null $user,

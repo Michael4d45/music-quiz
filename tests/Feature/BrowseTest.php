@@ -12,61 +12,71 @@ use App\Models\User;
 it('returns browse index data', function () {
     $response = $this->getJson('/api/browse');
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'categories',
-        'featured_playlists',
-        'recent_tracks'
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'categories',
+            'featured_playlists',
+            'recent_tracks',
+        ]);
 });
 
 it('returns categories list', function () {
     $response = $this->getJson('/api/browse/categories');
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'categories' => [
-            '*' => [
-                'id',
-                'name',
-                'description'
-            ]
-        ]
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'categories' => [
+                '*' => [
+                    'id',
+                    'name',
+                    'description',
+                ],
+            ],
+        ]);
 });
 
 it('returns category details', function () {
     $category = Category::factory()->create();
-    $subCategory = SubCategory::factory()->create(['category_id' => $category->id]);
+    $subCategory = SubCategory::factory()->create([
+        'category_id' => $category->id,
+    ]);
 
     $response = $this->getJson("/api/browse/categories/{$category->id}");
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'category' => [
-            'id',
-            'name',
-            'sub_categories' => [
-                '*' => [
-                    'id',
-                    'name'
-                ]
-            ]
-        ]
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'category' => [
+                'id',
+                'name',
+                'sub_categories' => [
+                    '*' => [
+                        'id',
+                        'name',
+                    ],
+                ],
+            ],
+        ]);
 });
 
 it('returns tracks list', function () {
     $response = $this->getJson('/api/browse/tracks');
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'tracks' => [
-            'data' => [
-                '*' => [
-                    'id',
-                    'title',
-                    'artist_name'
-                ]
-            ]
-        ]
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'tracks' => [
+                'data' => [
+                    '*' => [
+                        'id',
+                        'title',
+                        'artist_name',
+                    ],
+                ],
+            ],
+        ]);
 });
 
 it('returns track details', function () {
@@ -74,36 +84,40 @@ it('returns track details', function () {
 
     $response = $this->getJson("/api/browse/tracks/{$track->id}");
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'track' => [
-            'id',
-            'title',
-            'artist_name'
-        ]
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'track' => [
+                'id',
+                'title',
+                'artist_name',
+            ],
+        ]);
 });
 
 it('returns public playlists', function () {
     $user = User::factory()->create();
     $playlist = Playlist::factory()->create([
         'user_id' => $user->id,
-        'is_public' => true
+        'is_public' => true,
     ]);
 
     $response = $this->getJson('/api/browse/playlists');
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'playlists' => [
-            '*' => [
-                'id',
-                'name',
-                'user' => [
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'playlists' => [
+                '*' => [
                     'id',
-                    'name'
-                ]
-            ]
-        ]
-    ]);
+                    'name',
+                    'user' => [
+                        'id',
+                        'name',
+                    ],
+                ],
+            ],
+        ]);
 });
 
 it('returns 404 for non-existent category', function () {
@@ -123,14 +137,16 @@ it('returns subcategories', function () {
 
     $response = $this->getJson('/api/sub-categories');
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'sub_categories' => [
-            '*' => [
-                'id',
-                'name'
-            ]
-        ]
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'sub_categories' => [
+                '*' => [
+                    'id',
+                    'name',
+                ],
+            ],
+        ]);
 });
 
 it('returns music sources', function () {
@@ -138,12 +154,14 @@ it('returns music sources', function () {
 
     $response = $this->getJson('/api/music-sources');
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'music_sources' => [
-            '*' => [
-                'id',
-                'name'
-            ]
-        ]
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'music_sources' => [
+                '*' => [
+                    'id',
+                    'name',
+                ],
+            ],
+        ]);
 });

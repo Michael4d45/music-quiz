@@ -21,7 +21,6 @@ export function RegisterPage() {
         return validationErrors[fieldName]?.[0] || null;
     };
 
-
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -32,7 +31,9 @@ export function RegisterPage() {
 
         const formData = new FormData(e.currentTarget);
         const password = formData.get('password') as string;
-        const passwordConfirmation = formData.get('password_confirmation') as string;
+        const passwordConfirmation = formData.get(
+            'password_confirmation',
+        ) as string;
 
         // Client-side validation
         const errors: ValidationErrors = {};

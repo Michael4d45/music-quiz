@@ -16,13 +16,13 @@ class SessionParticipantData extends Data
     public function __construct(
         public string $id,
         public string $session_id,
-        public ?string $user_id,
-        public ?string $guest_name,
+        public null|string $user_id,
+        public null|string $guest_name,
         public Role $role,
         public int $current_total_score,
         public bool $is_connected,
         public Carbon $joined_at,
-        public ?Carbon $buzzed_in_at,
+        public null|Carbon $buzzed_in_at,
         /** @var GameSessionData|Lazy $session */
         #[AutoWhenLoadedLazy]
         public GameSessionData|Lazy $session,

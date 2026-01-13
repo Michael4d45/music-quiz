@@ -10,11 +10,13 @@ it('returns home data', function () {
 
     $response = $this->withToken($token)->getJson('/api/home');
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'statistic',
-        'recent_sessions',
-        'recent_playlists'
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'statistic',
+            'recent_sessions',
+            'recent_playlists',
+        ]);
 });
 
 it('returns guest home data when not authenticated', function () {

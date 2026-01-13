@@ -18,12 +18,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $user_id
  * @property string $channel_name
  * @property string|null $ip_address
- * @property array<string, string> $user_agent
+ * @property array<string, string>|null $user_agent
  * @property Carbon $connected_at
  * @property Carbon|null $disconnected_at
  * @property Carbon $created_at
  * @property Carbon $updated_at
- * @property User $user
+ * @property-read User $user
  */
 class RealtimeConnection extends Model
 {

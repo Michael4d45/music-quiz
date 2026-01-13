@@ -1,9 +1,8 @@
+import SearchSelect from '@/components/Select/SearchSelect';
 import { ApiClient } from '@/lib/apiClient';
 import { authManager } from '@/lib/auth';
+import { useEffect, useState } from 'react';
 import { redirect, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { CreateQuizQuestionRequestSchema } from '@/schemas/App/Data/Requests';
-import SearchSelect from '@/components/Select/SearchSelect';
 
 export async function createQuizQuestionLoader() {
     let user = authManager.getUser();
@@ -29,7 +28,9 @@ export async function createQuizQuestionLoader() {
 export function CreateQuizQuestionPage() {
     const navigate = useNavigate();
     const [isCreating, setIsCreating] = useState(false);
-    const [tracks, setTracks] = useState<{ value: string; label: string }[]>([]);
+    const [tracks, setTracks] = useState<{ value: string; label: string }[]>(
+        [],
+    );
     const [loading, setLoading] = useState(true);
     const [errors, setErrors] = useState<Record<string, string[]>>({});
 
@@ -39,7 +40,7 @@ export function CreateQuizQuestionPage() {
                 const result = await ApiClient.showUserMusicTracks();
 
                 if (result._tag === 'Success') {
-                    const options = result.data.tracks.map(track => ({
+                    const options = result.data.tracks.map((track) => ({
                         value: track.id.toString(),
                         label: `${track.title} - ${track.artist_name}`,
                     }));
@@ -67,12 +68,18 @@ export function CreateQuizQuestionPage() {
             const payload = {
                 question_type: formData.get('question_type') as any,
                 correct_answer: formData.get('correct_answer') as string,
-                track_id: formData.get('track_id') as string || null,
-                prompt_text: formData.get('prompt_text') as string || null,
-                base_points: parseInt(formData.get('base_points') as string) || 1000,
-                media_start_seconds: formData.get('media_start_seconds') ? parseInt(formData.get('media_start_seconds') as string) : null,
-                media_end_seconds: formData.get('media_end_seconds') ? parseInt(formData.get('media_end_seconds') as string) : null,
-                difficulty_level: parseInt(formData.get('difficulty_level') as string) || 1,
+                track_id: (formData.get('track_id') as string) || null,
+                prompt_text: (formData.get('prompt_text') as string) || null,
+                base_points:
+                    parseInt(formData.get('base_points') as string) || 1000,
+                media_start_seconds: formData.get('media_start_seconds')
+                    ? parseInt(formData.get('media_start_seconds') as string)
+                    : null,
+                media_end_seconds: formData.get('media_end_seconds')
+                    ? parseInt(formData.get('media_end_seconds') as string)
+                    : null,
+                difficulty_level:
+                    parseInt(formData.get('difficulty_level') as string) || 1,
                 visibility: formData.get('visibility') as any,
             };
 
@@ -81,9 +88,14 @@ export function CreateQuizQuestionPage() {
             if (result._tag === 'Success') {
                 navigate('/quiz-questions');
             } else if (result._tag === 'ValidationError') {
-                setErrors(Object.fromEntries(
-                    Object.entries(result.errors).map(([key, value]) => [key, [...value]])
-                ));
+                setErrors(
+                    Object.fromEntries(
+                        Object.entries(result.errors).map(([key, value]) => [
+                            key,
+                            [...value],
+                        ]),
+                    ),
+                );
             } else {
                 console.error('Failed to create quiz question:', result);
             }
@@ -105,42 +117,57 @@ export function CreateQuizQuestionPage() {
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="mx-auto max-w-2xl">
-                <h1 className="text-3xl font-bold mb-8 text-center">Create Quiz Question</h1>
+                <h1 className="mb-8 text-center text-3xl font-bold">
+                    Create Quiz Question
+                </h1>
 
-                <form onSubmit={handleSubmit} className="bg-card rounded-lg p-6 shadow-lg space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <form
+                    onSubmit={handleSubmit}
+                    className="bg-card space-y-4 rounded-lg p-6 shadow-lg"
+                >
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div>
-                            <label htmlFor="question_type" className="block text-sm font-medium mb-2">
+                            <label
+                                htmlFor="question_type"
+                                className="mb-2 block text-sm font-medium"
+                            >
                                 Question Type *
                             </label>
                             <select
                                 id="question_type"
                                 name="question_type"
                                 defaultValue="artist"
-                                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                                className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-(--primary) focus:outline-none"
                                 required
                             >
                                 <option value="artist">Artist Name</option>
                                 <option value="title">Song Title</option>
                                 <option value="year">Release Year</option>
-                                <option value="multiple_choice">Multiple Choice</option>
+                                <option value="multiple_choice">
+                                    Multiple Choice
+                                </option>
                                 <option value="lyric">Lyric</option>
                                 <option value="audio_clip">Audio Clip</option>
                             </select>
                             {errors.question_type && (
-                                <p className="text-red-500 text-sm mt-1">{errors.question_type[0]}</p>
+                                <p className="mt-1 text-sm text-red-500">
+                                    {errors.question_type[0]}
+                                </p>
                             )}
                         </div>
 
                         <div>
-                            <label htmlFor="difficulty_level" className="block text-sm font-medium mb-2">
+                            <label
+                                htmlFor="difficulty_level"
+                                className="mb-2 block text-sm font-medium"
+                            >
                                 Difficulty Level *
                             </label>
                             <select
                                 id="difficulty_level"
                                 name="difficulty_level"
                                 defaultValue={1}
-                                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                                className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-(--primary) focus:outline-none"
                             >
                                 <option value={1}>Easy</option>
                                 <option value={2}>Medium</option>
@@ -149,30 +176,37 @@ export function CreateQuizQuestionPage() {
                                 <option value={5}>Master</option>
                             </select>
                             {errors.difficulty_level && (
-                                <p className="text-red-500 text-sm mt-1">{errors.difficulty_level[0]}</p>
+                                <p className="mt-1 text-sm text-red-500">
+                                    {errors.difficulty_level[0]}
+                                </p>
                             )}
                         </div>
                     </div>
 
                     <div>
-                        <label htmlFor="correct_answer" className="block text-sm font-medium mb-2">
+                        <label
+                            htmlFor="correct_answer"
+                            className="mb-2 block text-sm font-medium"
+                        >
                             Correct Answer *
                         </label>
                         <input
                             type="text"
                             id="correct_answer"
                             name="correct_answer"
-                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                            className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-(--primary) focus:outline-none"
                             placeholder="The correct answer to the question"
                             required
                         />
                         {errors.correct_answer && (
-                            <p className="text-red-500 text-sm mt-1">{errors.correct_answer[0]}</p>
+                            <p className="mt-1 text-sm text-red-500">
+                                {errors.correct_answer[0]}
+                            </p>
                         )}
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-2">
+                        <label className="mb-2 block text-sm font-medium">
                             Associated Track (Optional)
                         </label>
                         <SearchSelect
@@ -181,29 +215,39 @@ export function CreateQuizQuestionPage() {
                             options={tracks}
                         />
                         {errors.track_id && (
-                            <p className="text-red-500 text-sm mt-1">{errors.track_id[0]}</p>
+                            <p className="mt-1 text-sm text-red-500">
+                                {errors.track_id[0]}
+                            </p>
                         )}
                     </div>
 
                     <div>
-                        <label htmlFor="prompt_text" className="block text-sm font-medium mb-2">
+                        <label
+                            htmlFor="prompt_text"
+                            className="mb-2 block text-sm font-medium"
+                        >
                             Prompt Text
                         </label>
                         <textarea
                             id="prompt_text"
                             name="prompt_text"
-                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                            className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-(--primary) focus:outline-none"
                             placeholder="Additional context or question text..."
                             rows={3}
                         />
                         {errors.prompt_text && (
-                            <p className="text-red-500 text-sm mt-1">{errors.prompt_text[0]}</p>
+                            <p className="mt-1 text-sm text-red-500">
+                                {errors.prompt_text[0]}
+                            </p>
                         )}
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                         <div>
-                            <label htmlFor="base_points" className="block text-sm font-medium mb-2">
+                            <label
+                                htmlFor="base_points"
+                                className="mb-2 block text-sm font-medium"
+                            >
                                 Base Points *
                             </label>
                             <input
@@ -213,15 +257,20 @@ export function CreateQuizQuestionPage() {
                                 min="1"
                                 max="10000"
                                 defaultValue={1000}
-                                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                                className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-(--primary) focus:outline-none"
                             />
                             {errors.base_points && (
-                                <p className="text-red-500 text-sm mt-1">{errors.base_points[0]}</p>
+                                <p className="mt-1 text-sm text-red-500">
+                                    {errors.base_points[0]}
+                                </p>
                             )}
                         </div>
 
                         <div>
-                            <label htmlFor="media_start_seconds" className="block text-sm font-medium mb-2">
+                            <label
+                                htmlFor="media_start_seconds"
+                                className="mb-2 block text-sm font-medium"
+                            >
                                 Start Time (sec)
                             </label>
                             <input
@@ -229,15 +278,20 @@ export function CreateQuizQuestionPage() {
                                 id="media_start_seconds"
                                 name="media_start_seconds"
                                 min="0"
-                                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                                className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-(--primary) focus:outline-none"
                             />
                             {errors.media_start_seconds && (
-                                <p className="text-red-500 text-sm mt-1">{errors.media_start_seconds[0]}</p>
+                                <p className="mt-1 text-sm text-red-500">
+                                    {errors.media_start_seconds[0]}
+                                </p>
                             )}
                         </div>
 
                         <div>
-                            <label htmlFor="media_end_seconds" className="block text-sm font-medium mb-2">
+                            <label
+                                htmlFor="media_end_seconds"
+                                className="mb-2 block text-sm font-medium"
+                            >
                                 End Time (sec)
                             </label>
                             <input
@@ -245,29 +299,36 @@ export function CreateQuizQuestionPage() {
                                 id="media_end_seconds"
                                 name="media_end_seconds"
                                 min="0"
-                                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                                className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-(--primary) focus:outline-none"
                             />
                             {errors.media_end_seconds && (
-                                <p className="text-red-500 text-sm mt-1">{errors.media_end_seconds[0]}</p>
+                                <p className="mt-1 text-sm text-red-500">
+                                    {errors.media_end_seconds[0]}
+                                </p>
                             )}
                         </div>
                     </div>
 
                     <div>
-                        <label htmlFor="visibility" className="block text-sm font-medium mb-2">
+                        <label
+                            htmlFor="visibility"
+                            className="mb-2 block text-sm font-medium"
+                        >
                             Visibility *
                         </label>
                         <select
                             id="visibility"
                             name="visibility"
                             defaultValue="public"
-                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                            className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-(--primary) focus:outline-none"
                         >
                             <option value="public">Public</option>
                             <option value="private">Private</option>
                         </select>
                         {errors.visibility && (
-                            <p className="text-red-500 text-sm mt-1">{errors.visibility[0]}</p>
+                            <p className="mt-1 text-sm text-red-500">
+                                {errors.visibility[0]}
+                            </p>
                         )}
                     </div>
 
@@ -275,14 +336,14 @@ export function CreateQuizQuestionPage() {
                         <button
                             type="button"
                             onClick={() => navigate('/quiz-questions')}
-                            className="flex-1 btn-secondary rounded-lg py-3 transition-colors"
+                            className="btn-secondary flex-1 rounded-lg py-3 transition-colors"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={isCreating}
-                            className="flex-1 btn-success rounded-lg py-3 transition-colors disabled:opacity-50"
+                            className="btn-success flex-1 rounded-lg py-3 transition-colors disabled:opacity-50"
                         >
                             {isCreating ? 'Creating...' : 'Create Question'}
                         </button>

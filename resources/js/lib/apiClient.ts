@@ -1,6 +1,4 @@
-import {
-    UserDataSchema,
-} from '@/schemas/App/Data/Models';
+import { UserDataSchema } from '@/schemas/App/Data/Models';
 import {
     AuthenticateBroadcastingRequestSchema,
     CreateMusicTrackRequestSchema,
@@ -243,7 +241,10 @@ const playlistsGroup = HttpApiGroup.make('playlists')
             .addSuccess(PlaylistResponseSchema),
     )
     .add(
-        HttpApiEndpoint.get('userPlaylists', '/api/playlists/user/list').addSuccess(
+        HttpApiEndpoint.get(
+            'userPlaylists',
+            '/api/playlists/user/list',
+        ).addSuccess(
             Schema.Struct({
                 playlists: Schema.Array(Schema.Any),
             }),
@@ -286,9 +287,10 @@ const quizQuestionsGroup = HttpApiGroup.make('quizQuestions')
 // Game Sessions endpoints (authenticated)
 const sessionsGroup = HttpApiGroup.make('sessions')
     .add(
-        HttpApiEndpoint.get('activeGames', '/api/sessions/active-games').addSuccess(
-            ActiveGamesResponseSchema,
-        ),
+        HttpApiEndpoint.get(
+            'activeGames',
+            '/api/sessions/active-games',
+        ).addSuccess(ActiveGamesResponseSchema),
     )
     .add(
         HttpApiEndpoint.post('create', '/api/sessions')
@@ -640,10 +642,7 @@ class ApiClientSingleton {
 
     async showContent() {
         const client = await this.getBaseClient();
-        return this.runEffectWithCache(
-            client.content.show(),
-            'content_list',
-        );
+        return this.runEffectWithCache(client.content.show(), 'content_list');
     }
 
     async showHome() {
@@ -746,7 +745,10 @@ class ApiClientSingleton {
      * ========================================================================== */
     async showSubCategories() {
         const client = await this.getBaseClient();
-        return this.runEffect(client.subCategories.index(), 'showSubCategories');
+        return this.runEffect(
+            client.subCategories.index(),
+            'showSubCategories',
+        );
     }
 
     async showMusicSources() {
@@ -842,12 +844,18 @@ class ApiClientSingleton {
      * ========================================================================== */
     async showUserMusicTracks() {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.musicTracks.userTracks(), 'showUserMusicTracks');
+        return this.runEffect(
+            client.musicTracks.userTracks(),
+            'showUserMusicTracks',
+        );
     }
 
     async showUserPlaylists() {
         const client = await this.getBaseAuthClient();
-        return this.runEffect(client.playlists.userPlaylists(), 'showUserPlaylists');
+        return this.runEffect(
+            client.playlists.userPlaylists(),
+            'showUserPlaylists',
+        );
     }
 
     /* ==========================================================================

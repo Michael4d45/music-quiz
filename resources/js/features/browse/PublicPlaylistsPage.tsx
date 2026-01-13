@@ -1,6 +1,6 @@
 import { ApiClient } from '@/lib/apiClient';
-import { Link, useLoaderData } from 'react-router-dom';
 import { PlaylistsResponse } from '@/schemas/App/Data/Response';
+import { useLoaderData } from 'react-router-dom';
 
 export async function publicPlaylistsLoader() {
     const result = await ApiClient.showPublicPlaylists();
@@ -16,8 +16,10 @@ export function PublicPlaylistsPage() {
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold mb-2">Public Playlists</h1>
-                <p className="text-muted">Explore community-created playlists</p>
+                <h1 className="mb-2 text-3xl font-bold">Public Playlists</h1>
+                <p className="text-muted">
+                    Explore community-created playlists
+                </p>
             </div>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -26,7 +28,7 @@ export function PublicPlaylistsPage() {
                         key={playlist.id}
                         className="bg-card rounded-lg p-6 shadow transition-shadow hover:shadow-lg"
                     >
-                        <h2 className="text-xl font-semibold mb-2">
+                        <h2 className="mb-2 text-xl font-semibold">
                             {playlist.name}
                         </h2>
                         {playlist.description && (
@@ -34,11 +36,14 @@ export function PublicPlaylistsPage() {
                                 {playlist.description}
                             </p>
                         )}
-                        <div className="text-muted text-sm space-y-1">
-                            <p>Created by: {(playlist.user as any)?.name || 'Unknown'}</p>
+                        <div className="text-muted space-y-1 text-sm">
+                            <p>
+                                Created by:{' '}
+                                {(playlist.user as any)?.name || 'Unknown'}
+                            </p>
                             <p>{playlist.play_count} plays</p>
-                            <div className="flex items-center gap-2 mt-2">
-                                <span className="text-xs bg-muted px-2 py-1 rounded">
+                            <div className="mt-2 flex items-center gap-2">
+                                <span className="bg-muted rounded px-2 py-1 text-xs">
                                     Public
                                 </span>
                             </div>

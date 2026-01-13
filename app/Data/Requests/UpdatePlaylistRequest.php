@@ -20,7 +20,7 @@ class UpdatePlaylistRequest extends Data
 
         #[StringType]
         #[Max(1000)]
-        public ?string $description,
+        public null|string $description,
 
         public bool $is_public,
 

@@ -17,9 +17,9 @@ class SessionRoundData extends Data
         public string $session_id,
         public int $round_number,
         public string $question_id,
-        public ?Carbon $started_at,
-        public ?Carbon $ended_at,
-        public ?string $first_buzzer_id,
+        public null|Carbon $started_at,
+        public null|Carbon $ended_at,
+        public null|string $first_buzzer_id,
         /** @var GameSessionData|Lazy $session */
         #[AutoWhenLoadedLazy]
         public GameSessionData|Lazy $session,

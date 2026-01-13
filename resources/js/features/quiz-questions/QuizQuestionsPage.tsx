@@ -1,7 +1,7 @@
 import { ApiClient } from '@/lib/apiClient';
 import { authManager } from '@/lib/auth';
-import { Link, redirect, useLoaderData } from 'react-router-dom';
 import { QuizQuestionsResponse } from '@/schemas/App/Data/Response';
+import { Link, redirect, useLoaderData } from 'react-router-dom';
 
 export async function quizQuestionsLoader() {
     let user = authManager.getUser();
@@ -86,10 +86,12 @@ export function QuizQuestionsPage() {
                         className="bg-card rounded-lg p-6 shadow transition-shadow hover:shadow-lg"
                     >
                         <div className="mb-4 flex items-start justify-between">
-                            <span className="text-xs bg-muted px-2 py-1 rounded">
-                                {getQuestionTypeLabel(question.question_type as string)}
+                            <span className="bg-muted rounded px-2 py-1 text-xs">
+                                {getQuestionTypeLabel(
+                                    question.question_type as string,
+                                )}
                             </span>
-                            <span className="text-xs bg-muted px-2 py-1 rounded">
+                            <span className="bg-muted rounded px-2 py-1 text-xs">
                                 {getDifficultyLabel(question.difficulty_level)}
                             </span>
                         </div>
@@ -100,20 +102,30 @@ export function QuizQuestionsPage() {
                             </p>
                         )}
 
-                        <p className="text-sm mb-2">
-                            <span className="font-medium">Answer:</span> {question.correct_answer}
+                        <p className="mb-2 text-sm">
+                            <span className="font-medium">Answer:</span>{' '}
+                            {question.correct_answer}
                         </p>
 
                         {(question.track as any) && (
-                            <p className="text-sm text-muted mb-2">
-                                Track: {(question.track as any)?.title} by {(question.track as any)?.artist_name}
+                            <p className="text-muted mb-2 text-sm">
+                                Track: {(question.track as any)?.title} by{' '}
+                                {(question.track as any)?.artist_name}
                             </p>
                         )}
 
                         <div className="text-muted mt-4 flex items-center gap-4 text-sm">
                             <span>{question.base_points} points</span>
-                        <span className={question.visibility === 'public' ? 'text-green-600' : 'text-orange-600'}>
-                            {question.visibility === 'public' ? 'Public' : 'Private'}
+                            <span
+                                className={
+                                    question.visibility === 'public'
+                                        ? 'text-green-600'
+                                        : 'text-orange-600'
+                                }
+                            >
+                                {question.visibility === 'public'
+                                    ? 'Public'
+                                    : 'Private'}
                             </span>
                         </div>
                     </div>

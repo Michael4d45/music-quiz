@@ -11,24 +11,28 @@ it('returns leaderboard data', function () {
 
     $response = $this->getJson('/api/leaderboard');
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'players' => [
-            '*' => [
-                'user' => [
-                    'id',
-                    'name'
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'players' => [
+                '*' => [
+                    'user' => [
+                        'id',
+                        'name',
+                    ],
+                    'total_points',
+                    'total_games_played',
                 ],
-                'total_points',
-                'total_games_played'
-            ]
-        ]
-    ]);
+            ],
+        ]);
 });
 
 it('returns empty leaderboard when no stats exist', function () {
     $response = $this->getJson('/api/leaderboard');
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'players' => []
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'players' => [],
+        ]);
 });

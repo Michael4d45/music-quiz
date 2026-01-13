@@ -1,7 +1,7 @@
 import { ApiClient } from '@/lib/apiClient';
 import { authManager } from '@/lib/auth';
-import { Link, redirect, useLoaderData } from 'react-router-dom';
 import { MusicTracksResponse } from '@/schemas/App/Data/Response';
+import { Link, redirect, useLoaderData } from 'react-router-dom';
 
 export async function musicTracksLoader() {
     let user = authManager.getUser();
@@ -49,9 +49,7 @@ export function MusicTracksPage() {
                         key={track.id}
                         className="bg-card rounded-lg p-6 shadow transition-shadow hover:shadow-lg"
                     >
-                        <h2 className="text-xl font-semibold">
-                            {track.title}
-                        </h2>
+                        <h2 className="text-xl font-semibold">{track.title}</h2>
                         <p className="text-muted mt-1">
                             by {track.artist_name}
                         </p>
@@ -62,16 +60,22 @@ export function MusicTracksPage() {
                         )}
                         <div className="text-muted mt-4 flex flex-wrap items-center gap-4 text-sm">
                             {track.genre && <span>{track.genre}</span>}
-                            {track.release_year && <span>{track.release_year}</span>}
+                            {track.release_year && (
+                                <span>{track.release_year}</span>
+                            )}
                             {track.duration_ms && (
                                 <span>
                                     {Math.floor(track.duration_ms / 60000)}:
-                                    {String(Math.floor((track.duration_ms % 60000) / 1000)).padStart(2, '0')}
+                                    {String(
+                                        Math.floor(
+                                            (track.duration_ms % 60000) / 1000,
+                                        ),
+                                    ).padStart(2, '0')}
                                 </span>
                             )}
                         </div>
                         <div className="mt-4 flex items-center gap-2">
-                            <span className="text-xs text-muted bg-muted px-2 py-1 rounded">
+                            <span className="text-muted bg-muted rounded px-2 py-1 text-xs">
                                 {(track.sub_category as any)?.name || 'Unknown'}
                             </span>
                         </div>

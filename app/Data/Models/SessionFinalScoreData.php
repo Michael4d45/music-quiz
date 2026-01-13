@@ -19,10 +19,10 @@ class SessionFinalScoreData extends Data
         public int $final_rank,
         public int $questions_answered,
         public int $correct_answers,
-        public ?int $average_response_time_ms,
+        public null|int $average_response_time_ms,
         public int $longest_streak,
-        public ?Carbon $created_at,
-        public ?Carbon $updated_at,
+        public null|Carbon $created_at,
+        public null|Carbon $updated_at,
         /** @var GameSessionData|Lazy $session */
         #[AutoWhenLoadedLazy]
         public GameSessionData|Lazy $session,

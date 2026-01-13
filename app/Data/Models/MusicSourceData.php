@@ -16,13 +16,13 @@ class MusicSourceData extends Data
         public string $id,
         public string $name,
         public string $display_name,
-        public ?string $icon_url,
-        public ?string $api_base_url,
+        public null|string $icon_url,
+        public null|string $api_base_url,
         public bool $requires_authentication,
         public bool $is_active,
         public int $priority,
-        public ?Carbon $created_at,
-        public ?Carbon $updated_at,
+        public null|Carbon $created_at,
+        public null|Carbon $updated_at,
         /** @var Collection<array-key,SourceApiCredentialData>|Lazy $api_credentials */
         #[AutoWhenLoadedLazy('apiCredentials')]
         public Collection|Lazy $api_credentials,

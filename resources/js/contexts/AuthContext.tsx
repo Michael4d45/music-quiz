@@ -1,11 +1,8 @@
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { ApiClient } from '@/lib/apiClient';
 import { authManager, AuthState } from '@/lib/auth';
-import {
-    LoginRequest,
-    RegisterRequest,
-} from '@/schemas/App/Data/Requests';
 import { UserData } from '@/schemas/App/Data/Models';
+import { LoginRequest, RegisterRequest } from '@/schemas/App/Data/Requests';
 import {
     createContext,
     ReactNode,

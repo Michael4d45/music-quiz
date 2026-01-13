@@ -112,6 +112,11 @@ export function ProfilePage() {
                                         Disconnect
                                     </Button>
                                 </div>
+                                {user.verified_google_email && (
+                                    <p className="text-secondary text-xs">
+                                        {user.verified_google_email}
+                                    </p>
+                                )}
                             </div>
                         ) : (
                             <div>

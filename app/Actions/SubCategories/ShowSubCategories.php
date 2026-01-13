@@ -16,9 +16,7 @@ class ShowSubCategories
      */
     public function __invoke(): JsonResponse
     {
-        $subCategories = SubCategory::with('category')
-            ->orderBy('name')
-            ->get();
+        $subCategories = SubCategory::with('category')->orderBy('name')->get();
 
         return response()->json(SubCategoriesResponse::from([
             'sub_categories' => SubCategoryData::collect($subCategories),

@@ -106,9 +106,6 @@ class HandleGoogleCallback
             Auth::login($user);
             $token = $user->createToken('oauth-token')->plainTextToken;
 
-            // Regenerate session ID to prevent session fixation attacks
-            session()->regenerate(true);
-
             // Store token and user in session for secure retrieval
             session()->put('oauth_token', $token);
             session()->put('oauth_user', $user->toArray());
@@ -212,12 +209,16 @@ class HandleGoogleCallback
                 return $this->rejectGoogleAlreadyLinked();
             }
 
+            $emailToUse = $intendedUser->email ?? $email;
+
             $intendedUser->update([
                 'name' => $googleUser->getName() ?? $intendedUser->name,
-                'email' => $email,
+                'email' => $emailToUse,
+                'verified_google_email' => $email,
                 'google_id' => $googleId,
                 'email_verified_at' =>
-                    $intendedUser->email_verified_at ?? now(),
+                    $intendedUser->email_verified_at
+                    ?? ($emailToUse === $email ? now() : null),
                 'is_guest' => false,
             ]);
 
@@ -249,6 +250,7 @@ class HandleGoogleCallback
             $emailUser->update([
                 'name' => $googleUser->getName() ?? $emailUser->name,
                 'google_id' => $googleId,
+                'verified_google_email' => $email,
                 'email_verified_at' => $emailUser->email_verified_at ?? now(),
                 'is_guest' => false,
             ]);
@@ -258,11 +260,16 @@ class HandleGoogleCallback
 
         // Step 4: Link to current authenticated user
         if ($wasAuthenticated && $currentUser instanceof User) {
+            $emailToUse = $currentUser->email ?? $email;
+
             $currentUser->update([
                 'name' => $currentUser->name ?? $googleUser->getName(),
-                'email' => $currentUser->email ?? $email,
+                'email' => $emailToUse,
                 'google_id' => $googleId,
-                'email_verified_at' => $currentUser->email_verified_at ?? now(),
+                'verified_google_email' => $email,
+                'email_verified_at' =>
+                    $currentUser->email_verified_at
+                    ?? ($emailToUse === $email ? now() : null),
                 'is_guest' => false,
             ]);
 
@@ -275,6 +282,7 @@ class HandleGoogleCallback
             'email' => $email,
             'password' => Hash::make(Str::random(32)),
             'google_id' => $googleId,
+            'verified_google_email' => $email,
             'email_verified_at' => now(),
             'is_guest' => false,
         ]);
@@ -297,11 +305,17 @@ class HandleGoogleCallback
         ]);
 
         $fromUser->update(['google_id' => null]);
+
+        $emailToUse = $toUser->email ?? $email;
+
         $toUser->update([
             'name' => $googleUser->getName() ?? $toUser->name,
-            'email' => $email,
+            'email' => $emailToUse,
+            'verified_google_email' => $email,
             'google_id' => $googleId,
-            'email_verified_at' => $toUser->email_verified_at ?? now(),
+            'email_verified_at' =>
+                $toUser->email_verified_at
+                ?? ($emailToUse === $email ? now() : null),
             'is_guest' => false,
         ]);
 

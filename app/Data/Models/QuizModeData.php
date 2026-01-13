@@ -15,11 +15,11 @@ class QuizModeData extends Data
     public function __construct(
         public string $id,
         public string $name,
-        public ?string $description,
+        public null|string $description,
         public bool $allows_host_override,
         public bool $requires_manual_scoring,
-        public ?Carbon $created_at,
-        public ?Carbon $updated_at,
+        public null|Carbon $created_at,
+        public null|Carbon $updated_at,
         /** @var Collection<array-key,GameSessionData>|Lazy $game_sessions */
         #[AutoWhenLoadedLazy('gameSessions')]
         public Collection|Lazy $game_sessions,

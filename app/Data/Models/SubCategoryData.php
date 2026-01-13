@@ -16,10 +16,10 @@ class SubCategoryData extends Data
         public string $id,
         public string $category_id,
         public string $name,
-        public ?string $description,
+        public null|string $description,
         public int $sort_order,
-        public ?Carbon $created_at,
-        public ?Carbon $updated_at,
+        public null|Carbon $created_at,
+        public null|Carbon $updated_at,
         /** @var CategoryData|Lazy $category */
         #[AutoWhenLoadedLazy]
         public CategoryData|Lazy $category,

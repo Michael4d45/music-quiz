@@ -15,11 +15,11 @@ class CategoryData extends Data
     public function __construct(
         public string $id,
         public string $name,
-        public ?string $description,
-        public ?string $icon_url,
+        public null|string $description,
+        public null|string $icon_url,
         public int $sort_order,
-        public ?Carbon $created_at,
-        public ?Carbon $updated_at,
+        public null|Carbon $created_at,
+        public null|Carbon $updated_at,
         /** @var Collection<array-key,SubCategoryData>|Lazy $sub_categories */
         #[AutoWhenLoadedLazy('subCategories')]
         public Collection|Lazy $sub_categories,

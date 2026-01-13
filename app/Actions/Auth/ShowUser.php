@@ -17,7 +17,6 @@ class ShowUser
     {
         $user = $request->assertedUser();
         $userData = UserData::from($user);
-        \Mago\inspect($userData->music_tracks);
 
         return response()->json($userData);
     }

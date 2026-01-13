@@ -16,18 +16,18 @@ class QuizQuestionData extends Data
 {
     public function __construct(
         public string $id,
-        public ?string $user_id,
-        public ?string $track_id,
+        public null|string $user_id,
+        public null|string $track_id,
         public QuestionType $question_type,
-        public ?string $prompt_text,
+        public null|string $prompt_text,
         public string $correct_answer,
         public int $base_points,
-        public ?int $media_start_seconds,
-        public ?int $media_end_seconds,
+        public null|int $media_start_seconds,
+        public null|int $media_end_seconds,
         public int $difficulty_level,
         public Visibility $visibility,
-        public ?Carbon $created_at,
-        public ?Carbon $updated_at,
+        public null|Carbon $created_at,
+        public null|Carbon $updated_at,
         /** @var UserData|null|Lazy $user */
         #[AutoWhenLoadedLazy]
         public Lazy|UserData|null $user,

@@ -13,22 +13,24 @@ it('returns user statistics', function () {
 
     $response = $this->withToken($token)->getJson('/api/statistics');
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'statistic' => [
-            'user_id',
-            'total_games_played',
-            'total_wins',
-            'total_points',
-            'average_score'
-        ],
-        'recent_sessions' => [
-            '*' => [
-                'id',
-                'room_code',
-                'status'
-            ]
-        ]
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'statistic' => [
+                'user_id',
+                'total_games_played',
+                'total_wins',
+                'total_points',
+                'average_score',
+            ],
+            'recent_sessions' => [
+                '*' => [
+                    'id',
+                    'room_code',
+                    'status',
+                ],
+            ],
+        ]);
 });
 
 it('returns empty stats when user has no statistics', function () {
@@ -37,10 +39,12 @@ it('returns empty stats when user has no statistics', function () {
 
     $response = $this->withToken($token)->getJson('/api/statistics');
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'statistic',
-        'recent_sessions'
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'statistic',
+            'recent_sessions',
+        ]);
 });
 
 it('returns unauthorized when not authenticated', function () {

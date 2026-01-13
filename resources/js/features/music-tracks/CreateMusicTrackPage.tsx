@@ -1,9 +1,8 @@
+import SearchSelect from '@/components/Select/SearchSelect';
 import { ApiClient } from '@/lib/apiClient';
 import { authManager } from '@/lib/auth';
+import { useEffect, useState } from 'react';
 import { redirect, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { CreateMusicTrackRequestSchema } from '@/schemas/App/Data/Requests';
-import SearchSelect from '@/components/Select/SearchSelect';
 
 export async function createMusicTrackLoader() {
     let user = authManager.getUser();
@@ -29,8 +28,12 @@ export async function createMusicTrackLoader() {
 export function CreateMusicTrackPage() {
     const navigate = useNavigate();
     const [isCreating, setIsCreating] = useState(false);
-    const [subCategories, setSubCategories] = useState<{ value: string; label: string }[]>([]);
-    const [musicSources, setMusicSources] = useState<{ value: string; label: string }[]>([]);
+    const [subCategories, setSubCategories] = useState<
+        { value: string; label: string }[]
+    >([]);
+    const [musicSources, setMusicSources] = useState<
+        { value: string; label: string }[]
+    >([]);
     const [loading, setLoading] = useState(true);
 
     const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -38,24 +41,29 @@ export function CreateMusicTrackPage() {
     useEffect(() => {
         const loadData = async () => {
             try {
-                const [subCategoriesResult, musicSourcesResult] = await Promise.all([
-                    ApiClient.showSubCategories(),
-                    ApiClient.showMusicSources(),
-                ]);
+                const [subCategoriesResult, musicSourcesResult] =
+                    await Promise.all([
+                        ApiClient.showSubCategories(),
+                        ApiClient.showMusicSources(),
+                    ]);
 
                 if (subCategoriesResult._tag === 'Success') {
-                    const options = subCategoriesResult.data.sub_categories.map(cat => ({
-                        value: cat.id.toString(),
-                        label: cat.name,
-                    }));
+                    const options = subCategoriesResult.data.sub_categories.map(
+                        (cat) => ({
+                            value: cat.id.toString(),
+                            label: cat.name,
+                        }),
+                    );
                     setSubCategories(options);
                 }
 
                 if (musicSourcesResult._tag === 'Success') {
-                    const options = musicSourcesResult.data.music_sources.map(source => ({
-                        value: source.id.toString(),
-                        label: source.name,
-                    }));
+                    const options = musicSourcesResult.data.music_sources.map(
+                        (source) => ({
+                            value: source.id.toString(),
+                            label: source.name,
+                        }),
+                    );
                     setMusicSources(options);
                 }
             } catch (error) {
@@ -82,10 +90,14 @@ export function CreateMusicTrackPage() {
                 artist_name: formData.get('artist_name') as string,
                 sub_category_id: formData.get('sub_category_id') as string,
                 primary_source_id: formData.get('primary_source_id') as string,
-                album_name: formData.get('album_name') as string || null,
-                release_year: formData.get('release_year') ? parseInt(formData.get('release_year') as string) : null,
-                genre: formData.get('genre') as string || null,
-                duration_ms: formData.get('duration_ms') ? parseInt(formData.get('duration_ms') as string) : null,
+                album_name: (formData.get('album_name') as string) || null,
+                release_year: formData.get('release_year')
+                    ? parseInt(formData.get('release_year') as string)
+                    : null,
+                genre: (formData.get('genre') as string) || null,
+                duration_ms: formData.get('duration_ms')
+                    ? parseInt(formData.get('duration_ms') as string)
+                    : null,
             };
 
             const result = await ApiClient.createMusicTrack(payload);
@@ -93,9 +105,14 @@ export function CreateMusicTrackPage() {
             if (result._tag === 'Success') {
                 navigate('/music-tracks');
             } else if (result._tag === 'ValidationError') {
-                setErrors(Object.fromEntries(
-                    Object.entries(result.errors).map(([key, value]) => [key, [...value]])
-                ));
+                setErrors(
+                    Object.fromEntries(
+                        Object.entries(result.errors).map(([key, value]) => [
+                            key,
+                            [...value],
+                        ]),
+                    ),
+                );
             } else {
                 console.error('Failed to create music track:', result);
             }
@@ -117,43 +134,58 @@ export function CreateMusicTrackPage() {
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="mx-auto max-w-md">
-                <h1 className="text-3xl font-bold mb-8 text-center">Add Music Track</h1>
+                <h1 className="mb-8 text-center text-3xl font-bold">
+                    Add Music Track
+                </h1>
 
-                <form onSubmit={handleSubmit} className="bg-card rounded-lg p-6 shadow-lg space-y-4">
+                <form
+                    onSubmit={handleSubmit}
+                    className="bg-card space-y-4 rounded-lg p-6 shadow-lg"
+                >
                     <div>
-                        <label htmlFor="title" className="block text-sm font-medium mb-2">
+                        <label
+                            htmlFor="title"
+                            className="mb-2 block text-sm font-medium"
+                        >
                             Title *
                         </label>
                         <input
                             type="text"
                             id="title"
                             name="title"
-                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                            className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-(--primary) focus:outline-none"
                             required
                         />
                         {errors.title && (
-                            <p className="text-red-500 text-sm mt-1">{errors.title[0]}</p>
+                            <p className="mt-1 text-sm text-red-500">
+                                {errors.title[0]}
+                            </p>
                         )}
                     </div>
 
                     <div>
-                        <label htmlFor="artist_name" className="block text-sm font-medium mb-2">
+                        <label
+                            htmlFor="artist_name"
+                            className="mb-2 block text-sm font-medium"
+                        >
                             Artist Name *
                         </label>
                         <input
                             type="text"
                             id="artist_name"
                             name="artist_name"
-                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                            className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-(--primary) focus:outline-none"
                             required
                         />
                         {errors.artist_name && (
-                            <p className="text-red-500 text-sm mt-1">{errors.artist_name[0]}</p>
+                            <p className="mt-1 text-sm text-red-500">
+                                {errors.artist_name[0]}
+                            </p>
                         )}
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-2">
+                        <label className="mb-2 block text-sm font-medium">
                             Category *
                         </label>
                         <SearchSelect
@@ -162,12 +194,14 @@ export function CreateMusicTrackPage() {
                             options={subCategories}
                         />
                         {errors.sub_category_id && (
-                            <p className="text-red-500 text-sm mt-1">{errors.sub_category_id[0]}</p>
+                            <p className="mt-1 text-sm text-red-500">
+                                {errors.sub_category_id[0]}
+                            </p>
                         )}
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-2">
+                        <label className="mb-2 block text-sm font-medium">
                             Music Source *
                         </label>
                         <SearchSelect
@@ -176,59 +210,79 @@ export function CreateMusicTrackPage() {
                             options={musicSources}
                         />
                         {errors.primary_source_id && (
-                            <p className="text-red-500 text-sm mt-1">{errors.primary_source_id[0]}</p>
+                            <p className="mt-1 text-sm text-red-500">
+                                {errors.primary_source_id[0]}
+                            </p>
                         )}
                     </div>
 
                     <div>
-                        <label htmlFor="album_name" className="block text-sm font-medium mb-2">
+                        <label
+                            htmlFor="album_name"
+                            className="mb-2 block text-sm font-medium"
+                        >
                             Album Name
                         </label>
                         <input
                             type="text"
                             id="album_name"
                             name="album_name"
-                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                            className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-(--primary) focus:outline-none"
                         />
                         {errors.album_name && (
-                            <p className="text-red-500 text-sm mt-1">{errors.album_name[0]}</p>
+                            <p className="mt-1 text-sm text-red-500">
+                                {errors.album_name[0]}
+                            </p>
                         )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label htmlFor="release_year" className="block text-sm font-medium mb-2">
+                            <label
+                                htmlFor="release_year"
+                                className="mb-2 block text-sm font-medium"
+                            >
                                 Release Year
                             </label>
                             <input
                                 type="number"
                                 id="release_year"
                                 name="release_year"
-                                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                                className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-(--primary) focus:outline-none"
                             />
                             {errors.release_year && (
-                                <p className="text-red-500 text-sm mt-1">{errors.release_year[0]}</p>
+                                <p className="mt-1 text-sm text-red-500">
+                                    {errors.release_year[0]}
+                                </p>
                             )}
                         </div>
 
                         <div>
-                            <label htmlFor="genre" className="block text-sm font-medium mb-2">
+                            <label
+                                htmlFor="genre"
+                                className="mb-2 block text-sm font-medium"
+                            >
                                 Genre
                             </label>
                             <input
                                 type="text"
                                 id="genre"
                                 name="genre"
-                                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                                className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-(--primary) focus:outline-none"
                             />
                             {errors.genre && (
-                                <p className="text-red-500 text-sm mt-1">{errors.genre[0]}</p>
+                                <p className="mt-1 text-sm text-red-500">
+                                    {errors.genre[0]}
+                                </p>
                             )}
                         </div>
                     </div>
 
                     <div>
-                        <label htmlFor="duration_ms" className="block text-sm font-medium mb-2">
+                        <label
+                            htmlFor="duration_ms"
+                            className="mb-2 block text-sm font-medium"
+                        >
                             Duration (milliseconds)
                         </label>
                         <input
@@ -236,10 +290,12 @@ export function CreateMusicTrackPage() {
                             id="duration_ms"
                             name="duration_ms"
                             min="1"
-                            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--primary)"
+                            className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-(--primary) focus:outline-none"
                         />
                         {errors.duration_ms && (
-                            <p className="text-red-500 text-sm mt-1">{errors.duration_ms[0]}</p>
+                            <p className="mt-1 text-sm text-red-500">
+                                {errors.duration_ms[0]}
+                            </p>
                         )}
                     </div>
 
@@ -247,14 +303,14 @@ export function CreateMusicTrackPage() {
                         <button
                             type="button"
                             onClick={() => navigate('/music-tracks')}
-                            className="flex-1 btn-secondary rounded-lg py-3 transition-colors"
+                            className="btn-secondary flex-1 rounded-lg py-3 transition-colors"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={isCreating}
-                            className="flex-1 btn-success rounded-lg py-3 transition-colors disabled:opacity-50"
+                            className="btn-success flex-1 rounded-lg py-3 transition-colors disabled:opacity-50"
                         >
                             {isCreating ? 'Adding...' : 'Add Track'}
                         </button>

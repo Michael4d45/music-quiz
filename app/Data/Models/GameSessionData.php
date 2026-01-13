@@ -20,12 +20,12 @@ class GameSessionData extends Data
         public SessionStatus $status,
         public string $quiz_mode_id,
         public string $scoring_rule_id,
-        public ?string $playlist_id,
+        public null|string $playlist_id,
         public int $max_players,
-        public ?Carbon $started_at,
-        public ?Carbon $ended_at,
-        public ?Carbon $created_at,
-        public ?Carbon $updated_at,
+        public null|Carbon $started_at,
+        public null|Carbon $ended_at,
+        public null|Carbon $created_at,
+        public null|Carbon $updated_at,
         /** @var UserData|Lazy $host */
         #[AutoWhenLoadedLazy]
         public Lazy|UserData $host,

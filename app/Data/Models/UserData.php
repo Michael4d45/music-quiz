@@ -14,14 +14,15 @@ class UserData extends Data
 {
     public function __construct(
         public string $id,
-        public ?string $name,
+        public null|string $name,
         public bool $is_admin,
-        public ?string $email,
+        public null|string $email,
         public bool $is_guest,
-        public ?string $google_id,
-        public ?Carbon $email_verified_at,
-        public ?Carbon $created_at,
-        public ?Carbon $updated_at,
+        public null|string $google_id,
+        public null|string $verified_google_email,
+        public null|Carbon $email_verified_at,
+        public null|Carbon $created_at,
+        public null|Carbon $updated_at,
         /** @var Collection<array-key,GameSessionData>|Lazy $game_sessions */
         #[AutoWhenLoadedLazy('gameSessions')]
         public Collection|Lazy $game_sessions,

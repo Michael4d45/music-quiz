@@ -15,11 +15,11 @@ class SourceApiCredentialData extends Data
     public function __construct(
         public string $id,
         public string $source_id,
-        public ?CredentialType $credential_type,
+        public null|CredentialType $credential_type,
         public string $encrypted_value,
-        public ?Carbon $expires_at,
-        public ?Carbon $created_at,
-        public ?Carbon $updated_at,
+        public null|Carbon $expires_at,
+        public null|Carbon $created_at,
+        public null|Carbon $updated_at,
         /** @var MusicSourceData|Lazy $source */
         #[AutoWhenLoadedLazy]
         public Lazy|MusicSourceData $source,

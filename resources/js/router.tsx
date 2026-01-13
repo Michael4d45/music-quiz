@@ -8,21 +8,22 @@ import {
     categoriesLoader,
 } from './features/browse/CategoriesPage';
 import {
-    TracksPage,
-    tracksLoader,
-} from './features/browse/TracksPage';
-import {
     PublicPlaylistsPage,
     publicPlaylistsLoader,
 } from './features/browse/PublicPlaylistsPage';
+import { TracksPage, tracksLoader } from './features/browse/TracksPage';
 import { ContentPage, contentLoader } from './features/content/ContentPage';
 import { ErrorPage } from './features/ErrorPage';
 import { HomePage, homeLoader } from './features/home/HomePage';
-import { NotFoundPage } from './features/NotFoundPage';
 import {
-    PlaylistsPage,
-    playlistsLoader,
-} from './features/playlists/PlaylistsPage';
+    CreateMusicTrackPage,
+    createMusicTrackLoader,
+} from './features/music-tracks/CreateMusicTrackPage';
+import {
+    MusicTracksPage,
+    musicTracksLoader,
+} from './features/music-tracks/MusicTracksPage';
+import { NotFoundPage } from './features/NotFoundPage';
 import {
     CreatePlaylistPage,
     createPlaylistLoader,
@@ -32,22 +33,18 @@ import {
     playlistDetailLoader,
 } from './features/playlists/PlaylistDetailPage';
 import {
-    MusicTracksPage,
-    musicTracksLoader,
-} from './features/music-tracks/MusicTracksPage';
-import {
-    CreateMusicTrackPage,
-    createMusicTrackLoader,
-} from './features/music-tracks/CreateMusicTrackPage';
-import {
-    QuizQuestionsPage,
-    quizQuestionsLoader,
-} from './features/quiz-questions/QuizQuestionsPage';
+    PlaylistsPage,
+    playlistsLoader,
+} from './features/playlists/PlaylistsPage';
+import { ProfilePage, profileLoader } from './features/profile/ProfilePage';
 import {
     CreateQuizQuestionPage,
     createQuizQuestionLoader,
 } from './features/quiz-questions/CreateQuizQuestionPage';
-import { ProfilePage, profileLoader } from './features/profile/ProfilePage';
+import {
+    QuizQuestionsPage,
+    quizQuestionsLoader,
+} from './features/quiz-questions/QuizQuestionsPage';
 import {
     ActiveGamesPage,
     activeGamesLoader,
@@ -57,13 +54,13 @@ import {
     createSessionLoader,
 } from './features/sessions/CreateSessionPage';
 import {
-    SessionLobbyPage,
-    sessionLobbyLoader,
-} from './features/sessions/SessionLobbyPage';
-import {
     JoinSessionPage,
     joinSessionLoader,
 } from './features/sessions/JoinSessionPage';
+import {
+    SessionLobbyPage,
+    sessionLobbyLoader,
+} from './features/sessions/SessionLobbyPage';
 import {
     LeaderboardPage,
     leaderboardLoader,

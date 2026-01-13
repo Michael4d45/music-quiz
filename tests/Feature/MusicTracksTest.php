@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Models\MusicSource;
 use App\Models\MusicTrack;
 use App\Models\SubCategory;
-use App\Models\MusicSource;
 use App\Models\User;
 
 it('returns user music tracks', function () {
@@ -15,18 +15,20 @@ it('returns user music tracks', function () {
 
     $response = $this->withToken($token)->getJson('/api/music-tracks');
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'music_tracks' => [
-            'data' => [
-                '*' => [
-                    'id',
-                    'title',
-                    'artist_name',
-                    'user_id'
-                ]
-            ]
-        ]
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'music_tracks' => [
+                'data' => [
+                    '*' => [
+                        'id',
+                        'title',
+                        'artist_name',
+                        'user_id',
+                    ],
+                ],
+            ],
+        ]);
 });
 
 it('creates a new music track', function () {
@@ -44,25 +46,30 @@ it('creates a new music track', function () {
         'album_name' => 'Test Album',
         'release_year' => 2023,
         'genre' => 'Pop',
-        'duration_ms' => 180000
+        'duration_ms' => 180000,
     ];
 
-    $response = $this->withToken($token)->postJson('/api/music-tracks', $trackData);
+    $response = $this->withToken($token)->postJson(
+        '/api/music-tracks',
+        $trackData,
+    );
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'music_track' => [
-            'id',
-            'title',
-            'artist_name',
-            'album_name',
-            'user_id'
-        ]
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'music_track' => [
+                'id',
+                'title',
+                'artist_name',
+                'album_name',
+                'user_id',
+            ],
+        ]);
 
     $this->assertDatabaseHas('music_tracks', [
         'title' => 'Test Song',
         'artist_name' => 'Test Artist',
-        'user_id' => $user->id
+        'user_id' => $user->id,
     ]);
 });
 
@@ -72,15 +79,17 @@ it('validates required fields when creating track', function () {
 
     $response = $this->withToken($token)->postJson('/api/music-tracks', []);
 
-    $response->assertUnprocessable()->assertJsonStructure([
-        'message',
-        'errors' => [
-            'title',
-            'artist_name',
-            'sub_category_id',
-            'primary_source_id'
-        ]
-    ]);
+    $response
+        ->assertUnprocessable()
+        ->assertJsonStructure([
+            'message',
+            'errors' => [
+                'title',
+                'artist_name',
+                'sub_category_id',
+                'primary_source_id',
+            ],
+        ]);
 });
 
 it('returns unauthorized when not authenticated', function () {
@@ -97,14 +106,16 @@ it('returns user music tracks for quiz questions', function () {
 
     $response = $this->withToken($token)->getJson('/api/music-tracks/user');
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'tracks' => [
-            '*' => [
-                'id',
-                'title',
-                'artist_name',
-                'user_id'
-            ]
-        ]
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'tracks' => [
+                '*' => [
+                    'id',
+                    'title',
+                    'artist_name',
+                    'user_id',
+                ],
+            ],
+        ]);
 });

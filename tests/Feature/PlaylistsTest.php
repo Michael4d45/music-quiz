@@ -13,15 +13,17 @@ it('returns user playlists', function () {
 
     $response = $this->withToken($token)->getJson('/api/playlists');
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'playlists' => [
-            '*' => [
-                'id',
-                'name',
-                'user_id'
-            ]
-        ]
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'playlists' => [
+                '*' => [
+                    'id',
+                    'name',
+                    'user_id',
+                ],
+            ],
+        ]);
 });
 
 it('creates a new playlist', function () {
@@ -31,24 +33,29 @@ it('creates a new playlist', function () {
     $playlistData = [
         'name' => 'My Awesome Playlist',
         'description' => 'A test playlist',
-        'is_public' => true
+        'is_public' => true,
     ];
 
-    $response = $this->withToken($token)->postJson('/api/playlists', $playlistData);
+    $response = $this->withToken($token)->postJson(
+        '/api/playlists',
+        $playlistData,
+    );
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'playlist' => [
-            'id',
-            'name',
-            'description',
-            'is_public',
-            'user_id'
-        ]
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'playlist' => [
+                'id',
+                'name',
+                'description',
+                'is_public',
+                'user_id',
+            ],
+        ]);
 
     $this->assertDatabaseHas('playlists', [
         'name' => 'My Awesome Playlist',
-        'user_id' => $user->id
+        'user_id' => $user->id,
     ]);
 });
 
@@ -58,15 +65,19 @@ it('returns playlist details', function () {
 
     $playlist = Playlist::factory()->create(['user_id' => $user->id]);
 
-    $response = $this->withToken($token)->getJson("/api/playlists/{$playlist->id}");
+    $response = $this->withToken($token)->getJson(
+        "/api/playlists/{$playlist->id}",
+    );
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'playlist' => [
-            'id',
-            'name',
-            'user_id'
-        ]
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'playlist' => [
+                'id',
+                'name',
+                'user_id',
+            ],
+        ]);
 });
 
 it('updates a playlist', function () {
@@ -75,28 +86,33 @@ it('updates a playlist', function () {
 
     $playlist = Playlist::factory()->create([
         'user_id' => $user->id,
-        'name' => 'Original Name'
+        'name' => 'Original Name',
     ]);
 
     $updateData = [
         'name' => 'Updated Name',
         'description' => 'Updated description',
-        'is_public' => false
+        'is_public' => false,
     ];
 
-    $response = $this->withToken($token)->putJson("/api/playlists/{$playlist->id}", $updateData);
+    $response = $this->withToken($token)->putJson(
+        "/api/playlists/{$playlist->id}",
+        $updateData,
+    );
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'playlist' => [
-            'id',
-            'name',
-            'description'
-        ]
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'playlist' => [
+                'id',
+                'name',
+                'description',
+            ],
+        ]);
 
     $this->assertDatabaseHas('playlists', [
         'id' => $playlist->id,
-        'name' => 'Updated Name'
+        'name' => 'Updated Name',
     ]);
 });
 
@@ -116,9 +132,12 @@ it('returns 403 when updating another users playlist', function () {
 
     $playlist = Playlist::factory()->create(['user_id' => $user1->id]);
 
-    $response = $this->withToken($token)->putJson("/api/playlists/{$playlist->id}", [
-        'name' => 'Hacked Name'
-    ]);
+    $response = $this->withToken($token)->putJson(
+        "/api/playlists/{$playlist->id}",
+        [
+            'name' => 'Hacked Name',
+        ],
+    );
 
     $response->assertForbidden();
 });
@@ -137,15 +156,17 @@ it('returns user playlists for session creation', function () {
 
     $response = $this->withToken($token)->getJson('/api/playlists/user/list');
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'playlists' => [
-            '*' => [
-                'id',
-                'name',
-                'user_id'
-            ]
-        ]
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'playlists' => [
+                '*' => [
+                    'id',
+                    'name',
+                    'user_id',
+                ],
+            ],
+        ]);
 });
 
 it('returns playlist details for viewing', function () {
@@ -154,14 +175,18 @@ it('returns playlist details for viewing', function () {
 
     $playlist = Playlist::factory()->create(['user_id' => $user->id]);
 
-    $response = $this->withToken($token)->getJson("/api/playlists/{$playlist->id}");
+    $response = $this->withToken($token)->getJson(
+        "/api/playlists/{$playlist->id}",
+    );
 
-    $response->assertSuccessful()->assertJsonStructure([
-        'playlist' => [
-            'id',
-            'name',
-            'user_id',
-            'items'
-        ]
-    ]);
+    $response
+        ->assertSuccessful()
+        ->assertJsonStructure([
+            'playlist' => [
+                'id',
+                'name',
+                'user_id',
+                'items',
+            ],
+        ]);
 });

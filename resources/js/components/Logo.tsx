@@ -25,7 +25,9 @@ export default function Logo({
     const sizeClasses = fill ? 'w-full h-full object-contain' : '';
 
     // Set up image props with proper typing
-    const imgProps: React.ImgHTMLAttributes<HTMLImageElement> & { style?: React.CSSProperties } = {
+    const imgProps: React.ImgHTMLAttributes<HTMLImageElement> & {
+        style?: React.CSSProperties;
+    } = {
         src: '/logo.svg',
         alt: 'Music Quiz Logo',
         className:

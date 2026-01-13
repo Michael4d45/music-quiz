@@ -16,11 +16,11 @@ class PlaylistData extends Data
         public string $id,
         public string $user_id,
         public string $name,
-        public ?string $description,
+        public null|string $description,
         public bool $is_public,
         public int $play_count,
-        public ?Carbon $created_at,
-        public ?Carbon $updated_at,
+        public null|Carbon $created_at,
+        public null|Carbon $updated_at,
         /** @var UserData|Lazy $user */
         #[AutoWhenLoadedLazy]
         public Lazy|UserData $user,
