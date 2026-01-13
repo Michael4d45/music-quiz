@@ -11,5 +11,6 @@ class SessionLobbyResponse extends Data
 {
     public function __construct(
         public GameSessionData $session,
+        public null|string $token = null,
     ) {}
 }

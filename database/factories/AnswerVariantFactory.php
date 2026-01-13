@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\QuizQuestion;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -15,7 +16,8 @@ class AnswerVariantFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'question_id' => QuizQuestion::factory(),
+            'accepted_text' => fake()->words(2, true),
         ];
     }
 }

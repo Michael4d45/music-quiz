@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Sessions;
 
 use App\Data\Models\QuizQuestionData;
+use App\Data\Models\ScoringRuleData;
 use App\Data\Models\SessionParticipantData;
 use App\Data\Models\SessionRoundData;
 use App\Data\Response\SessionPlayResponse;
@@ -25,10 +26,14 @@ class ShowSessionPlay
         $user = $request->assertedUser();
 
         $session = GameSession::where('room_code', $roomCode)
-            ->with(['rounds.question'])
+            ->with(['rounds.question', 'scoringRule'])
             ->firstOrFail();
 
-        $currentRound = $session->rounds()->latest('round_number')->first();
+        $currentRound = $session
+            ->rounds()
+            ->whereNotNull('started_at')
+            ->latest('round_number')
+            ->first();
         $currentQuestion = $currentRound?->question;
 
         $participant = SessionParticipant::where('session_id', $session->id)
@@ -45,6 +50,7 @@ class ShowSessionPlay
             'participant' => $participant
                 ? SessionParticipantData::from($participant)
                 : null,
+            'scoring_rule' => ScoringRuleData::from($session->scoringRule),
         ]));
     }
 }

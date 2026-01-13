@@ -8,9 +8,12 @@ use App\Data\Models\GameSessionData;
 use App\Data\Requests\JoinSessionRequest;
 use App\Data\Response\SessionLobbyResponse;
 use App\Enums\Role;
-use App\Http\Requests\AuthRequest;
+use App\Events\SessionEventOccurred;
 use App\Models\SessionParticipant;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class JoinSession
@@ -20,15 +23,25 @@ class JoinSession
      */
     public function __invoke(
         JoinSessionRequest $data,
-        AuthRequest $request,
+        Request $request,
     ): JsonResponse {
-        $user = $request->assertedUser();
+        $user = $request->user();
+        $token = null;
+
+        if ($user === null) {
+            $guestName = $data->guest_name ?: 'Guest ' . Str::random(5);
+            $user = User::create([
+                'name' => $guestName,
+                'is_guest' => true,
+            ]);
+            $token = $user->createToken('guest-token')->plainTextToken;
+        }
 
         $session = $data->gameSession();
 
         // Check if session is full
-        $currentParticipants = $session->participants()->count();
-        if ($currentParticipants >= $session->max_players) {
+        $currentParticipantsCount = $session->participants()->count();
+        if ($currentParticipantsCount >= $session->max_players) {
             throw ValidationException::withMessages([
                 'room_code' => 'This session is full.',
             ]);
@@ -90,11 +103,16 @@ class JoinSession
             'quizMode',
             'scoringRule',
             'playlist',
-            'participants',
+            'participants.user',
         ]);
+
+        broadcast(new SessionEventOccurred($session, 'PlayerJoined', [
+            'name' => $guestName ?: $user->name,
+        ]))->toOthers();
 
         return response()->json(SessionLobbyResponse::from([
             'session' => GameSessionData::from($session),
+            'token' => $token,
         ]));
     }
 }

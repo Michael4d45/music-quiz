@@ -10,6 +10,7 @@ import {
     LoginRequestSchema,
     RegisterRequest,
     RegisterRequestSchema,
+    SubmitAnswerRequestSchema,
 } from '@/schemas/App/Data/Requests';
 import {
     ActiveGamesResponseSchema,
@@ -31,6 +32,7 @@ import {
     SessionPlayResponseSchema,
     SessionResultsResponseSchema,
     StatisticsResponseSchema,
+    SubmitAnswerResponseSchema,
     TrackResponseSchema,
     TracksResponseSchema,
 } from '@/schemas/App/Data/Response';
@@ -321,6 +323,17 @@ const sessionsGroup = HttpApiGroup.make('sessions')
         HttpApiEndpoint.get('play', '/api/sessions/:roomCode/play')
             .setPath(Schema.Struct({ roomCode: Schema.String }))
             .addSuccess(SessionPlayResponseSchema),
+    )
+    .add(
+        HttpApiEndpoint.post('answer', '/api/sessions/:roomCode/answer')
+            .setPath(Schema.Struct({ roomCode: Schema.String }))
+            .setPayload(SubmitAnswerRequestSchema)
+            .addSuccess(SubmitAnswerResponseSchema),
+    )
+    .add(
+        HttpApiEndpoint.post('nextRound', '/api/sessions/:roomCode/next-round')
+            .setPath(Schema.Struct({ roomCode: Schema.String }))
+            .addSuccess(Schema.Struct({ message: Schema.String })),
     )
     .add(
         HttpApiEndpoint.get('results', '/api/sessions/:roomCode/results')
@@ -912,6 +925,25 @@ class ApiClientSingleton {
         return this.runEffect(
             client.sessions.play({ path: { roomCode } }),
             'showSessionPlay',
+        );
+    }
+
+    async submitAnswer(roomCode: string, answer: string) {
+        const client = await this.getBaseAuthClient();
+        return this.runEffect(
+            client.sessions.answer({
+                path: { roomCode },
+                payload: { answer, selected_option_id: null },
+            }),
+            'submitAnswer',
+        );
+    }
+
+    async nextRound(roomCode: string) {
+        const client = await this.getBaseAuthClient();
+        return this.runEffect(
+            client.sessions.nextRound({ path: { roomCode } }),
+            'nextRound',
         );
     }
 

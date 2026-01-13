@@ -62,6 +62,14 @@ import {
     sessionLobbyLoader,
 } from './features/sessions/SessionLobbyPage';
 import {
+    SessionPlayPage,
+    sessionPlayLoader,
+} from './features/sessions/SessionPlayPage';
+import {
+    SessionResultsPage,
+    sessionResultsLoader,
+} from './features/sessions/SessionResultsPage';
+import {
     LeaderboardPage,
     leaderboardLoader,
 } from './features/statistics/LeaderboardPage';
@@ -194,6 +202,18 @@ export const router = createBrowserRouter([
                 path: 'sessions/:roomCode',
                 element: <SessionLobbyPage />,
                 loader: sessionLobbyLoader,
+                errorElement: <ErrorPage />,
+            },
+            {
+                path: 'sessions/:roomCode/play',
+                element: <SessionPlayPage />,
+                loader: sessionPlayLoader,
+                errorElement: <ErrorPage />,
+            },
+            {
+                path: 'sessions/:roomCode/results',
+                element: <SessionResultsPage />,
+                loader: sessionResultsLoader,
                 errorElement: <ErrorPage />,
             },
             // Statistics routes

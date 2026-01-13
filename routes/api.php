@@ -21,7 +21,10 @@ Route::prefix('browse')->group(function () {
 Route::get('leaderboard', \App\Actions\Statistics\ShowLeaderboard::class);
 
 // Subcategories (public)
-Route::get('sub-categories', \App\Actions\SubCategories\ShowSubCategories::class);
+Route::get(
+    'sub-categories',
+    \App\Actions\SubCategories\ShowSubCategories::class,
+);
 
 // Music sources (public)
 Route::get('music-sources', \App\Actions\MusicSources\ShowMusicSources::class);
@@ -40,7 +43,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', \App\Actions\Playlists\CreatePlaylist::class);
         Route::get('/{id}', \App\Actions\Playlists\ShowPlaylist::class);
         Route::put('/{id}', \App\Actions\Playlists\UpdatePlaylist::class);
-        Route::get('user/list', \App\Actions\Playlists\ShowUserPlaylists::class);
+        Route::get(
+            'user/list',
+            \App\Actions\Playlists\ShowUserPlaylists::class,
+        );
     });
 
     // Music tracks endpoints
@@ -63,9 +69,12 @@ Route::middleware('auth:sanctum')->group(function () {
             \App\Actions\Sessions\ShowActiveGames::class,
         );
         Route::post('/', \App\Actions\Sessions\CreateSession::class);
-        Route::post('join', \App\Actions\Sessions\JoinSession::class);
         Route::get('{roomCode}', \App\Actions\Sessions\ShowSessionLobby::class);
         Route::post('{roomCode}/start', \App\Actions\Sessions\StartGame::class);
+        Route::post(
+            '{roomCode}/next-round',
+            \App\Actions\Sessions\NextRound::class,
+        );
         Route::post(
             '{roomCode}/leave',
             \App\Actions\Sessions\LeaveSession::class,
@@ -73,6 +82,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get(
             '{roomCode}/play',
             \App\Actions\Sessions\ShowSessionPlay::class,
+        );
+        Route::post(
+            '{roomCode}/answer',
+            \App\Actions\Sessions\SubmitAnswer::class,
         );
         Route::get(
             '{roomCode}/results',
@@ -89,5 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
         \App\Actions\Broadcasting\AuthenticateBroadcasting::class,
     );
 });
+
+Route::post('sessions/join', \App\Actions\Sessions\JoinSession::class);
 
 require __DIR__ . '/auth.php';

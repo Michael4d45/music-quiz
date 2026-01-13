@@ -1,7 +1,8 @@
 import { ApiClient } from '@/lib/apiClient';
 import { authManager } from '@/lib/auth';
+import { echo } from '@/lib/echo';
 import { SessionLobbyResponse } from '@/schemas/App/Data/Response';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
 
 export async function sessionLobbyLoader({ params }: any) {
@@ -34,9 +35,44 @@ export function SessionLobbyPage() {
     const { roomCode } = useParams<{ roomCode: string }>();
     const navigate = useNavigate();
     const [isStarting, setIsStarting] = useState(false);
+    const [session, setSession] = useState(data.session);
 
-    const session = data.session;
     const isHost = session.host_id === authManager.getUser()?.id;
+
+    useEffect(() => {
+        if (!roomCode) return;
+
+        const channel = echo.join(`session.${roomCode}`);
+
+        channel.listen('PlayerJoined', (event: any) => {
+            console.log('Player joined:', event);
+            // Refresh lobby data
+            ApiClient.showSessionLobby(roomCode).then((result) => {
+                if (result._tag === 'Success') {
+                    setSession(result.data.session);
+                }
+            });
+        });
+
+        channel.listen('PlayerLeft', (event: any) => {
+            console.log('Player left:', event);
+            // Refresh lobby data
+            ApiClient.showSessionLobby(roomCode).then((result) => {
+                if (result._tag === 'Success') {
+                    setSession(result.data.session);
+                }
+            });
+        });
+
+        channel.listen('RoundStarted', (event: any) => {
+            console.log('Round started:', event);
+            navigate(`/sessions/${roomCode}/play`);
+        });
+
+        return () => {
+            echo.leave(`session.${roomCode}`);
+        };
+    }, [roomCode, navigate]);
 
     const handleStartGame = async () => {
         if (!roomCode) return;
@@ -134,13 +170,9 @@ export function SessionLobbyPage() {
                                     className="bg-muted flex items-center justify-between rounded p-3"
                                 >
                                     <span className="font-medium">
-                                        {participant.user?.name}
+                                        {participant.user?.name ||
+                                            participant.guest_name}
                                     </span>
-                                    {participant.is_ready && (
-                                        <span className="text-sm text-green-600">
-                                            Ready
-                                        </span>
-                                    )}
                                 </div>
                             ),
                         )}
@@ -152,7 +184,7 @@ export function SessionLobbyPage() {
                         <button
                             onClick={handleStartGame}
                             disabled={isStarting}
-                            className="btn-success rounded-lg px-6 py-3 transition-colors disabled:opacity-50"
+                            className="rounded-lg bg-green-600 px-6 py-3 text-white transition-colors hover:bg-green-700 disabled:opacity-50"
                         >
                             {isStarting ? 'Starting...' : 'Start Game'}
                         </button>
@@ -160,7 +192,7 @@ export function SessionLobbyPage() {
 
                     <button
                         onClick={handleLeaveGame}
-                        className="btn-secondary rounded-lg px-6 py-3 transition-colors"
+                        className="rounded-lg bg-gray-600 px-6 py-3 text-white transition-colors hover:bg-gray-700"
                     >
                         Leave Game
                     </button>
