@@ -24,11 +24,9 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 
-/resources/js/actions
-/resources/js/routes
-/resources/js/wayfinder
-
 boost.json
 reports/
 /resources/js/schemas/
 tests/Browser/Screenshots
+
+.github/copilot-instructions.md

@@ -1,5 +1,2 @@
 resources/js/components/ui/*
 resources/views/mail/*
-resources/js/wayfinder
-resources/js/routes
-resources/js/actions
