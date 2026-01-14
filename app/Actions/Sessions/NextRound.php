@@ -23,19 +23,20 @@ class NextRound
     ): JsonResponse {
         $user = $request->assertedUser();
 
-        $session = GameSession::where('room_code', $roomCode)
-            ->with(['scoringRule', 'participants.answers.round'])
+        $session = GameSession::query()
+            ->where('room_code', $roomCode)
+            ->with(['scoringRule', 'participants.answers.round', 'rounds'])
             ->firstOrFail();
 
         if ($session->host_id !== $user->id) {
             abort(403, 'Only the host can advance to the next round');
         }
 
-        // Find the last round that was started
+        // Find the last round that was started (reorder to override the relation's default ordering)
         $lastStartedRound = $session
             ->rounds()
             ->whereNotNull('started_at')
-            ->orderBy('round_number', 'desc')
+            ->reorder('round_number', 'desc')
             ->first();
 
         // If there's an active round (started but not ended), end it
@@ -43,21 +44,14 @@ class NextRound
             $lastStartedRound->update(['ended_at' => now()]);
         }
 
-        // Find next round
-        $nextRoundNumber = $lastStartedRound
-            ? $lastStartedRound->round_number + 1
-            : 1;
-
+        // Find next unstarted round (the next with no started_at)
         $nextRound = $session
             ->rounds()
-            ->where('round_number', $nextRoundNumber)
+            ->whereNull('started_at')
+            ->orderBy('round_number', 'asc')
             ->first();
 
         if ($nextRound) {
-            \Illuminate\Support\Facades\Log::info('Found next round', [
-                'number' => $nextRound->round_number,
-                'session_id' => $session->id,
-            ]);
             $nextRound->update(['started_at' => now()]);
 
             if ($session->scoringRule->max_time_ms) {

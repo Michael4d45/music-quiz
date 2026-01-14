@@ -1,7 +1,9 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { App } from './app';
+import { ForgotPasswordPage } from './features/auth/ForgotPasswordPage';
 import { LoginPage } from './features/auth/LoginPage';
 import { RegisterPage } from './features/auth/RegisterPage';
+import { ResetPasswordPage } from './features/auth/ResetPasswordPage';
 import { BrowsePage, browseLoader } from './features/browse/BrowsePage';
 import {
     CategoriesPage,

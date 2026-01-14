@@ -41,14 +41,20 @@ class StartGame
             'scoringRule',
         ]);
 
+        $playlist = $session->playlist;
+
+        if (!$playlist) {
+            abort(422, 'Cannot start game without a playlist');
+        }
+
         // Validate playlist has questions
-        if ($session->playlist->items->isEmpty()) {
+        if ($playlist->items->isEmpty()) {
             abort(422, 'Cannot start game with empty playlist');
         }
 
         // Create rounds from playlist items
         $roundNumber = 1;
-        foreach ($session->playlist->items as $item) {
+        foreach ($playlist->items as $item) {
             $round = SessionRound::create([
                 'session_id' => $session->id,
                 'round_number' => $roundNumber,
@@ -56,8 +62,11 @@ class StartGame
                 'started_at' => $roundNumber === 1 ? now() : null,
             ]);
 
-            if ($roundNumber === 1 && $session->scoringRule->max_time_ms) {
-                EndRound::dispatch($round->id)->delay(now()->addMilliseconds($session->scoringRule->max_time_ms));
+            if (
+                $roundNumber === 1
+                && $session->scoringRule->max_time_ms !== null
+            ) {
+                EndRound::dispatch($round->id)->delay(now()->addMilliseconds((int) $session->scoringRule->max_time_ms));
             }
 
             $roundNumber++;

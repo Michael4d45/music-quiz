@@ -8,6 +8,8 @@ use App\Data\Requests\SubmitAnswerRequest;
 use App\Data\Response\SubmitAnswerResponse;
 use App\Models\GameSession;
 use App\Models\PlayerAnswer;
+use App\Models\QuizQuestion;
+use App\Models\ScoringRule;
 use App\Models\SessionParticipant;
 use App\Models\SessionRound;
 use Illuminate\Http\JsonResponse;
@@ -92,8 +94,10 @@ class SubmitAnswer
         ]));
     }
 
-    private function checkAnswer(string $submitted, $question): bool
-    {
+    private function checkAnswer(
+        string $submitted,
+        QuizQuestion $question,
+    ): bool {
         $normalizedSubmitted = Str::lower(trim($submitted));
         $normalizedCorrect = Str::lower(trim($question->correct_answer));
 
@@ -104,18 +108,22 @@ class SubmitAnswer
         // Check variants
         foreach ($question->answerVariants as $variant) {
             if (
-                Str::lower(trim($variant->accepted_text))
-                === $normalizedSubmitted
+                Str::lower(trim($variant->accepted_text ?? ''))
+                !== $normalizedSubmitted
             ) {
-                return true;
+                continue;
             }
+
+            return true;
         }
 
         return false;
     }
 
-    private function calculatePoints(SessionRound $round, $scoringRule): int
-    {
+    private function calculatePoints(
+        SessionRound $round,
+        ScoringRule $scoringRule,
+    ): int {
         $basePoints = $scoringRule->base_points ?? 1000;
 
         if (

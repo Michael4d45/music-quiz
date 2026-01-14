@@ -665,6 +665,11 @@ class ApiClientSingleton {
         return this.runEffect(client.home.show(), 'showHome');
     }
 
+    async showContent() {
+        const client = await this.getBaseClient();
+        return this.runEffectWithCache(client.content.show(), 'content_list');
+    }
+
     /**
      * Fetch OAuth token after successful OAuth callback.
      * Called when user returns from OAuth provider with ?auth=success

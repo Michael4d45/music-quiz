@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Data\Requests;
 
-use App\Data\Models\UserData;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\StringType;
@@ -20,13 +19,11 @@ class UpdatePlaylistRequest extends Data
 
         #[StringType]
         #[Max(1000)]
-        public null|string $description,
+        public string|null $description = null,
 
-        public bool $is_public,
+        public bool $is_public = false,
 
         /** @var array<string> $question_ids */
-        public array $question_ids,
-
-        public UserData $user,
+        public array $question_ids = [],
     ) {}
 }

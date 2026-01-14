@@ -11,7 +11,7 @@ use Spatie\LaravelData\Data;
 class ContentItems extends Data
 {
     public function __construct(
-        /** @var Collection<array-key,ContentData> $content */
+        /** @var Collection<array-key, ContentData> */
         public Collection $content,
     ) {}
 }
