@@ -29,7 +29,6 @@ use Laravel\Sanctum\HasApiTokens;
  * @property bool $is_google_verified
  * @property string|null $google_id
  * @property Carbon|null $email_verified_at
- * @property string|null $remember_token
  * @property Carbon|null $updated_at
  * @property Carbon|null $created_at
  * @property-read Collection<array-key,GameSession> $gameSessions
@@ -69,7 +68,6 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
      */
     protected $hidden = [
         'password',
-        'remember_token',
     ];
 
     /**

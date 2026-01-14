@@ -9,7 +9,7 @@ Route::get('home', \App\Actions\Home\ShowHome::class);
 
 // Browse endpoints (public)
 Route::prefix('browse')->group(function () {
-    Route::get('/', \App\Actions\Browse\ShowBrowse::class);
+    Route::get('', \App\Actions\Browse\ShowBrowse::class);
     Route::get('categories', \App\Actions\Browse\ShowCategories::class);
     Route::get('categories/{id}', \App\Actions\Browse\ShowCategory::class);
     Route::get('tracks', \App\Actions\Browse\ShowTracks::class);

@@ -21,7 +21,7 @@ export function RegisterPage() {
         return validationErrors[fieldName]?.[0] || null;
     };
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (isBlocked) {
@@ -29,20 +29,23 @@ export function RegisterPage() {
             return;
         }
 
-        const formData = new FormData(e.currentTarget);
-        const password = formData.get('password') as string;
-        const passwordConfirmation = formData.get(
+        // Read values directly from form elements (works with browser automation)
+        const formData = new FormData(e.target as HTMLFormElement);
+        const nameValue = formData.get('name') as string;
+        const emailValue = formData.get('email') as string;
+        const passwordValue = formData.get('password') as string;
+        const passwordConfirmationValue = formData.get(
             'password_confirmation',
         ) as string;
 
         // Client-side validation
         const errors: ValidationErrors = {};
 
-        if (password.length < 8) {
+        if (passwordValue.length < 8) {
             errors.password = ['Password must be at least 8 characters'];
         }
 
-        if (password !== passwordConfirmation) {
+        if (passwordValue !== passwordConfirmationValue) {
             errors.password_confirmation = ['Passwords do not match'];
         }
 
@@ -54,10 +57,10 @@ export function RegisterPage() {
         setValidationErrors({}); // Clear previous errors
 
         const result = await register({
-            name: formData.get('name') as string,
-            email: formData.get('email') as string,
-            password,
-            password_confirmation: passwordConfirmation,
+            name: nameValue,
+            email: emailValue,
+            password: passwordValue,
+            password_confirmation: passwordConfirmationValue,
         });
         if (result._tag === 'Success') {
             navigate('/');
@@ -93,6 +96,7 @@ export function RegisterPage() {
                             type="text"
                             id="name"
                             name="name"
+                            defaultValue=""
                             className={`w-full rounded-md border px-3 py-2 focus:ring-2 focus:outline-none ${
                                 getFieldError('name')
                                     ? 'border-danger focus:ring-danger'
@@ -119,6 +123,7 @@ export function RegisterPage() {
                             type="email"
                             id="email"
                             name="email"
+                            defaultValue=""
                             className={`w-full rounded-md border px-3 py-2 focus:ring-2 focus:outline-none ${
                                 getFieldError('email')
                                     ? 'border-danger focus:ring-danger'
@@ -145,6 +150,7 @@ export function RegisterPage() {
                             type="password"
                             id="password"
                             name="password"
+                            defaultValue=""
                             className={`w-full rounded-md border px-3 py-2 focus:ring-2 focus:outline-none ${
                                 getFieldError('password')
                                     ? 'border-danger focus:ring-danger'
@@ -172,6 +178,7 @@ export function RegisterPage() {
                             type="password"
                             id="password_confirmation"
                             name="password_confirmation"
+                            defaultValue=""
                             className={`w-full rounded-md border px-3 py-2 focus:ring-2 focus:outline-none ${
                                 getFieldError('password_confirmation')
                                     ? 'border-danger focus:ring-danger'

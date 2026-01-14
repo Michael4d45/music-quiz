@@ -229,6 +229,14 @@ export const router = createBrowserRouter([
                 loader: statisticsLoader,
                 errorElement: <ErrorPage />,
             },
+            {
+                path: 'forgot-password',
+                element: <ForgotPasswordPage />,
+            },
+            {
+                path: 'reset-password/:email/:token',
+                element: <ResetPasswordPage />,
+            },
         ],
     },
     {

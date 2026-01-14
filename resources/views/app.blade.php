@@ -11,8 +11,6 @@
     <meta name="apple-mobile-web-app-title" content="Music Quiz">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Music Quiz') }}</title>
-
     <!-- Favicon -->
     <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">

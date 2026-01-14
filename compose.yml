@@ -50,10 +50,10 @@ services:
     ports:
       - '${REDIS_PORT}:6379'
 
-  # mailhog:
-  #   restart: unless-stopped
-  #   image: mailhog/mailhog:latest
-  #   container_name: music-quiz-mailhog
-  #   ports:
-  #     - "1025:1025" # SMTP
-  #     - "8025:8025" # Web UI
+  mailhog:
+    restart: unless-stopped
+    image: mailhog/mailhog:latest
+    container_name: music-quiz-mailhog
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # Web UI
