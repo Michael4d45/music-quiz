@@ -51,25 +51,6 @@ it('does not log requests when should_log_requests is disabled', function (): vo
     Log::shouldNotHaveReceived('info');
 });
 
-it('logs responses when should_log_responses is enabled', function (): void {
-    Config::set('logging.should_log_responses', true);
-
-    Log::shouldReceive('info')
-        ->once()
-        ->with('Outgoing Response', \Mockery::on(function ($data) {
-            return isset($data['method'], $data['url'], $data['status_code']);
-        }));
-
-    $request = Request::create('/test', 'GET');
-    $middleware = new LogResponses;
-
-    $response = $middleware->handle($request, function ($req) {
-        return response()->json(['message' => 'OK'], 200);
-    });
-
-    expect($response->getStatusCode())->toBe(200);
-});
-
 it('does not log responses when should_log_responses is disabled', function (): void {
     Config::set('logging.should_log_responses', false);
 

@@ -55,10 +55,8 @@ export function SessionResultsPage() {
                                 </div>
                                 <div>
                                     <div className="text-xl font-bold">
-                                        {(score.participant as any)?.user
-                                            ?.name ||
-                                            (score.participant as any)
-                                                ?.guest_name}
+                                        {score.participant?.user?.name ||
+                                            score.participant?.guest_name}
                                     </div>
                                     <div className="text-muted text-sm">
                                         {score.correct_answers} /{' '}
@@ -97,21 +95,17 @@ export function SessionResultsPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-border divide-y">
-                                {data.rounds?.map((round: any) => (
+                                {data.rounds.map((round) => (
                                     <tr key={round.id}>
                                         <td className="px-6 py-4">
                                             {round.round_number}
                                         </td>
                                         <td className="px-6 py-4">
-                                            {(round.question as any)
-                                                ?.prompt_text ||
+                                            {round.question?.prompt_text ||
                                                 'Identify track/artist'}
                                         </td>
                                         <td className="px-6 py-4 font-medium">
-                                            {
-                                                (round.question as any)
-                                                    ?.correct_answer
-                                            }
+                                            {round.question?.correct_answer}
                                         </td>
                                     </tr>
                                 ))}

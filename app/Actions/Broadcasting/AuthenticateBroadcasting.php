@@ -8,7 +8,6 @@ use App\Data\Requests\AuthenticateBroadcastingRequest;
 use App\Data\Response\AuthenticateBroadcastingResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Broadcast;
 
 class AuthenticateBroadcasting
@@ -16,22 +15,16 @@ class AuthenticateBroadcasting
     /**
      * Authenticate a broadcasting channel
      */
-    public function __invoke(Request $request): JsonResponse
-    {
-        // Validate request data
-        $data = AuthenticateBroadcastingRequest::from($request->only([
-            'socket_id',
-            'channel_name',
-        ]));
-
-        $user = Auth::user();
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
+    public function __invoke(
+        AuthenticateBroadcastingRequest $data,
+        Request $request,
+    ): JsonResponse {
         // Authenticate the channel
         try {
             $authData = Broadcast::auth($request);
+            if (str_contains($data->channel_name, 'presence-')) {
+                dump($authData);
+            }
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Channel authentication failed',

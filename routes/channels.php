@@ -18,13 +18,23 @@ Broadcast::channel('online', function (User $user): array {
     ];
 });
 
-Broadcast::channel('session.{roomCode}', function ($user, $roomCode) {
+Broadcast::channel('session.{roomCode}', function (
+    User $user,
+    string $roomCode,
+): array|bool {
     // Users can listen to session channels if they are participants
-    $session = GameSession::where('room_code', $roomCode)->first();
+    $session = GameSession::query()->where('room_code', $roomCode)->first();
 
     if (!$session) {
         return false;
     }
 
-    return $session->participants()->where('user_id', $user->id)->exists();
+    if (!$session->participants()->where('user_id', $user->id)->exists()) {
+        return false;
+    }
+
+    return [
+        'id' => (string) $user->id,
+        'name' => $user->name ?? 'Unknown user',
+    ];
 });

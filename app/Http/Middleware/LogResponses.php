@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Http\Middleware\LoggingHelper;
 use Closure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -36,14 +35,6 @@ class LogResponses
                 'is_guest' => $user->is_guest,
                 'is_admin' => $user->is_admin,
             ]);
-        }
-
-        if (!$response instanceof Response) {
-            $response = response(
-                is_string($response)
-                    ? $response
-                    : (string) (is_scalar($response) ? $response : ''),
-            );
         }
 
         if (
