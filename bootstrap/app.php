@@ -30,10 +30,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: [
             'oauth_token_handoff',
         ]);
-
-        $middleware->alias([
-            'api.auth' => ApiAuth::class,
-        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->report(function (ValidationException $e) {

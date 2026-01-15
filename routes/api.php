@@ -1,8 +1,7 @@
 <?php
 
+use App\Http\Middleware\RefreshSanctumToken;
 use Illuminate\Support\Facades\Route;
-
-Route::middleware('api.auth')->group(function () {});
 
 // Home endpoint (authenticated, but returns empty data for guests)
 Route::get('home', \App\Actions\Home\ShowHome::class);
@@ -42,7 +41,10 @@ Route::get('quiz-modes', \App\Actions\QuizModes\ShowQuizModes::class);
 Route::get('scoring-rules', \App\Actions\ScoringRules\ShowScoringRules::class);
 
 // Authenticated routes
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware([
+    'auth:sanctum',
+    RefreshSanctumToken::class,
+])->group(function () {
     // Playlists endpoints
     Route::prefix('playlists')->group(function () {
         Route::get('/', \App\Actions\Playlists\ShowPlaylists::class);
