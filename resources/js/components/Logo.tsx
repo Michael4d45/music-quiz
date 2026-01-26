@@ -3,7 +3,7 @@ interface LogoProps {
     width?: number;
     height?: number;
     variant?: 'auto' | 'light' | 'dark';
-    fill?: boolean; // When true, fills parent container
+    fill?: boolean;
 }
 
 export default function Logo({
@@ -21,13 +21,9 @@ export default function Logo({
         dark: 'invert hue-rotate-[180deg] brightness-110',
     };
 
-    // When fill is true, use classes to fill parent and maintain aspect ratio
     const sizeClasses = fill ? 'w-full h-full object-contain' : '';
 
-    // Set up image props with proper typing
-    const imgProps: React.ImgHTMLAttributes<HTMLImageElement> & {
-        style?: React.CSSProperties;
-    } = {
+    const imgProps: React.ImgHTMLAttributes<HTMLImageElement> = {
         src: '/logo.svg',
         alt: 'Music Quiz Logo',
         className:
@@ -37,6 +33,10 @@ export default function Logo({
     if (!fill) {
         imgProps.width = width;
         imgProps.height = height;
+        (imgProps as any).style = {
+            width: `${width}px`,
+            height: `${height}px`,
+        };
     }
 
     return <img {...imgProps} />;

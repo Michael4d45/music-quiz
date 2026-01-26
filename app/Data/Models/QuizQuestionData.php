@@ -8,9 +8,8 @@ use App\Enums\QuestionType;
 use App\Enums\Visibility;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 
 class QuizQuestionData extends Data
 {
@@ -28,23 +27,17 @@ class QuizQuestionData extends Data
         public Visibility $visibility,
         public null|Carbon $created_at,
         public null|Carbon $updated_at,
-        /** @var UserData|null|Lazy $user */
-        #[AutoWhenLoadedLazy]
-        public Lazy|UserData|null $user,
-        /** @var MusicTrackData|null|Lazy $track */
-        #[AutoWhenLoadedLazy]
-        public Lazy|MusicTrackData|null $track,
-        /** @var Collection<array-key,AnswerVariantData>|Lazy $answer_variants */
-        #[AutoWhenLoadedLazy('answerVariants')]
-        public Collection|Lazy $answer_variants,
-        /** @var Collection<array-key,MultipleChoiceOptionData>|Lazy $multiple_choice_options */
-        #[AutoWhenLoadedLazy('multipleChoiceOptions')]
-        public Collection|Lazy $multiple_choice_options,
-        /** @var Collection<array-key,SessionRoundData>|Lazy $session_rounds */
-        #[AutoWhenLoadedLazy('sessionRounds')]
-        public Collection|Lazy $session_rounds,
-        /** @var Collection<array-key,PlaylistItemData>|Lazy $playlist_items */
-        #[AutoWhenLoadedLazy('playlistItems')]
-        public Collection|Lazy $playlist_items,
+        /** @var UserData|null|Optional $user */
+        public Optional|UserData|null $user,
+        /** @var MusicTrackData|null|Optional $track */
+        public Optional|MusicTrackData|null $track,
+        /** @var Collection<array-key,AnswerVariantData>|Optional */
+        public Collection|Optional $answer_variants,
+        /** @var Collection<array-key,MultipleChoiceOptionData>|Optional */
+        public Collection|Optional $multiple_choice_options,
+        /** @var Collection<array-key,SessionRoundData>|Optional */
+        public Collection|Optional $session_rounds,
+        /** @var Collection<array-key,PlaylistItemData>|Optional */
+        public Collection|Optional $playlist_items,
     ) {}
 }

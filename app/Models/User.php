@@ -7,30 +7,37 @@ namespace App\Models;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Str;
 
 /**
- * User model for authentication and user management.
+ * User model for storing user information and authentication.
  *
  * @property string $id
+ *
  * @property string|null $name
- * @property string|null $email
+ *
  * @property string|null $password
- * @property bool $is_guest
- * @property bool $is_admin
- * @property bool $is_google_verified
- * @property string|null $google_id
+ * @property string|null $remember_token
+ * @property string|null $email
  * @property Carbon|null $email_verified_at
- * @property Carbon|null $updated_at
+ *
+ * @property string|null $google_id
+ * @property string|null $verified_google_email
+ *
+ * @property bool $is_admin
+ * @property bool $is_guest
+ *
  * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
  * @property-read Collection<array-key,GameSession> $gameSessions
  * @property-read Collection<array-key,SessionParticipant> $participants
  * @property-read Collection<array-key,UserStatistic> $statistics
@@ -43,35 +50,56 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /** @use HasApiTokens<PersonalAccessToken> */
-    use HasApiTokens;
-
     use HasUuids;
+    use Notifiable;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var list<model-property<self>>
      */
     protected $fillable = [
         'name',
+
         'email',
         'password',
-        'is_guest',
-        'is_admin',
+        'remember_token',
+        'email_verified_at',
+
         'google_id',
         'verified_google_email',
-        'email_verified_at',
+
+        'is_admin',
+        'is_guest',
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var list<model-property<self>>
      */
     protected $hidden = [
         'password',
+        'remember_token',
+        'google_id',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<model-property<self>,mixed>
+     */
+    #[\Override]
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'is_admin' => 'boolean',
+            'is_guest' => 'boolean',
+        ];
+    }
 
     /**
      * Determine if the user should verify their email.
@@ -104,11 +132,6 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
             // Use the default implementation
             parent::sendEmailVerificationNotification();
         }
-    }
-
-    public function canAccessPanel(Panel $panel): bool
-    {
-        return !$this->is_guest && $this->is_admin;
     }
 
     /**
@@ -213,17 +236,19 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     }
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Get the user's initials
      */
-    protected function casts(): array
+    public function initials(): string
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'is_guest' => 'boolean',
-            'is_admin' => 'boolean',
-        ];
+        return Str::of($this->name ?? 'User')
+            ->explode(' ')
+            ->take(2)
+            ->map(static fn($word) => Str::substr($word, 0, 1))
+            ->implode('');
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->is_admin;
     }
 }

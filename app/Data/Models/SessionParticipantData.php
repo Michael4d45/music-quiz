@@ -7,9 +7,8 @@ namespace App\Data\Models;
 use App\Enums\Role;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 
 class SessionParticipantData extends Data
 {
@@ -23,17 +22,13 @@ class SessionParticipantData extends Data
         public bool $is_connected,
         public Carbon $joined_at,
         public null|Carbon $buzzed_in_at,
-        /** @var GameSessionData|Lazy $session */
-        #[AutoWhenLoadedLazy]
-        public GameSessionData|Lazy $session,
-        /** @var UserData|null|Lazy $user */
-        #[AutoWhenLoadedLazy]
-        public Lazy|UserData|null $user,
-        /** @var Collection<array-key,PlayerAnswerData>|Lazy $answers */
-        #[AutoWhenLoadedLazy]
-        public Collection|Lazy $answers,
-        /** @var SessionFinalScoreData|null|Lazy $final_score */
-        #[AutoWhenLoadedLazy('finalScore')]
-        public Lazy|SessionFinalScoreData|null $final_score,
+        /** @var GameSessionData|Optional $session */
+        public GameSessionData|Optional $session,
+        /** @var UserData|null|Optional $user */
+        public Optional|UserData|null $user,
+        /** @var Collection<array-key,PlayerAnswerData>|Optional */
+        public Collection|Optional $answers,
+        /** @var SessionFinalScoreData|null|Optional $final_score */
+        public Optional|SessionFinalScoreData|null $final_score,
     ) {}
 }

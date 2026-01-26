@@ -6,9 +6,8 @@ namespace App\Data\Models;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 
 class MusicTrackData extends Data
 {
@@ -25,20 +24,15 @@ class MusicTrackData extends Data
         public string $primary_source_id,
         public null|Carbon $created_at,
         public null|Carbon $updated_at,
-        /** @var UserData|null|Lazy $user */
-        #[AutoWhenLoadedLazy]
-        public Lazy|UserData|null $user,
-        /** @var SubCategoryData|Lazy $sub_category */
-        #[AutoWhenLoadedLazy('subCategory')]
-        public Lazy|SubCategoryData $sub_category,
-        /** @var MusicSourceData|Lazy $primary_source */
-        #[AutoWhenLoadedLazy('primarySource')]
-        public Lazy|MusicSourceData $primary_source,
-        /** @var Collection<array-key,TrackSourceLinkData>|Lazy $source_links */
-        #[AutoWhenLoadedLazy('sourceLinks')]
-        public Collection|Lazy $source_links,
-        /** @var Collection<array-key,QuizQuestionData>|Lazy $quiz_questions */
-        #[AutoWhenLoadedLazy('quizQuestions')]
-        public Collection|Lazy $quiz_questions,
+        /** @var UserData|null|Optional $user */
+        public Optional|UserData|null $user,
+        /** @var SubCategoryData|Optional $sub_category */
+        public Optional|SubCategoryData $sub_category,
+        /** @var MusicSourceData|Optional $primary_source */
+        public Optional|MusicSourceData $primary_source,
+        /** @var Collection<array-key,TrackSourceLinkData>|Optional */
+        public Collection|Optional $source_links,
+        /** @var Collection<array-key,QuizQuestionData>|Optional */
+        public Collection|Optional $quiz_questions,
     ) {}
 }

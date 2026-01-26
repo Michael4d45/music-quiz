@@ -1,26 +1,8 @@
 import { ApiClient } from '@/lib/apiClient';
-import { authManager } from '@/lib/auth';
 import { PlaylistResponse } from '@/schemas/App/Data/Response';
-import { Link, redirect, useLoaderData, useParams } from 'react-router-dom';
+import { Link, useLoaderData, useParams } from 'react-router-dom';
 
 export async function playlistDetailLoader({ params }: any) {
-    let user = authManager.getUser();
-    let token = authManager.getToken();
-
-    // Try to restore from session if no local token
-    if (!user || !token) {
-        const result = await ApiClient.fetchSessionToken();
-        if (result._tag === 'Success') {
-            authManager.setAuthData(result.data.token, result.data.user);
-            user = result.data.user;
-            token = result.data.token;
-        }
-    }
-
-    if (!user || !token) {
-        return redirect('/login');
-    }
-
     const result = await ApiClient.showPlaylist(params.id);
     if (result._tag === 'Success') {
         return result.data;

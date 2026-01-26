@@ -27,9 +27,19 @@ class SystemInfoWidget extends BaseSystemInfoWidget
             'icon' => 'heroicon-o-squares-2x2',
             'type' => 'packagist',
         ],
+        [
+            'name' => 'laravel/reverb',
+            'displayName' => 'Reverb Version',
+            'icon' => 'heroicon-o-signal',
+            'type' => 'packagist',
+        ],
+        [
+            'name' => 'laravel/sanctum',
+            'displayName' => 'Sanctum Version',
+            'icon' => 'heroicon-o-shield-check',
+            'type' => 'packagist',
+        ],
     ];
-
-    protected string|null $heading = 'System Information';
 
     protected null|string $pollingInterval = '60s';
 

@@ -15,9 +15,6 @@ class ShowUser
      */
     public function __invoke(AuthRequest $request): Response
     {
-        $user = $request->assertedUser();
-        $userData = UserData::from($user);
-
-        return response()->json($userData);
+        return response()->json(UserData::from($request->assertedUser()));
     }
 }

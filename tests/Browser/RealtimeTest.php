@@ -22,6 +22,7 @@ afterEach(function () {
  | They use Event::fake() to mock the broadcasting layer.
  |
  */
+
 it('broadcasts to correct private channel', function (): void {
     $user = User::factory()->create();
 

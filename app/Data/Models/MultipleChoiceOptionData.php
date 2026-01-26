@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Data\Models;
 
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 
 class MultipleChoiceOptionData extends Data
 {
@@ -17,11 +16,9 @@ class MultipleChoiceOptionData extends Data
         public string $option_text,
         public bool $is_correct,
         public null|int $sort_order,
-        /** @var QuizQuestionData|Lazy $question */
-        #[AutoWhenLoadedLazy]
-        public Lazy|QuizQuestionData $question,
-        /** @var Collection<array-key,PlayerAnswerData>|Lazy $player_answers */
-        #[AutoWhenLoadedLazy('playerAnswers')]
-        public Collection|Lazy $player_answers,
+        /** @var QuizQuestionData|Optional $question */
+        public Optional|QuizQuestionData $question,
+        /** @var Collection<array-key,PlayerAnswerData>|Optional */
+        public Collection|Optional $player_answers,
     ) {}
 }

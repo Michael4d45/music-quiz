@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Data\Models;
 
 use Illuminate\Support\Carbon;
-use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 
 class PlaylistItemData extends Data
 {
@@ -17,11 +16,9 @@ class PlaylistItemData extends Data
         public string $question_id,
         public int $sort_order,
         public Carbon $added_at,
-        /** @var PlaylistData|Lazy $playlist */
-        #[AutoWhenLoadedLazy]
-        public Lazy|PlaylistData $playlist,
-        /** @var QuizQuestionData|Lazy $question */
-        #[AutoWhenLoadedLazy]
-        public Lazy|QuizQuestionData $question,
+        /** @var PlaylistData|Optional $playlist */
+        public Optional|PlaylistData $playlist,
+        /** @var QuizQuestionData|Optional $question */
+        public Optional|QuizQuestionData $question,
     ) {}
 }

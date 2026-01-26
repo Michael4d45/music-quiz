@@ -9,13 +9,16 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Music Quiz">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="Music Quiz - A fun music quiz application">
+
+    <title>{{ config('app.name', 'Laravel React PWA') }}</title>
 
     <!-- Favicon -->
-    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
-    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+    <link rel="icon" href="{{ asset('favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ asset('icon-192x192.png') }}">
+    <link rel="manifest" href="{{ asset('build/manifest.webmanifest') }}">
 
     <!-- Theme initialization script to prevent FOUC -->
     <script>

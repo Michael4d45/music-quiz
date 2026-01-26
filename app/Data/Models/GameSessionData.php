@@ -7,9 +7,8 @@ namespace App\Data\Models;
 use App\Enums\SessionStatus;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 
 class GameSessionData extends Data
 {
@@ -26,29 +25,21 @@ class GameSessionData extends Data
         public null|Carbon $ended_at,
         public null|Carbon $created_at,
         public null|Carbon $updated_at,
-        /** @var UserData|Lazy $host */
-        #[AutoWhenLoadedLazy]
-        public Lazy|UserData $host,
-        /** @var QuizModeData|Lazy $quiz_mode */
-        #[AutoWhenLoadedLazy('quizMode')]
-        public Lazy|QuizModeData $quiz_mode,
-        /** @var ScoringRuleData|Lazy $scoring_rule */
-        #[AutoWhenLoadedLazy('scoringRule')]
-        public Lazy|ScoringRuleData $scoring_rule,
-        /** @var PlaylistData|null|Lazy $playlist */
-        #[AutoWhenLoadedLazy]
-        public Lazy|PlaylistData|null $playlist,
-        /** @var Collection<array-key,SessionParticipantData>|Lazy $participants */
-        #[AutoWhenLoadedLazy]
-        public Collection|Lazy $participants,
-        /** @var Collection<array-key,SessionRoundData>|Lazy $rounds */
-        #[AutoWhenLoadedLazy]
-        public Collection|Lazy $rounds,
-        /** @var Collection<array-key,SessionEventData>|Lazy $events */
-        #[AutoWhenLoadedLazy]
-        public Collection|Lazy $events,
-        /** @var Collection<array-key,SessionFinalScoreData>|Lazy $final_scores */
-        #[AutoWhenLoadedLazy('finalScores')]
-        public Collection|Lazy $final_scores,
+        /** @var UserData|Optional $host */
+        public Optional|UserData $host,
+        /** @var QuizModeData|Optional $quiz_mode */
+        public Optional|QuizModeData $quiz_mode,
+        /** @var ScoringRuleData|Optional $scoring_rule */
+        public Optional|ScoringRuleData $scoring_rule,
+        /** @var PlaylistData|null|Optional $playlist */
+        public Optional|PlaylistData|null $playlist,
+        /** @var Collection<array-key,SessionParticipantData>|Optional */
+        public Collection|Optional $participants,
+        /** @var Collection<array-key,SessionRoundData>|Optional */
+        public Collection|Optional $rounds,
+        /** @var Collection<array-key,SessionEventData>|Optional */
+        public Collection|Optional $events,
+        /** @var Collection<array-key,SessionFinalScoreData>|Optional */
+        public Collection|Optional $final_scores,
     ) {}
 }

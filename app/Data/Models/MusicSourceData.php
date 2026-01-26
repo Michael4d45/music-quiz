@@ -6,9 +6,8 @@ namespace App\Data\Models;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 
 class MusicSourceData extends Data
 {
@@ -23,14 +22,11 @@ class MusicSourceData extends Data
         public int $priority,
         public null|Carbon $created_at,
         public null|Carbon $updated_at,
-        /** @var Collection<array-key,SourceApiCredentialData>|Lazy $api_credentials */
-        #[AutoWhenLoadedLazy('apiCredentials')]
-        public Collection|Lazy $api_credentials,
-        /** @var Collection<array-key,MusicTrackData>|Lazy $primary_tracks */
-        #[AutoWhenLoadedLazy('primaryTracks')]
-        public Collection|Lazy $primary_tracks,
-        /** @var Collection<array-key,TrackSourceLinkData>|Lazy $track_source_links */
-        #[AutoWhenLoadedLazy('trackSourceLinks')]
-        public Collection|Lazy $track_source_links,
+        /** @var Collection<array-key,SourceApiCredentialData>|Optional */
+        public Collection|Optional $api_credentials,
+        /** @var Collection<array-key,MusicTrackData>|Optional */
+        public Collection|Optional $primary_tracks,
+        /** @var Collection<array-key,TrackSourceLinkData>|Optional */
+        public Collection|Optional $track_source_links,
     ) {}
 }

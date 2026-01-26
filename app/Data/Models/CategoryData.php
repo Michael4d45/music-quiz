@@ -6,9 +6,8 @@ namespace App\Data\Models;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 
 class CategoryData extends Data
 {
@@ -20,11 +19,9 @@ class CategoryData extends Data
         public int $sort_order,
         public null|Carbon $created_at,
         public null|Carbon $updated_at,
-        /** @var Collection<array-key,SubCategoryData>|Lazy $sub_categories */
-        #[AutoWhenLoadedLazy('subCategories')]
-        public Collection|Lazy $sub_categories,
-        /** @var Collection<array-key,UserStatisticData>|Lazy $user_statistics */
-        #[AutoWhenLoadedLazy('userStatistics')]
-        public Collection|Lazy $user_statistics,
+        /** @var Collection<array-key,SubCategoryData>|Optional */
+        public Collection|Optional $sub_categories,
+        /** @var Collection<array-key,UserStatisticData>|Optional */
+        public Collection|Optional $user_statistics,
     ) {}
 }

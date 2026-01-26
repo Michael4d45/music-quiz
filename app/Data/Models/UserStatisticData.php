@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Data\Models;
 
 use Illuminate\Support\Carbon;
-use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 
 class UserStatisticData extends Data
 {
@@ -22,11 +21,9 @@ class UserStatisticData extends Data
         public null|string $favorite_category_id,
         public null|Carbon $created_at,
         public null|Carbon $updated_at,
-        /** @var UserData|Lazy $user */
-        #[AutoWhenLoadedLazy]
-        public Lazy|UserData $user,
-        /** @var CategoryData|null|Lazy $favorite_category */
-        #[AutoWhenLoadedLazy('favoriteCategory')]
-        public CategoryData|Lazy|null $favorite_category,
+        /** @var UserData|Optional $user */
+        public Optional|UserData $user,
+        /** @var CategoryData|null|Optional $favorite_category */
+        public CategoryData|Optional|null $favorite_category,
     ) {}
 }

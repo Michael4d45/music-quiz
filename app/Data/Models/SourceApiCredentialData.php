@@ -6,9 +6,8 @@ namespace App\Data\Models;
 
 use App\Enums\CredentialType;
 use Illuminate\Support\Carbon;
-use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 
 class SourceApiCredentialData extends Data
 {
@@ -20,8 +19,7 @@ class SourceApiCredentialData extends Data
         public null|Carbon $expires_at,
         public null|Carbon $created_at,
         public null|Carbon $updated_at,
-        /** @var MusicSourceData|Lazy $source */
-        #[AutoWhenLoadedLazy]
-        public Lazy|MusicSourceData $source,
+        /** @var MusicSourceData|Optional $source */
+        public Optional|MusicSourceData $source,
     ) {}
 }

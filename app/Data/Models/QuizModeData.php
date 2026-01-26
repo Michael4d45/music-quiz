@@ -6,9 +6,8 @@ namespace App\Data\Models;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 
 class QuizModeData extends Data
 {
@@ -20,8 +19,7 @@ class QuizModeData extends Data
         public bool $requires_manual_scoring,
         public null|Carbon $created_at,
         public null|Carbon $updated_at,
-        /** @var Collection<array-key,GameSessionData>|Lazy $game_sessions */
-        #[AutoWhenLoadedLazy('gameSessions')]
-        public Collection|Lazy $game_sessions,
+        /** @var Collection<array-key,GameSessionData>|Optional */
+        public Collection|Optional $game_sessions,
     ) {}
 }

@@ -102,14 +102,27 @@ export const router = createBrowserRouter([
                 element: <ProfilePage />,
                 loader: profileLoader,
                 errorElement: <ErrorPage />,
+                handle: { isProtected: true },
             },
             {
                 path: 'login',
                 element: <LoginPage />,
+                handle: { isAuthPage: true },
             },
             {
                 path: 'register',
                 element: <RegisterPage />,
+                handle: { isAuthPage: true },
+            },
+            {
+                path: 'forgot-password',
+                element: <ForgotPasswordPage />,
+                handle: { isAuthPage: true },
+            },
+            {
+                path: 'reset-password/:email/:token',
+                element: <ResetPasswordPage />,
+                handle: { isAuthPage: true },
             },
             // Browse routes
             {
@@ -230,14 +243,6 @@ export const router = createBrowserRouter([
                 element: <StatisticsPage />,
                 loader: statisticsLoader,
                 errorElement: <ErrorPage />,
-            },
-            {
-                path: 'forgot-password',
-                element: <ForgotPasswordPage />,
-            },
-            {
-                path: 'reset-password/:email/:token',
-                element: <ResetPasswordPage />,
             },
         ],
     },

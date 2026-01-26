@@ -1,15 +1,11 @@
 <?php
 
-use App\Http\Middleware\RefreshSanctumToken;
+declare(strict_types=1);
+
 use Illuminate\Support\Facades\Route;
 
-// Home endpoint (authenticated, but returns empty data for guests)
 Route::get('home', \App\Actions\Home\ShowHome::class);
 
-// Content endpoint (public)
-Route::get('content', \App\Actions\Content\ShowContent::class);
-
-// Browse endpoints (public)
 Route::prefix('browse')->group(function () {
     Route::get('', \App\Actions\Browse\ShowBrowse::class);
     Route::get('categories', \App\Actions\Browse\ShowCategories::class);
@@ -22,28 +18,18 @@ Route::prefix('browse')->group(function () {
     Route::get('playlists', \App\Actions\Browse\ShowPublicPlaylists::class);
 });
 
-// Leaderboard (public)
 Route::get('leaderboard', \App\Actions\Statistics\ShowLeaderboard::class);
-
-// Subcategories (public)
 Route::get(
     'sub-categories',
     \App\Actions\SubCategories\ShowSubCategories::class,
 );
-
-// Music sources (public)
 Route::get('music-sources', \App\Actions\MusicSources\ShowMusicSources::class);
-
-// Quiz modes (public)
 Route::get('quiz-modes', \App\Actions\QuizModes\ShowQuizModes::class);
-
-// Scoring rules (public)
 Route::get('scoring-rules', \App\Actions\ScoringRules\ShowScoringRules::class);
 
-// Authenticated routes
 Route::middleware([
+    'web',
     'auth:sanctum',
-    RefreshSanctumToken::class,
 ])->group(function () {
     // Playlists endpoints
     Route::prefix('playlists')->group(function () {

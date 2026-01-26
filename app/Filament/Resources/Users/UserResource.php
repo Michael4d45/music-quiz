@@ -28,7 +28,7 @@ class UserResource extends Resource
     protected static \BackedEnum|string|null $navigationIcon =
         Heroicon::OutlinedRectangleStack;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Core Identity & Analytics';
+    protected static string|\UnitEnum|null $navigationGroup = 'Users';
 
     public static function form(Schema $schema): Schema
     {

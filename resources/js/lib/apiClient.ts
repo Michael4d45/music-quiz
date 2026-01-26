@@ -1,1021 +1,226 @@
 import { UserDataSchema } from '@/schemas/App/Data/Models';
 import {
-    AuthenticateBroadcastingRequestSchema,
-    CreateMusicTrackRequestSchema,
-    CreatePlaylistRequestSchema,
-    CreateQuizQuestionRequestSchema,
-    CreateSessionRequestSchema,
-    JoinSessionRequestSchema,
     LoginRequest,
-    LoginRequestSchema,
     RegisterRequest,
-    RegisterRequestSchema,
     ResetPasswordRequest,
-    ResetPasswordRequestSchema,
-    SubmitAnswerRequestSchema,
 } from '@/schemas/App/Data/Requests';
 import {
-    ActiveGamesResponseSchema,
     AuthenticateBroadcastingResponseSchema,
-    AuthResponseSchema,
-    BrowseResponseSchema,
-    CategoriesResponseSchema,
-    CategoryResponseSchema,
     ContentItemsSchema,
-    HomeResponseSchema,
-    LeaderboardResponseSchema,
+    DisconnectGoogleResponseSchema,
     MessageResponseSchema,
-    MusicTrackResponseSchema,
-    MusicTracksResponseSchema,
-    PlaylistResponseSchema,
-    PlaylistsResponseSchema,
-    QuizQuestionResponseSchema,
-    QuizQuestionsResponseSchema,
-    SessionLobbyResponseSchema,
-    SessionPlayResponseSchema,
-    SessionResultsResponseSchema,
-    StatisticsResponseSchema,
-    SubmitAnswerResponseSchema,
-    TokenListResponseSchema,
-    TrackResponseSchema,
-    TracksResponseSchema,
 } from '@/schemas/App/Data/Response';
-import {
-    FetchHttpClient,
-    HttpApi,
-    HttpApiClient,
-    HttpApiEndpoint,
-    HttpApiGroup,
-    HttpClient,
-    HttpClientRequest,
-} from '@effect/platform';
-import { Effect, Schema } from 'effect';
-
-import { HttpApiDecodeError } from '@effect/platform/HttpApiError';
-import { HttpClientError } from '@effect/platform/HttpClientError';
-import { ParseError } from 'effect/ParseResult';
+import { Effect, pipe } from 'effect';
 import { apiCache } from './apiCache';
-import { authManager } from './auth';
-
-// Intercept fetch to handle token rotation
-const originalFetch = window.fetch;
-window.fetch = async (...args) => {
-    const response = await originalFetch(...args);
-
-    // Check for token rotation header
-    const newToken = response.headers.get('X-New-Token');
-    if (newToken) {
-        console.debug('[Auth] Token rotated, updating stored token');
-        authManager.setToken(newToken);
-    }
-
-    return response;
-};
-
-export const ValidationErrorSchema = Schema.Struct({
-    _tag: Schema.Literal('ValidationError'),
-    message: Schema.String,
-    errors: Schema.Record({
-        key: Schema.String,
-        value: Schema.Array(Schema.String),
-    }),
-});
-
-export type ValidationError = Schema.Schema.Type<typeof ValidationErrorSchema>;
-
-export const CsrfTokenExpiredErrorSchema = Schema.Struct({
-    _tag: Schema.Literal('CsrfTokenExpiredError'),
-    message: Schema.String,
-});
-
-export type CsrfTokenExpiredError = Schema.Schema.Type<
-    typeof CsrfTokenExpiredErrorSchema
->;
-
-export const AuthenticationErrorSchema = Schema.Struct({
-    _tag: Schema.Literal('AuthenticationError'),
-    message: Schema.String,
-});
-
-export type AuthenticationError = Schema.Schema.Type<
-    typeof AuthenticationErrorSchema
->;
-
-export const NotFoundErrorSchema = Schema.Struct({
-    _tag: Schema.Literal('NotFoundError'),
-    message: Schema.String,
-});
-
-export type NotFoundError = Schema.Schema.Type<typeof NotFoundErrorSchema>;
-
-export const TooManyAttemptsErrorSchema = Schema.Struct({
-    _tag: Schema.Literal('TooManyAttemptsError'),
-    message: Schema.String,
-});
-
-export type TooManyAttemptsError = Schema.Schema.Type<
-    typeof TooManyAttemptsErrorSchema
->;
+import {
+    ensureCsrfToken,
+    httpRequest,
+    runEffect,
+    withCache,
+    withRetry,
+} from './apiCore';
 
 /* ============================================================================
- * API Definition
- * ============================================================================
- */
+ * API Client Singleton
+ * ============================================================================ */
 
-const authGroup = HttpApiGroup.make('auth')
-    .add(
-        HttpApiEndpoint.post('login', '/api/login')
-            .setPayload(LoginRequestSchema)
-            .addSuccess(AuthResponseSchema),
-    )
-    .add(
-        HttpApiEndpoint.post('register', '/api/register')
-            .setPayload(RegisterRequestSchema)
-            .addSuccess(AuthResponseSchema),
-    )
-    .add(
-        HttpApiEndpoint.post('logout', '/api/logout').addSuccess(
-            MessageResponseSchema,
-        ),
-    )
-    .add(
-        HttpApiEndpoint.post(
-            'disconnectGoogle',
-            '/api/disconnect-google',
-        ).addSuccess(
-            Schema.Struct({
-                message: Schema.String,
-                user: UserDataSchema,
-            }),
-        ),
-    )
-    .add(
-        HttpApiEndpoint.post(
-            'sendPasswordResetLink',
-            '/api/send-password-reset-link',
-        )
-            .setPayload(Schema.Struct({ email: Schema.String }))
-            .addSuccess(MessageResponseSchema),
-    )
-    .add(
-        HttpApiEndpoint.post('resetPassword', '/api/reset-password')
-            .setPayload(ResetPasswordRequestSchema)
-            .addSuccess(MessageResponseSchema),
-    )
-    .add(
-        HttpApiEndpoint.get('oauthToken', '/api/oauth-token').addSuccess(
-            AuthResponseSchema,
-        ),
-    )
-    .add(
-        HttpApiEndpoint.get('sessionToken', '/api/token').addSuccess(
-            AuthResponseSchema,
-        ),
-    )
-    .add(
-        HttpApiEndpoint.get('listTokens', '/api/tokens').addSuccess(
-            TokenListResponseSchema,
-        ),
-    )
-    .add(
-        HttpApiEndpoint.del('deleteToken', '/api/tokens/:tokenId')
-            .setPath(Schema.Struct({ tokenId: Schema.String }))
-            .addSuccess(MessageResponseSchema),
-    )
-    .add(
-        HttpApiEndpoint.post(
-            'resendVerificationEmail',
-            '/api/send-email-verification-notification',
-        ).addSuccess(MessageResponseSchema),
-    );
-
-const userGroup = HttpApiGroup.make('users').add(
-    HttpApiEndpoint.get('show', '/api/user').addSuccess(UserDataSchema),
-);
-
-const contentGroup = HttpApiGroup.make('content').add(
-    HttpApiEndpoint.get('show', '/api/content').addSuccess(ContentItemsSchema),
-);
-
-// Home endpoint (authenticated, but returns empty data for guests)
-const homeGroup = HttpApiGroup.make('home').add(
-    HttpApiEndpoint.get('show', '/api/home').addSuccess(HomeResponseSchema),
-);
-
-// Browse endpoints (public)
-const browseGroup = HttpApiGroup.make('browse')
-    .add(
-        HttpApiEndpoint.get('index', '/api/browse').addSuccess(
-            BrowseResponseSchema,
-        ),
-    )
-    .add(
-        HttpApiEndpoint.get('categories', '/api/browse/categories').addSuccess(
-            CategoriesResponseSchema,
-        ),
-    )
-    .add(
-        HttpApiEndpoint.get('category', '/api/browse/categories/:id')
-            .setPath(Schema.Struct({ id: Schema.String }))
-            .addSuccess(CategoryResponseSchema),
-    )
-    .add(
-        HttpApiEndpoint.get('tracks', '/api/browse/tracks').addSuccess(
-            TracksResponseSchema,
-        ),
-    )
-    .add(
-        HttpApiEndpoint.get('track', '/api/browse/tracks/:id')
-            .setPath(Schema.Struct({ id: Schema.String }))
-            .addSuccess(TrackResponseSchema),
-    )
-    .add(
-        HttpApiEndpoint.get('playlists', '/api/browse/playlists').addSuccess(
-            PlaylistsResponseSchema,
-        ),
-    );
-
-// Subcategories and music sources (public)
-const subCategoriesGroup = HttpApiGroup.make('subCategories').add(
-    HttpApiEndpoint.get('index', '/api/sub-categories').addSuccess(
-        Schema.Struct({
-            sub_categories: Schema.Array(Schema.Any),
-        }),
-    ),
-);
-
-const musicSourcesGroup = HttpApiGroup.make('musicSources').add(
-    HttpApiEndpoint.get('index', '/api/music-sources').addSuccess(
-        Schema.Struct({
-            music_sources: Schema.Array(Schema.Any),
-        }),
-    ),
-);
-
-// Quiz modes and scoring rules (public)
-const quizModesGroup = HttpApiGroup.make('quizModes').add(
-    HttpApiEndpoint.get('index', '/api/quiz-modes').addSuccess(
-        Schema.Struct({
-            quiz_modes: Schema.Array(Schema.Any),
-        }),
-    ),
-);
-
-const scoringRulesGroup = HttpApiGroup.make('scoringRules').add(
-    HttpApiEndpoint.get('index', '/api/scoring-rules').addSuccess(
-        Schema.Struct({
-            scoring_rules: Schema.Array(Schema.Any),
-        }),
-    ),
-);
-
-// Leaderboard (public)
-const leaderboardGroup = HttpApiGroup.make('leaderboard').add(
-    HttpApiEndpoint.get('show', '/api/leaderboard').addSuccess(
-        LeaderboardResponseSchema,
-    ),
-);
-
-// Playlists endpoints (authenticated)
-const playlistsGroup = HttpApiGroup.make('playlists')
-    .add(
-        HttpApiEndpoint.get('list', '/api/playlists').addSuccess(
-            PlaylistsResponseSchema,
-        ),
-    )
-    .add(
-        HttpApiEndpoint.post('create', '/api/playlists')
-            .setPayload(CreatePlaylistRequestSchema)
-            .addSuccess(PlaylistResponseSchema),
-    )
-    .add(
-        HttpApiEndpoint.get('show', '/api/playlists/:id')
-            .setPath(Schema.Struct({ id: Schema.String }))
-            .addSuccess(PlaylistResponseSchema),
-    )
-    .add(
-        HttpApiEndpoint.put('update', '/api/playlists/:id')
-            .setPath(Schema.Struct({ id: Schema.String }))
-            .setPayload(CreatePlaylistRequestSchema)
-            .addSuccess(PlaylistResponseSchema),
-    )
-    .add(
-        HttpApiEndpoint.get(
-            'userPlaylists',
-            '/api/playlists/user/list',
-        ).addSuccess(
-            Schema.Struct({
-                playlists: Schema.Array(Schema.Any),
-            }),
-        ),
-    );
-
-// Music Tracks endpoints (authenticated)
-const musicTracksGroup = HttpApiGroup.make('musicTracks')
-    .add(
-        HttpApiEndpoint.get('list', '/api/music-tracks').addSuccess(
-            MusicTracksResponseSchema,
-        ),
-    )
-    .add(
-        HttpApiEndpoint.post('create', '/api/music-tracks')
-            .setPayload(CreateMusicTrackRequestSchema)
-            .addSuccess(MusicTrackResponseSchema, { status: 201 }),
-    )
-    .add(
-        HttpApiEndpoint.get('userTracks', '/api/music-tracks/user').addSuccess(
-            Schema.Struct({
-                tracks: Schema.Array(Schema.Any),
-            }),
-        ),
-    );
-
-// Quiz Questions endpoints (authenticated)
-const quizQuestionsGroup = HttpApiGroup.make('quizQuestions')
-    .add(
-        HttpApiEndpoint.get('list', '/api/quiz-questions').addSuccess(
-            QuizQuestionsResponseSchema,
-        ),
-    )
-    .add(
-        HttpApiEndpoint.post('create', '/api/quiz-questions')
-            .setPayload(CreateQuizQuestionRequestSchema)
-            .addSuccess(QuizQuestionResponseSchema, { status: 201 }),
-    );
-
-// Game Sessions endpoints (authenticated)
-const sessionsGroup = HttpApiGroup.make('sessions')
-    .add(
-        HttpApiEndpoint.get(
-            'activeGames',
-            '/api/sessions/active-games',
-        ).addSuccess(ActiveGamesResponseSchema),
-    )
-    .add(
-        HttpApiEndpoint.post('create', '/api/sessions')
-            .setPayload(CreateSessionRequestSchema)
-            .addSuccess(SessionLobbyResponseSchema, { status: 201 }),
-    )
-    .add(
-        HttpApiEndpoint.post('join', '/api/sessions/join')
-            .setPayload(JoinSessionRequestSchema)
-            .addSuccess(SessionLobbyResponseSchema, { status: 201 }),
-    )
-    .add(
-        HttpApiEndpoint.get('lobby', '/api/sessions/:roomCode')
-            .setPath(Schema.Struct({ roomCode: Schema.String }))
-            .addSuccess(SessionLobbyResponseSchema),
-    )
-    .add(
-        HttpApiEndpoint.post('start', '/api/sessions/:roomCode/start')
-            .setPath(Schema.Struct({ roomCode: Schema.String }))
-            .addSuccess(SessionLobbyResponseSchema),
-    )
-    .add(
-        HttpApiEndpoint.post('leave', '/api/sessions/:roomCode/leave')
-            .setPath(Schema.Struct({ roomCode: Schema.String }))
-            .addSuccess(Schema.Struct({ message: Schema.String })),
-    )
-    .add(
-        HttpApiEndpoint.get('play', '/api/sessions/:roomCode/play')
-            .setPath(Schema.Struct({ roomCode: Schema.String }))
-            .addSuccess(SessionPlayResponseSchema),
-    )
-    .add(
-        HttpApiEndpoint.post('answer', '/api/sessions/:roomCode/answer')
-            .setPath(Schema.Struct({ roomCode: Schema.String }))
-            .setPayload(SubmitAnswerRequestSchema)
-            .addSuccess(SubmitAnswerResponseSchema),
-    )
-    .add(
-        HttpApiEndpoint.post('nextRound', '/api/sessions/:roomCode/next-round')
-            .setPath(Schema.Struct({ roomCode: Schema.String }))
-            .addSuccess(Schema.Struct({ message: Schema.String })),
-    )
-    .add(
-        HttpApiEndpoint.get('results', '/api/sessions/:roomCode/results')
-            .setPath(Schema.Struct({ roomCode: Schema.String }))
-            .addSuccess(SessionResultsResponseSchema),
-    );
-
-// Broadcasting endpoints (authenticated)
-const broadcastingGroup = HttpApiGroup.make('broadcasting').add(
-    HttpApiEndpoint.post('auth', '/api/broadcasting/auth')
-        .setPayload(AuthenticateBroadcastingRequestSchema)
-        .addSuccess(AuthenticateBroadcastingResponseSchema),
-);
-
-// Statistics endpoints (authenticated)
-const statisticsGroup = HttpApiGroup.make('statistics').add(
-    HttpApiEndpoint.get('show', '/api/statistics').addSuccess(
-        StatisticsResponseSchema,
-    ),
-);
-
-export const Api = HttpApi.make('BackendApi')
-    .add(authGroup)
-    .add(userGroup)
-    .add(contentGroup)
-    .add(homeGroup)
-    .add(browseGroup)
-    .add(subCategoriesGroup)
-    .add(musicSourcesGroup)
-    .add(quizModesGroup)
-    .add(scoringRulesGroup)
-    .add(leaderboardGroup)
-    .add(playlistsGroup)
-    .add(musicTracksGroup)
-    .add(quizQuestionsGroup)
-    .add(sessionsGroup)
-    .add(broadcastingGroup)
-    .add(statisticsGroup)
-    .addError(ValidationErrorSchema, { status: 422 })
-    .addError(CsrfTokenExpiredErrorSchema, { status: 419 })
-    .addError(AuthenticationErrorSchema, { status: 401 })
-    .addError(NotFoundErrorSchema, { status: 404 })
-    .addError(TooManyAttemptsErrorSchema, { status: 429 });
-
-/* ============================================================================
- * Form-Friendly Result
- * ============================================================================
- */
-const baseUrl = ''; // Empty string to use relative paths
-
-// Base transform that always adds Accept header
-const withJsonAccept = HttpClient.mapRequest(
-    HttpClientRequest.setHeader('Accept', 'application/json'),
-);
-
-// Base client with common configuration
-const baseClient = HttpApiClient.make(Api, {
-    baseUrl,
-    transformClient: (client) => client.pipe(withJsonAccept),
-});
-
-// Auth client - adds bearer token on top of base
-const baseAuthClient = HttpApiClient.make(Api, {
-    baseUrl,
-    transformClient: (client) => {
-        const token = authManager.getToken();
-        if (token) {
-            return client.pipe(
-                withJsonAccept,
-                HttpClient.mapRequest(HttpClientRequest.bearerToken(token)),
-            );
-        }
-        return client.pipe(withJsonAccept);
-    },
-});
-
-/* ============================================================================
- * Client Types (inferred from HttpApiClient.make)
- * ============================================================================
- */
-type BaseClientType = Effect.Effect.Success<typeof baseClient>;
-type BaseAuthClientType = Effect.Effect.Success<typeof baseAuthClient>;
-
-type ErrorsType =
-    | HttpApiDecodeError
-    | ValidationError
-    | CsrfTokenExpiredError
-    | HttpClientError
-    | ParseError
-    | AuthenticationError
-    | NotFoundError
-    | TooManyAttemptsError;
-
-/* ============================================================================
- * Singleton Client
- * ============================================================================
- */
 class ApiClientSingleton {
+    private csrfInitialized = false;
+
+    private async ensureCsrf(): Promise<void> {
+        if (!this.csrfInitialized) {
+            await Effect.runPromise(ensureCsrfToken);
+            this.csrfInitialized = true;
+        }
+    }
+
     /* ==========================================================================
-     * Memoized Client Instances
-     * ========================================================================== */
-    private _baseClientPromise: Promise<BaseClientType> | null = null;
-    private _baseAuthClientPromise: Promise<BaseAuthClientType> | null = null;
+     * Content
+     * ========================================================================= */
 
-    private getBaseClient(): Promise<BaseClientType> {
-        if (!this._baseClientPromise) {
-            this._baseClientPromise = Effect.runPromise(
-                baseClient.pipe(Effect.provide(FetchHttpClient.layer)),
-            );
-        }
-        return this._baseClientPromise;
-    }
-
-    private getBaseAuthClient(): Promise<BaseAuthClientType> {
-        if (!this._baseAuthClientPromise) {
-            this._baseAuthClientPromise = Effect.runPromise(
-                baseAuthClient.pipe(Effect.provide(FetchHttpClient.layer)),
-            );
-        }
-        return this._baseAuthClientPromise;
-    }
-
-    private runEffect<A>(
-        effect: Effect.Effect<A, ErrorsType>,
-        context: string,
-    ) {
-        return Effect.runPromise(
-            effect.pipe(
-                Effect.map((data) => ({
-                    _tag: 'Success' as const,
-                    data,
-                })),
-                Effect.catchTag('ValidationError', (e) => {
-                    return Effect.succeed({
-                        _tag: 'ValidationError' as const,
-                        message: e.message,
-                        errors: e.errors,
-                    });
-                }),
-                Effect.catchTag('CsrfTokenExpiredError', (e) => {
-                    return Effect.succeed({
-                        _tag: 'CsrfTokenExpiredError' as const,
-                        message: e.message,
-                    });
-                }),
-                Effect.catchTag('AuthenticationError', (e) => {
-                    return Effect.succeed({
-                        _tag: 'AuthenticationError' as const,
-                        message: e.message,
-                    });
-                }),
-                Effect.catchTag('NotFoundError', (e) => {
-                    return Effect.succeed({
-                        _tag: 'NotFoundError' as const,
-                        message: e.message,
-                    });
-                }),
-                Effect.catchTag('TooManyAttemptsError', (e) => {
-                    return Effect.succeed({
-                        _tag: 'TooManyAttemptsError' as const,
-                        message: e.message,
-                    });
-                }),
-                Effect.catchTag('ParseError', (e) => {
-                    console.error(context, e);
-                    return Effect.succeed({
-                        _tag: 'ParseError' as const,
-                        message: e.toString(),
-                    });
-                }),
-                Effect.catchAll((e) => {
-                    console.error(e);
-                    return Effect.succeed({
-                        _tag: 'FatalError' as const,
-                        message: e.toString(),
-                    });
-                }),
-                Effect.provide(FetchHttpClient.layer),
+    async showContent() {
+        const effect = pipe(
+            httpRequest(
+                `/api/content`,
+                {
+                    method: 'GET',
+                },
+                ContentItemsSchema,
             ),
+            (eff) => withRetry(eff, 'getContent'),
+            (eff) => withCache(eff, `content`),
         );
-    }
 
-    /**
-     * Run an Effect with optional caching for offline support.
-     * If a cacheKey is provided:
-     * - Online: Fetch fresh data and cache it
-     * - Offline: Return cached data if available
-     */
-    private async runEffectWithCache<A>(
-        effect: Effect.Effect<A, ErrorsType>,
-        cacheKey: string,
-    ) {
-        // If offline, try to return cached data
-        if (!navigator.onLine) {
-            const cached = await apiCache.get<A>(cacheKey);
-            if (cached !== undefined) {
-                return {
-                    _tag: 'Success' as const,
-                    data: cached,
-                };
-            }
-            // No cached data available while offline
-            return {
-                _tag: 'FatalError' as const,
-                message: 'You are offline and no cached data is available.',
-            };
-        }
-
-        // Online: fetch fresh data
-        const result = await this.runEffect(effect, cacheKey);
-
-        // Cache successful responses
-        if (result._tag === 'Success') {
-            await apiCache.set(cacheKey, result.data);
-        }
-
-        return result;
+        return runEffect(effect, 'getContent');
     }
 
     /* ==========================================================================
-     * Public API Methods
+     * Auth Methods
      * ========================================================================== */
+
     async login(payload: LoginRequest) {
-        const client = await this.getBaseClient();
-        return this.runEffect(client.auth.login({ payload }), 'login');
+        await this.ensureCsrf();
+
+        const effect = pipe(
+            httpRequest(
+                '/login',
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                },
+                MessageResponseSchema,
+            ),
+            (eff) => withRetry(eff, 'login'),
+        );
+
+        return runEffect(effect, 'login');
     }
 
     async register(payload: RegisterRequest) {
-        const client = await this.getBaseClient();
-        return this.runEffect(client.auth.register({ payload }), 'register');
-    }
+        await this.ensureCsrf();
 
-    async sendPasswordResetLink(email: string) {
-        const client = await this.getBaseClient();
-        return this.runEffect(
-            client.auth.sendPasswordResetLink({ payload: { email } }),
-            'sendPasswordResetLink',
+        const effect = pipe(
+            httpRequest(
+                '/register',
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                },
+                MessageResponseSchema,
+            ),
+            (eff) => withRetry(eff, 'register'),
         );
-    }
 
-    async resetPassword(payload: ResetPasswordRequest) {
-        const client = await this.getBaseClient();
-        return this.runEffect(
-            client.auth.resetPassword({ payload }),
-            'resetPassword',
-        );
-    }
-
-    async showUser() {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(client.users.show(), 'showUser');
+        return runEffect(effect, 'register');
     }
 
     async logout() {
-        const client = await this.getBaseAuthClient();
-        const result = await this.runEffect(client.auth.logout({}), 'logout');
-        // Clear cached data on logout to prevent data leakage
-        await apiCache.clear();
-        return result;
+        const effect = pipe(
+            httpRequest(
+                '/api/logout',
+                {
+                    method: 'POST',
+                },
+                MessageResponseSchema,
+            ),
+            Effect.tap(() => Effect.promise(() => apiCache.clear())),
+        );
+
+        return runEffect(effect, 'logout');
+    }
+
+    async sendPasswordResetLink(email: string) {
+        await this.ensureCsrf();
+
+        const effect = pipe(
+            httpRequest(
+                '/api/send-password-reset-link',
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email }),
+                },
+                MessageResponseSchema,
+            ),
+            (eff) => withRetry(eff, 'sendPasswordResetLink'),
+        );
+
+        return runEffect(effect, 'sendPasswordResetLink');
+    }
+
+    async resetPassword(payload: ResetPasswordRequest) {
+        await this.ensureCsrf();
+
+        const effect = pipe(
+            httpRequest(
+                '/api/reset-password',
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                },
+                MessageResponseSchema,
+            ),
+            (eff) => withRetry(eff, 'resetPassword'),
+        );
+
+        return runEffect(effect, 'resetPassword');
+    }
+
+    async resendVerificationEmail() {
+        const effect = pipe(
+            httpRequest(
+                '/api/send-email-verification-notification',
+                {
+                    method: 'POST',
+                },
+                MessageResponseSchema,
+            ),
+            (eff) => withRetry(eff, 'resendVerificationEmail'),
+        );
+
+        return runEffect(effect, 'resendVerificationEmail');
     }
 
     async disconnectGoogle() {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.auth.disconnectGoogle({}),
-            'disconnectGoogle',
+        const effect = pipe(
+            httpRequest(
+                '/api/disconnect-google',
+                {
+                    method: 'POST',
+                },
+                DisconnectGoogleResponseSchema,
+            ),
+            (eff) => withRetry(eff, 'disconnectGoogle'),
         );
-    }
 
-    async showHome() {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(client.home.show(), 'showHome');
-    }
-
-    async showContent() {
-        const client = await this.getBaseClient();
-        return this.runEffectWithCache(client.content.show(), 'content_list');
-    }
-
-    /**
-     * Fetch OAuth token after successful OAuth callback.
-     * Called when user returns from OAuth provider with ?auth=success
-     */
-    async fetchOAuthToken() {
-        const client = await this.getBaseClient();
-        return this.runEffect(client.auth.oauthToken({}), 'fetchOAuthToken');
-    }
-
-    /**
-     * Fetch session token from server.
-     * Useful for restoring auth state from server session (e.g., after OAuth or in tests with actingAs)
-     */
-    async fetchSessionToken() {
-        const client = await this.getBaseClient();
-        return this.runEffect(
-            client.auth.sessionToken({}),
-            'fetchSessionToken',
-        );
-    }
-
-    /**
-     * Initiate Google OAuth login/registration flow
-     */
-    googleLogin(forceConsent = false) {
-        // Include current user ID in the OAuth redirect URL as a query parameter
-        // This will be picked up by RedirectToGoogle action
-        const user = authManager.getUser();
-        const query: Record<string, string> = {};
-        if (forceConsent) {
-            query.force_consent = '1';
-        }
-        if (user) {
-            query.user_id = user.id;
-        }
-
-        const queryString = new URLSearchParams(query).toString();
-        window.location.href = `/auth/google${queryString ? `?${queryString}` : ''}`;
+        return runEffect(effect, 'disconnectGoogle');
     }
 
     /* ==========================================================================
-     * Browse API Methods (Public)
+     * User Methods
      * ========================================================================== */
-    async showBrowse() {
-        const client = await this.getBaseClient();
-        return this.runEffectWithCache(client.browse.index(), 'browse_index');
-    }
 
-    async showCategories() {
-        const client = await this.getBaseClient();
-        return this.runEffectWithCache(
-            client.browse.categories(),
-            'categories_list',
+    async showUser() {
+        const effect = pipe(
+            httpRequest(
+                '/api/user',
+                {
+                    method: 'GET',
+                },
+                UserDataSchema,
+            ),
+            (eff) => withRetry(eff, 'showUser'),
         );
-    }
 
-    async showCategory(id: string) {
-        const client = await this.getBaseClient();
-        return this.runEffectWithCache(
-            client.browse.category({ path: { id } }),
-            `category_${id}`,
-        );
-    }
-
-    async showTracks(search?: string) {
-        const client = await this.getBaseClient();
-        return this.runEffect(client.browse.tracks(), 'showTracks');
-    }
-
-    async showTrack(id: string) {
-        const client = await this.getBaseClient();
-        return this.runEffectWithCache(
-            client.browse.track({ path: { id } }),
-            `track_${id}`,
-        );
-    }
-
-    async showPublicPlaylists() {
-        const client = await this.getBaseClient();
-        return this.runEffectWithCache(
-            client.browse.playlists(),
-            'public_playlists',
-        );
-    }
-
-    async showLeaderboard() {
-        const client = await this.getBaseClient();
-        return this.runEffectWithCache(
-            client.leaderboard.show(),
-            'leaderboard',
-        );
+        return runEffect(effect, 'showUser');
     }
 
     /* ==========================================================================
-     * Public Data API Methods
+     * Broadcasting Methods
      * ========================================================================== */
-    async showSubCategories() {
-        const client = await this.getBaseClient();
-        return this.runEffect(
-            client.subCategories.index(),
-            'showSubCategories',
-        );
-    }
 
-    async showMusicSources() {
-        const client = await this.getBaseClient();
-        return this.runEffect(client.musicSources.index(), 'showMusicSources');
-    }
-
-    async showQuizModes() {
-        const client = await this.getBaseClient();
-        return this.runEffect(client.quizModes.index(), 'showQuizModes');
-    }
-
-    async showScoringRules() {
-        const client = await this.getBaseClient();
-        return this.runEffect(client.scoringRules.index(), 'showScoringRules');
-    }
-
-    /* ==========================================================================
-     * Playlists API Methods (Authenticated)
-     * ========================================================================== */
-    async listPlaylists() {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(client.playlists.list(), 'listPlaylists');
-    }
-
-    async createPlaylist(
-        payload: Schema.Schema.Type<typeof CreatePlaylistRequestSchema>,
-    ) {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.playlists.create({ payload }),
-            'createPlaylist',
-        );
-    }
-
-    async showPlaylist(id: string) {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.playlists.show({ path: { id } }),
-            'showPlaylist',
-        );
-    }
-
-    async updatePlaylist(
-        id: string,
-        payload: Schema.Schema.Type<typeof CreatePlaylistRequestSchema>,
-    ) {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.playlists.update({ path: { id }, payload }),
-            'updatePlaylist',
-        );
-    }
-
-    /* ==========================================================================
-     * Music Tracks API Methods (Authenticated)
-     * ========================================================================== */
-    async listMusicTracks() {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(client.musicTracks.list(), 'listMusicTracks');
-    }
-
-    async createMusicTrack(
-        payload: Schema.Schema.Type<typeof CreateMusicTrackRequestSchema>,
-    ) {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.musicTracks.create({ payload }),
-            'createMusicTrack',
-        );
-    }
-
-    /* ==========================================================================
-     * Quiz Questions API Methods (Authenticated)
-     * ========================================================================== */
-    async listQuizQuestions() {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(client.quizQuestions.list(), 'listQuizQuestions');
-    }
-
-    async createQuizQuestion(
-        payload: Schema.Schema.Type<typeof CreateQuizQuestionRequestSchema>,
-    ) {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.quizQuestions.create({ payload }),
-            'createQuizQuestion',
-        );
-    }
-
-    /* ==========================================================================
-     * User Data API Methods (Authenticated)
-     * ========================================================================== */
-    async showUserMusicTracks() {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.musicTracks.userTracks(),
-            'showUserMusicTracks',
-        );
-    }
-
-    async showUserPlaylists() {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.playlists.userPlaylists(),
-            'showUserPlaylists',
-        );
-    }
-
-    /* ==========================================================================
-     * Game Sessions API Methods (Authenticated)
-     * ========================================================================== */
-    async listActiveGames() {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(client.sessions.activeGames(), 'listActiveGames');
-    }
-
-    async createSession(
-        payload: Schema.Schema.Type<typeof CreateSessionRequestSchema>,
-    ) {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.sessions.create({ payload }),
-            'createSession',
-        );
-    }
-
-    async joinSession(
-        payload: Schema.Schema.Type<typeof JoinSessionRequestSchema>,
-    ) {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(client.sessions.join({ payload }), 'joinSession');
-    }
-
-    async showSessionLobby(roomCode: string) {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.sessions.lobby({ path: { roomCode } }),
-            'showSessionLobby',
-        );
-    }
-
-    async startSession(roomCode: string) {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.sessions.start({ path: { roomCode } }),
-            'startSession',
-        );
-    }
-
-    async leaveSession(roomCode: string) {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.sessions.leave({ path: { roomCode } }),
-            'leaveSession',
-        );
-    }
-
-    async showSessionPlay(roomCode: string) {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.sessions.play({ path: { roomCode } }),
-            'showSessionPlay',
-        );
-    }
-
-    async submitAnswer(roomCode: string, answer: string) {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.sessions.answer({
-                path: { roomCode },
-                payload: { answer, selected_option_id: null },
-            }),
-            'submitAnswer',
-        );
-    }
-
-    async nextRound(roomCode: string) {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.sessions.nextRound({ path: { roomCode } }),
-            'nextRound',
-        );
-    }
-
-    async showSessionResults(roomCode: string) {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.sessions.results({ path: { roomCode } }),
-            'showSessionResults',
-        );
-    }
-
-    /* ==========================================================================
-     * Statistics API Methods (Authenticated)
-     * ========================================================================== */
-    async showStatistics() {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(client.statistics.show(), 'showStatistics');
-    }
-
-    /* ==========================================================================
-     * Broadcasting API Methods (Authenticated)
-     * ========================================================================== */
     async authenticateBroadcasting(socketId: string, channelName: string) {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.broadcasting.auth({
-                payload: { socket_id: socketId, channel_name: channelName },
-            }),
-            'authenticateBroadcasting',
+        const effect = pipe(
+            httpRequest(
+                '/api/broadcasting/auth',
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        socket_id: socketId,
+                        channel_name: channelName,
+                    }),
+                },
+                AuthenticateBroadcastingResponseSchema,
+            ),
+            (eff) => withRetry(eff, 'authenticateBroadcasting'),
         );
-    }
 
-    /**
-     * List all active sessions (personal access tokens) for the authenticated user
-     */
-    async listTokens() {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(client.auth.listTokens({}), 'listTokens');
-    }
-
-    /**
-     * Delete a specific token/session
-     */
-    async deleteToken(tokenId: string) {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.auth.deleteToken({ path: { tokenId } }),
-            'deleteToken',
-        );
-    }
-
-    /**
-     * Resend the email verification notification
-     */
-    async resendVerificationEmail() {
-        const client = await this.getBaseAuthClient();
-        return this.runEffect(
-            client.auth.resendVerificationEmail({}),
-            'resendVerificationEmail',
-        );
+        return runEffect(effect, 'authenticateBroadcasting');
     }
 }
 
-// Export singleton instance
 export const ApiClient = new ApiClientSingleton();

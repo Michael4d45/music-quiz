@@ -1,4 +1,4 @@
-name: "music-quiz"
+name: 'music-quiz'
 
 services:
   pgsql:
@@ -12,11 +12,7 @@ services:
       POSTGRES_USER: '${DB_USERNAME}'
       POSTGRES_PASSWORD: '${DB_PASSWORD}'
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"
-        ]
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}']
       start_period: 5s
       interval: 5s
       timeout: 5s
@@ -33,11 +29,7 @@ services:
       POSTGRES_USER: '${DB_USERNAME}'
       POSTGRES_PASSWORD: '${DB_PASSWORD}'
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"
-        ]
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}']
       start_period: 5s
       interval: 5s
       timeout: 5s
@@ -55,5 +47,5 @@ services:
     image: mailhog/mailhog:latest
     container_name: music-quiz-mailhog
     ports:
-      - "1025:1025" # SMTP
-      - "8025:8025" # Web UI
+      - '1025:1025' # SMTP
+      - '8025:8025' # Web UI

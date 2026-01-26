@@ -99,7 +99,7 @@ export default [
             'laravelDataTypes.ts',
             'vite.config.js',
             'reports',
-            'resources/js/schemas/',
+            'resources/js/schemas',
         ],
     },
 

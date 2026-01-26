@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Data\Models;
 
 use Illuminate\Support\Collection;
-use Spatie\LaravelData\Attributes\AutoWhenLoadedLazy;
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Lazy;
+use Spatie\LaravelData\Optional;
 
 class AnswerVariantData extends Data
 {
@@ -15,11 +14,9 @@ class AnswerVariantData extends Data
         public string $id,
         public string $question_id,
         public null|string $accepted_text,
-        /** @var QuizQuestionData|Lazy $question */
-        #[AutoWhenLoadedLazy]
-        public Lazy|QuizQuestionData $question,
-        /** @var Collection<array-key,PlayerAnswerData>|Lazy $player_answers */
-        #[AutoWhenLoadedLazy('playerAnswers')]
-        public Collection|Lazy $player_answers,
+        /** @var QuizQuestionData|Optional $question */
+        public Optional|QuizQuestionData $question,
+        /** @var Collection<array-key,PlayerAnswerData>|Optional */
+        public Collection|Optional $player_answers,
     ) {}
 }
