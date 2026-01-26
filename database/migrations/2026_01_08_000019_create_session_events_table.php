@@ -6,8 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -21,8 +20,16 @@ return new class extends Migration
             $table->jsonb('payload')->nullable();
             $table->timestampsTz();
 
-            $table->foreign('session_id')->references('id')->on('game_sessions')->onDelete('cascade');
-            $table->foreign('participant_id')->references('id')->on('session_participants')->onDelete('set null');
+            $table
+                ->foreign('session_id')
+                ->references('id')
+                ->on('game_sessions')
+                ->onDelete('cascade');
+            $table
+                ->foreign('participant_id')
+                ->references('id')
+                ->on('session_participants')
+                ->onDelete('set null');
             $table->index(['session_id', 'created_at']);
             $table->index('event_type');
         });

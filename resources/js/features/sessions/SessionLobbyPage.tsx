@@ -6,23 +6,6 @@ import { useEffect, useState } from 'react';
 import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
 
 export async function sessionLobbyLoader({ params }: any) {
-    let user = authManager.getUser();
-    let token = authManager.getToken();
-
-    // Try to restore from session if no local token
-    if (!user || !token) {
-        const result = await ApiClient.fetchSessionToken();
-        if (result._tag === 'Success') {
-            authManager.setAuthData(result.data.token, result.data.user);
-            user = result.data.user;
-            token = result.data.token;
-        }
-    }
-
-    if (!user || !token) {
-        throw new Error('Unauthorized');
-    }
-
     const result = await ApiClient.showSessionLobby(params.roomCode);
     if (result._tag === 'Success') {
         return result.data;

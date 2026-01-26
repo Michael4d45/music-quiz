@@ -9,11 +9,9 @@ use App\Data\Requests\JoinSessionRequest;
 use App\Data\Response\SessionLobbyResponse;
 use App\Enums\Role;
 use App\Events\SessionEventOccurred;
+use App\Http\Requests\AuthRequest;
 use App\Models\SessionParticipant;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class JoinSession
@@ -23,19 +21,9 @@ class JoinSession
      */
     public function __invoke(
         JoinSessionRequest $data,
-        Request $request,
+        AuthRequest $request,
     ): JsonResponse {
-        $user = $request->user();
-        $token = null;
-
-        if ($user === null) {
-            $guestName = $data->guest_name ?: 'Guest ' . Str::random(5);
-            $user = User::create([
-                'name' => $guestName,
-                'is_guest' => true,
-            ]);
-            $token = $user->createToken('guest-token')->plainTextToken;
-        }
+        $user = $request->assertedUser();
 
         $session = $data->gameSession();
 
@@ -50,47 +38,35 @@ class JoinSession
         // Use user's name if guest_name is blank
         $guestName = $data->guest_name ?: $user->name;
 
-        if ($user->is_guest && !$guestName) {
+        if (!$guestName) {
             throw ValidationException::withMessages([
                 'guest_name' => 'You must provide a guest name.',
             ]);
         }
 
-        if ($guestName) {
-            // Check if guest name is already in use
-            $existingParticipant = SessionParticipant::where(
-                'session_id',
-                $session->id,
-            )
-                ->where('guest_name', $guestName)
-                ->first();
+        // Check if guest name is already in use
+        $existingParticipant = SessionParticipant::where(
+            'session_id',
+            $session->id,
+        )
+            ->where('guest_name', $guestName)
+            ->first();
 
-            if (
-                $existingParticipant !== null
-                && $existingParticipant->user_id !== $user->id
-            ) {
-                throw ValidationException::withMessages([
-                    'guest_name' => 'This guest name is already in use by another user.',
-                ]);
-            }
+        if (
+            $existingParticipant !== null
+            && $existingParticipant->user_id !== $user->id
+        ) {
+            throw ValidationException::withMessages([
+                'guest_name' => 'This guest name is already in use by another user.',
+            ]);
+        }
 
-            if ($existingParticipant === null) {
-                SessionParticipant::updateOrCreate([
-                    'user_id' => $user->id,
-                    'session_id' => $session->id,
-                ], [
-                    'guest_name' => $guestName,
-                    'role' => Role::Player,
-                    'current_total_score' => 0,
-                    'is_connected' => true,
-                    'joined_at' => now(),
-                ]);
-            }
-        } else {
+        if ($existingParticipant === null) {
             SessionParticipant::updateOrCreate([
                 'user_id' => $user->id,
                 'session_id' => $session->id,
             ], [
+                'guest_name' => $guestName,
                 'role' => Role::Player,
                 'current_total_score' => 0,
                 'is_connected' => true,
@@ -107,12 +83,11 @@ class JoinSession
         ]);
 
         broadcast(new SessionEventOccurred($session, 'PlayerJoined', [
-            'name' => $guestName ?: $user->name,
+            'name' => $guestName,
         ]))->toOthers();
 
         return response()->json(SessionLobbyResponse::from([
             'session' => GameSessionData::from($session),
-            'token' => $token,
         ]));
     }
 }

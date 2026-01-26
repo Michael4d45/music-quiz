@@ -6,8 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -22,7 +21,11 @@ return new class extends Migration
             $table->integer('play_count')->default(0);
             $table->timestampsTz();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table
+                ->foreign('user_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
             $table->index('user_id');
             $table->index(['is_public', 'play_count']);
         });

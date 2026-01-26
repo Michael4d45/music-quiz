@@ -6,8 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -26,10 +25,26 @@ return new class extends Migration
             $table->timestampTz('started_at')->nullable();
             $table->timestampTz('ended_at')->nullable();
 
-            $table->foreign('host_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('quiz_mode_id')->references('id')->on('quiz_modes')->onDelete('cascade');
-            $table->foreign('scoring_rule_id')->references('id')->on('scoring_rules')->onDelete('cascade');
-            $table->foreign('playlist_id')->references('id')->on('playlists')->onDelete('set null');
+            $table
+                ->foreign('host_id')
+                ->references('id')
+                ->on('users')
+                ->onDelete('cascade');
+            $table
+                ->foreign('quiz_mode_id')
+                ->references('id')
+                ->on('quiz_modes')
+                ->onDelete('cascade');
+            $table
+                ->foreign('scoring_rule_id')
+                ->references('id')
+                ->on('scoring_rules')
+                ->onDelete('cascade');
+            $table
+                ->foreign('playlist_id')
+                ->references('id')
+                ->on('playlists')
+                ->onDelete('set null');
             $table->index('room_code');
             $table->index(['status', 'created_at']);
         });

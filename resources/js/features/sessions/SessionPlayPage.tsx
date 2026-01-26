@@ -1,24 +1,10 @@
 import { ApiClient } from '@/lib/apiClient';
-import { authManager } from '@/lib/auth';
 import { echo } from '@/lib/echo';
 import { SessionPlayResponse } from '@/schemas/App/Data/Response';
 import { useEffect, useState } from 'react';
 import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
 
 export async function sessionPlayLoader({ params }: any) {
-    let user = authManager.getUser();
-    let token = authManager.getToken();
-
-    // Try to restore from session if no local token
-    if (!user || !token) {
-        const result = await ApiClient.fetchSessionToken();
-        if (result._tag === 'Success') {
-            authManager.setAuthData(result.data.token, result.data.user);
-            user = result.data.user;
-            token = result.data.token;
-        }
-    }
-
     const result = await ApiClient.showSessionPlay(params.roomCode);
     if (result._tag === 'Success') {
         return result.data;

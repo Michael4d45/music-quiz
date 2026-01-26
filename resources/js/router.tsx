@@ -14,7 +14,6 @@ import {
     publicPlaylistsLoader,
 } from './features/browse/PublicPlaylistsPage';
 import { TracksPage, tracksLoader } from './features/browse/TracksPage';
-import { ContentPage, contentLoader } from './features/content/ContentPage';
 import { ErrorPage } from './features/ErrorPage';
 import { HomePage, homeLoader } from './features/home/HomePage';
 import {
@@ -89,12 +88,6 @@ export const router = createBrowserRouter([
                 index: true,
                 element: <HomePage />,
                 loader: homeLoader,
-                errorElement: <ErrorPage />,
-            },
-            {
-                path: 'content',
-                element: <ContentPage />,
-                loader: contentLoader,
                 errorElement: <ErrorPage />,
             },
             {

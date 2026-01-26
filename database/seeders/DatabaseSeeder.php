@@ -1205,29 +1205,29 @@ class DatabaseSeeder extends Seeder
         $genreMap = [
             'Pop' =>
                 $subCategories->where('name', 'like', '%Pop%')->first()->id
-                ?? $defaultSubCategory->id,
+                    ?? $defaultSubCategory->id,
             'Rock' =>
                 $subCategories->where('name', 'like', '%Rock%')->first()->id
-                ?? $fallbackSubCategory->id,
+                    ?? $fallbackSubCategory->id,
             'Hip-Hop' =>
                 $subCategories->where('name', 'like', '%Rap%')->first()->id
-                ?? $fallbackSubCategory->id,
+                    ?? $fallbackSubCategory->id,
             'Electronic' =>
                 $subCategories->where('name', 'like', '%House%')->first()->id
-                ?? $fallbackSubCategory->id,
+                    ?? $fallbackSubCategory->id,
             'Jazz' =>
                 $subCategories->where('name', 'like', '%Jazz%')->first()->id
-                ?? $fallbackSubCategory->id,
+                    ?? $fallbackSubCategory->id,
             'Classical' =>
                 $subCategories
                     ->where('name', 'like', '%Classical%')
                     ->first()->id ?? $fallbackSubCategory->id,
             'Country' =>
                 $subCategories->where('name', 'like', '%Country%')->first()->id
-                ?? $fallbackSubCategory->id,
+                    ?? $fallbackSubCategory->id,
             'R&B' =>
                 $subCategories->where('name', 'like', '%R&B%')->first()->id
-                ?? $fallbackSubCategory->id,
+                    ?? $fallbackSubCategory->id,
         ];
 
         foreach ($trackData as $trackInfo) {

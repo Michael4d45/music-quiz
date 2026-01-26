@@ -6,8 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -27,8 +26,16 @@ return new class extends Migration
             $table->timestampTz('last_checked_at')->nullable();
             $table->timestampsTz();
 
-            $table->foreign('track_id')->references('id')->on('music_tracks')->onDelete('cascade');
-            $table->foreign('source_id')->references('id')->on('music_sources')->onDelete('cascade');
+            $table
+                ->foreign('track_id')
+                ->references('id')
+                ->on('music_tracks')
+                ->onDelete('cascade');
+            $table
+                ->foreign('source_id')
+                ->references('id')
+                ->on('music_sources')
+                ->onDelete('cascade');
             $table->unique(['track_id', 'source_id']);
             $table->index('external_id');
             $table->index(['source_id', 'external_id']);
