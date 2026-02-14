@@ -13,7 +13,6 @@ import {
 } from '@/schemas/App/Data/Requests';
 import {
     AuthenticateBroadcastingResponseSchema,
-    ContentItemsSchema,
     DisconnectGoogleResponseSchema,
     MessageResponseSchema,
 } from '@/schemas/App/Data/Response';
@@ -132,20 +131,6 @@ export async function showUser() {
             httpRequest('/api/user'),
             withRetry('showUser'),
             decodeJson(UserDataSchema),
-        ),
-    );
-}
-
-/* ==========================================================================
- * Content Methods
- * ========================================================================== */
-
-export async function showContent() {
-    return runEffect(
-        pipe(
-            httpRequest('/api/content'),
-            withRetry('showContent'),
-            decodeJson(ContentItemsSchema),
         ),
     );
 }
