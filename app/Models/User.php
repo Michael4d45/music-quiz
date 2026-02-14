@@ -196,47 +196,6 @@ class User extends Authenticatable implements MustVerifyEmail, FilamentUser
     }
 
     /**
-     * Merge guest user data to the real user and delete the guest.
-     */
-    public static function mergeGuestData(self $guest, self $user): void
-    {
-        DB::transaction(function () use ($guest, $user) {
-            // Transfer game sessions hosted by guest
-            GameSession::where('host_id', $guest->id)->update([
-                'host_id' => $user->id,
-            ]);
-
-            // Transfer session participations
-            SessionParticipant::where('user_id', $guest->id)->update([
-                'user_id' => $user->id,
-            ]);
-
-            // Transfer user statistics
-            UserStatistic::where('user_id', $guest->id)->update([
-                'user_id' => $user->id,
-            ]);
-
-            // Transfer playlists
-            Playlist::where('user_id', $guest->id)->update([
-                'user_id' => $user->id,
-            ]);
-
-            // Transfer quiz questions
-            QuizQuestion::where('user_id', $guest->id)->update([
-                'user_id' => $user->id,
-            ]);
-
-            // Transfer music tracks
-            MusicTrack::where('user_id', $guest->id)->update([
-                'user_id' => $user->id,
-            ]);
-
-            // Delete the guest user
-            $guest->delete();
-        });
-    }
-
-    /**
      * Get the user's initials
      */
     public function initials(): string

@@ -48,7 +48,12 @@ it('rejects invalid credentials', function (): void {
     ]);
 
     $response->assertStatus(422);
-    $this->assertGuest();
+
+    // EnsureGuestUser middleware means a guest is always logged in,
+    // so we verify the real user was NOT authenticated
+    $currentUser = auth()->user();
+    expect($currentUser)->not->toBeNull();
+    expect($currentUser->is_guest)->toBeTrue();
 });
 
 it('rate limits login attempts', function (): void {

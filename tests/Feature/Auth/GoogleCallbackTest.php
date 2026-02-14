@@ -252,8 +252,10 @@ it('rejects when Google does not provide email', function (): void {
             ),
     );
 
-    // Should not be authenticated
-    $this->assertGuest();
+    // EnsureGuestUser middleware means a guest is always logged in
+    $currentUser = auth()->user();
+    expect($currentUser)->not->toBeNull();
+    expect($currentUser->is_guest)->toBeTrue();
 });
 
 it('rejects when Google does not provide email and user is authenticated', function (): void {
@@ -299,8 +301,10 @@ it('handles exceptions gracefully', function (): void {
     // Should redirect to login
     $response->assertRedirect('/login');
 
-    // Should not be authenticated
-    $this->assertGuest();
+    // EnsureGuestUser middleware means a guest is always logged in
+    $currentUser = auth()->user();
+    expect($currentUser)->not->toBeNull();
+    expect($currentUser->is_guest)->toBeTrue();
 });
 
 it('handles exceptions gracefully when user is authenticated', function (): void {

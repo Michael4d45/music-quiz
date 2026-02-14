@@ -14,7 +14,6 @@ Route::middleware('throttle:5,1')->group(function () {
 });
 
 Route::middleware([
-    'web',
     'auth:sanctum',
 ])->group(function () {
     Route::get('user', \App\Actions\Auth\ShowUser::class);

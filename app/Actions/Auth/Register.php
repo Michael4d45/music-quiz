@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\Hash;
  * After registration, the frontend stores user data and uses
  * session cookies for subsequent API requests.
  *
- * TODO: account for "is_guest" users.
  */
 class Register
 {
@@ -30,6 +29,8 @@ class Register
      */
     public function __invoke(RegisterRequest $registerData): JsonResponse
     {
+        $guestUser = Auth::user();
+
         // Create new user
         $user = User::create([
             'name' => $registerData->name,
@@ -48,6 +49,12 @@ class Register
         $request = request();
         if ($request->hasSession()) {
             $request->session()->regenerate();
+            $request->session()->forget('guest_user_id');
+        }
+
+        // Delete the guest user now that the real user is registered
+        if ($guestUser instanceof User && $guestUser->is_guest) {
+            $guestUser->delete();
         }
 
         return response()->json(MessageResponse::from([

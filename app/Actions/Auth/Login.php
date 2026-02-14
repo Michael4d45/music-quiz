@@ -6,6 +6,7 @@ namespace App\Actions\Auth;
 
 use App\Data\Requests\LoginRequest;
 use App\Data\Response\MessageResponse;
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +24,6 @@ use Illuminate\Validation\ValidationException;
  *
  * The frontend stores user data in localStorage and uses session cookies for API auth.
  *
- * TODO: account for "is_guest" users.
  */
 class Login
 {
@@ -89,6 +89,8 @@ class Login
      */
     public function __invoke(LoginRequest $loginData): JsonResponse
     {
+        $guestUser = Auth::user();
+
         $this->authenticate(
             $loginData->email,
             $loginData->password,
@@ -97,6 +99,12 @@ class Login
 
         if (request()->hasSession()) {
             request()->session()->regenerate();
+            request()->session()->forget('guest_user_id');
+        }
+
+        // Delete the guest user now that the real user is authenticated
+        if ($guestUser instanceof User && $guestUser->is_guest) {
+            $guestUser->delete();
         }
 
         RateLimiter::clear($this->throttleKey($loginData->email));

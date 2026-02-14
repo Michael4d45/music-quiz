@@ -13,14 +13,13 @@ use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-//TODO: account for $user->is_guest.
 class HandleGoogleCallback
 {
     function __invoke(): RedirectResponse
     {
         /** @var User|null $currentUser */
         $currentUser = Auth::user();
-        $wasAuthenticated = $currentUser instanceof User;
+        $wasAuthenticated = $currentUser instanceof User && !$currentUser->is_guest;
 
         try {
             /** @var \Laravel\Socialite\Two\GoogleProvider $driver */
@@ -54,6 +53,12 @@ class HandleGoogleCallback
             }
             // Log the user in
             Auth::login($user, $remember);
+
+            // Delete the guest user now that the real user is authenticated
+            if ($currentUser instanceof User && $currentUser->is_guest) {
+                session()->forget('guest_user_id');
+                $currentUser->delete();
+            }
 
             return redirect(
                 ($wasAuthenticated ? '/profile' : '/') . '?auth=success',
