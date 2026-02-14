@@ -20,11 +20,9 @@ import {
 import toast from 'react-hot-toast';
 import { useMatches, useNavigate } from 'react-router';
 
-export interface AuthContextState {
+export type AuthContextState = AuthState & {
     hasFetchedUser: boolean;
-    isAuthenticated: boolean;
-    user: UserData | null;
-}
+};
 
 interface AuthContextType {
     authState: AuthContextState;
@@ -191,7 +189,7 @@ export function useAuth(): AuthContextType {
 
 // Component to handle navigation when authenticated on auth pages
 export function AuthGuard({ children }: { children: ReactNode }) {
-    const { authState } = useAuth();
+    const { authState, user } = useAuth();
     const navigate = useNavigate();
     const matches = useMatches();
 

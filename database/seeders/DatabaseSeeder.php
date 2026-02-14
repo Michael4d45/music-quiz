@@ -1319,7 +1319,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Standard Scoring',
             'base_points' => 1000,
             'decay_factor' => 0.95,
-            'max_time_ms' => 30000,
+            'max_time_ms' => 30_000,
             'streak_bonus_enabled' => false,
         ]);
 
@@ -1327,7 +1327,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Speed Scoring',
             'base_points' => 1000,
             'decay_factor' => 0.90,
-            'max_time_ms' => 20000,
+            'max_time_ms' => 20_000,
             'streak_bonus_enabled' => true,
             'streak_multiplier' => 1.2,
         ]);
@@ -1336,7 +1336,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Hard Mode',
             'base_points' => 2000,
             'decay_factor' => 0.85,
-            'max_time_ms' => 15000,
+            'max_time_ms' => 15_000,
             'streak_bonus_enabled' => true,
             'streak_multiplier' => 1.5,
         ]);

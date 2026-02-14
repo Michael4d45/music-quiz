@@ -22,7 +22,7 @@ class MusicTrackFactory extends Factory
                 ->optional()
                 ->numberBetween(1950, now()->year),
             'genre' => fake()->optional()->word(),
-            'duration_ms' => fake()->optional()->numberBetween(60000, 300000),
+            'duration_ms' => fake()->optional()->numberBetween(60_000, 300_000),
             'sub_category_id' => \App\Models\SubCategory::factory(),
             'primary_source_id' => \App\Models\MusicSource::factory(),
         ];

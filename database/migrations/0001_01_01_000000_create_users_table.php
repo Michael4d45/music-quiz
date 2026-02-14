@@ -15,11 +15,11 @@ return new class extends Migration {
         Schema::create('users', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
 
-            $table->string('name');
+            $table->string('name')->nullable();
 
             $table->string('password')->nullable();
             $table->rememberToken();
-            $table->string('email')->unique();
+            $table->string('email')->nullable()->unique();
             $table->timestampTz('email_verified_at')->nullable();
 
             $table->string('google_id')->nullable()->unique();

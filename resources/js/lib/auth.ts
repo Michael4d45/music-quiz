@@ -4,7 +4,7 @@ const USER_KEY = 'auth_user';
 
 interface AuthLoggedInState {
     user: UserData;
-    isAuthenticated: true;
+    isAuthenticated: boolean;
 }
 
 interface AuthLoggedOutState {
@@ -34,7 +34,7 @@ export class AuthManager {
         if (user) {
             return {
                 user,
-                isAuthenticated: true,
+                isAuthenticated: !user.is_guest,
             };
         }
 
