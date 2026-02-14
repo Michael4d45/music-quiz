@@ -100,6 +100,15 @@ class Login
         if (request()->hasSession()) {
             request()->session()->regenerate();
             request()->session()->forget('guest_user_id');
+
+            // Clear stale password hash stored by Sanctum's AuthenticateSession
+            // middleware when the guest user (null password) was authenticated.
+            // Without this, AuthenticateSession sees a hash mismatch between the
+            // guest's null hash and the real user's bcrypt hash, causing a 401.
+            /** @var string $guard */
+            foreach (\Illuminate\Support\Arr::wrap(config('sanctum.guard', 'web')) as $guard) {
+                request()->session()->forget('password_hash_' . $guard);
+            }
         }
 
         // Delete the guest user now that the real user is authenticated
