@@ -1,78 +1,57 @@
-import { cn } from '@/lib/utils';
-import { InputHTMLAttributes, useId, useState } from 'react';
+import React from 'react';
 
-interface ToggleProps extends Omit<
-    InputHTMLAttributes<HTMLInputElement>,
-    'type'
-> {
+interface ToggleProps {
+    checked: boolean;
+    onChange: (checked: boolean) => void;
     label?: string;
-    labelClassName?: string;
-    containerClassName?: string;
+    disabled?: boolean;
+    className?: string;
+    name?: string;
+    id?: string;
 }
 
-export default function Toggle({
-    id,
-    label,
-    labelClassName,
-    containerClassName,
-    className,
+export const Toggle: React.FC<ToggleProps> = ({
     checked,
-    defaultChecked,
     onChange,
-    ...props
-}: ToggleProps) {
-    const generatedId = useId();
-    const toggleId = id || generatedId;
-    const [internalChecked, setInternalChecked] = useState(
-        defaultChecked ?? false,
-    );
-    const isChecked = checked !== undefined ? checked : internalChecked;
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (checked === undefined) {
-            setInternalChecked(e.target.checked);
-        }
-        onChange?.(e);
-    };
-
+    label,
+    disabled = false,
+    className = '',
+    name,
+    id,
+}) => {
     return (
-        <div className={cn('flex items-center', containerClassName)}>
+        <label
+            className={`inline-flex cursor-pointer items-center ${
+                disabled ? 'cursor-not-allowed opacity-50' : ''
+            } ${className}`}
+        >
             <input
                 type="checkbox"
-                id={toggleId}
-                checked={isChecked}
-                onChange={handleChange}
                 className="sr-only"
-                {...props}
+                checked={checked}
+                onChange={(e) => onChange(e.target.checked)}
+                disabled={disabled}
+                name={name}
+                id={id}
             />
-            <label
-                htmlFor={toggleId}
-                className={cn(
-                    'relative inline-flex h-6 w-11 cursor-pointer items-center rounded-full transition-colors focus-within:ring-2 focus-within:ring-offset-2 focus-within:outline-none',
-                    'focus-within:ring-(--primary)',
-                    isChecked ? 'bg-(--primary)' : 'bg-(--secondary-border)',
-                    props.disabled && 'cursor-not-allowed opacity-50',
-                    className,
-                )}
+            <div
+                className={`relative inline-block h-6 w-10 rounded-full transition-colors duration-200 ${
+                    checked
+                        ? 'bg-primary-light'
+                        : 'bg-gray-300 dark:bg-gray-600'
+                }`}
             >
-                <span
-                    className={cn(
-                        'bg-card inline-block h-4 w-4 transform rounded-full transition-transform',
-                        isChecked ? 'translate-x-6' : 'translate-x-1',
-                    )}
-                />
-            </label>
+                <div
+                    className={`absolute top-0.5 h-5 w-5 rounded-full bg-bg-card shadow-md transition-transform duration-200 ${
+                        checked ? 'translate-x-4' : 'translate-x-0.5'
+                    }`}
+                ></div>
+            </div>
             {label && (
-                <label
-                    htmlFor={toggleId}
-                    className={cn(
-                        'text-secondary ml-3 cursor-pointer text-sm font-medium',
-                        labelClassName,
-                    )}
-                >
+                <span className="text-secondary ml-3 text-sm font-medium">
                     {label}
-                </label>
+                </span>
             )}
-        </div>
+        </label>
     );
-}
+};

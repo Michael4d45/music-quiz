@@ -4,6 +4,7 @@ interface LogoProps {
     height?: number;
     variant?: 'auto' | 'light' | 'dark';
     fill?: boolean;
+    kind?: 'full' | 'mark';
 }
 
 export default function Logo({
@@ -12,6 +13,7 @@ export default function Logo({
     height = 50,
     variant = 'auto',
     fill = false,
+    kind = 'full',
 }: LogoProps) {
     const baseClasses = 'transition-all duration-200';
 
@@ -24,8 +26,8 @@ export default function Logo({
     const sizeClasses = fill ? 'w-full h-full object-contain' : '';
 
     const imgProps: React.ImgHTMLAttributes<HTMLImageElement> = {
-        src: '/logo.svg',
-        alt: 'Music Quiz Logo',
+        src: kind === 'mark' ? '/favicon.svg' : '/logo.svg',
+        alt: 'App Logo',
         className:
             `${baseClasses} ${variantClasses[variant]} ${sizeClasses} ${className}`.trim(),
     };

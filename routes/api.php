@@ -4,33 +4,12 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('home', \App\Actions\Home\ShowHome::class);
-
-Route::prefix('browse')->group(function () {
-    Route::get('', \App\Actions\Browse\ShowBrowse::class);
-    Route::get('categories', \App\Actions\Browse\ShowCategories::class);
-    Route::get(
-        'categories/{category}',
-        \App\Actions\Browse\ShowCategory::class,
-    );
-    Route::get('tracks', \App\Actions\Browse\ShowTracks::class);
-    Route::get('tracks/{track}', \App\Actions\Browse\ShowTrack::class);
-    Route::get('playlists', \App\Actions\Browse\ShowPublicPlaylists::class);
-});
-
-Route::get('leaderboard', \App\Actions\Statistics\ShowLeaderboard::class);
-Route::get(
-    'sub-categories',
-    \App\Actions\SubCategories\ShowSubCategories::class,
-);
-Route::get('music-sources', \App\Actions\MusicSources\ShowMusicSources::class);
-Route::get('quiz-modes', \App\Actions\QuizModes\ShowQuizModes::class);
-Route::get('scoring-rules', \App\Actions\ScoringRules\ShowScoringRules::class);
-
 Route::middleware([
     'web',
     'auth:sanctum',
 ])->group(function () {
+    // Authenticated routes for user-specific data and actions
+
     // Playlists endpoints
     Route::prefix('playlists')->group(function () {
         Route::get('/', \App\Actions\Playlists\ShowPlaylists::class);
@@ -97,6 +76,38 @@ Route::middleware([
     );
 });
 
-Route::post('sessions/join', \App\Actions\Sessions\JoinSession::class);
+Route::middleware(['web'])->group(function () {
+    // Routes that allow unauthenticated access for public data
+    Route::get('home', \App\Actions\Home\ShowHome::class);
+
+    Route::prefix('browse')->group(function () {
+        Route::get('', \App\Actions\Browse\ShowBrowse::class);
+        Route::get('categories', \App\Actions\Browse\ShowCategories::class);
+        Route::get(
+            'categories/{category}',
+            \App\Actions\Browse\ShowCategory::class,
+        );
+        Route::get('tracks', \App\Actions\Browse\ShowTracks::class);
+        Route::get('tracks/{track}', \App\Actions\Browse\ShowTrack::class);
+        Route::get('playlists', \App\Actions\Browse\ShowPublicPlaylists::class);
+    });
+
+    Route::get('leaderboard', \App\Actions\Statistics\ShowLeaderboard::class);
+    Route::get(
+        'sub-categories',
+        \App\Actions\SubCategories\ShowSubCategories::class,
+    );
+    Route::get(
+        'music-sources',
+        \App\Actions\MusicSources\ShowMusicSources::class,
+    );
+    Route::get('quiz-modes', \App\Actions\QuizModes\ShowQuizModes::class);
+    Route::get(
+        'scoring-rules',
+        \App\Actions\ScoringRules\ShowScoringRules::class,
+    );
+
+    Route::post('sessions/join', \App\Actions\Sessions\JoinSession::class);
+});
 
 require __DIR__ . '/auth.php';
