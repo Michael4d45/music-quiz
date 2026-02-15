@@ -25,11 +25,16 @@ return new class extends Migration {
             $table->uuid('track_id')->nullable();
             $table->string('question_type');
             $table->text('prompt_text')->nullable();
+            $table->text('rich_prompt_text')->nullable();
+            $table->text('explanation')->nullable();
+            $table->json('hints')->nullable();
             $table->string('correct_answer');
-            $table->integer('base_points')->default(1000);
+            $table->integer('base_points')->default(10);
             $table->integer('media_start_seconds')->nullable();
             $table->integer('media_end_seconds')->nullable();
             $table->integer('difficulty_level')->default(1);
+            $table->boolean('is_draft')->default(false);
+            $table->timestampTz('last_tested_at')->nullable();
             $table->timestampsTz();
             $table
                 ->foreign('track_id')

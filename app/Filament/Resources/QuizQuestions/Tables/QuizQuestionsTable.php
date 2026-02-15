@@ -6,6 +6,7 @@ namespace App\Filament\Resources\QuizQuestions\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -80,6 +81,23 @@ class QuizQuestionsTable
                     ->sortable()
                     ->toggleable(),
 
+                TextColumn::make('visibility')
+                    ->badge()
+                    ->sortable()
+                    ->toggleable(),
+
+                IconColumn::make('is_draft')
+                    ->label('Is Draft')
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('last_tested_at')
+                    ->label('Last Tested')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(),
+
                 TextColumn::make('answer_variants_count')
                     ->label('Answer Variants')
                     ->numeric()
@@ -123,6 +141,9 @@ class QuizQuestionsTable
                 SelectFilter::make('question_type')
                     ->label('Question Type')
                     ->options(\App\Enums\QuestionType::class),
+                SelectFilter::make('visibility')
+                    ->label('Visibility')
+                    ->options(\App\Enums\Visibility::class),
                 SelectFilter::make('difficulty_level')
                     ->label('Difficulty Level')
                     ->options([

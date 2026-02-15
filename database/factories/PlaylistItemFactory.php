@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Models\Playlist;
-use App\Models\QuizQuestion;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -13,12 +11,11 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class PlaylistItemFactory extends Factory
 {
-    #[\Override]
     public function definition(): array
     {
         return [
-            'playlist_id' => Playlist::factory(),
-            'question_id' => QuizQuestion::factory(),
+            'playlist_id' => \App\Models\Playlist::factory(),
+            'question_id' => \App\Models\QuizQuestion::factory(),
             'sort_order' => fake()->numberBetween(1, 100),
             'added_at' => now(),
         ];

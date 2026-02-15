@@ -17,6 +17,8 @@ enum QuestionType: string implements HasColor, HasLabel
     case MultipleChoice = 'multiple_choice';
     case Lyric = 'lyric';
     case AudioClip = 'audio_clip';
+    case TextInput = 'text_input';
+    case TrueFalse = 'true_false';
 
     public function getColor(): string
     {
@@ -27,6 +29,8 @@ enum QuestionType: string implements HasColor, HasLabel
             self::MultipleChoice => 'success',
             self::Lyric => 'danger',
             self::AudioClip => 'gray',
+            self::TextInput => 'primary',
+            self::TrueFalse => 'secondary',
         };
     }
 
@@ -39,6 +43,8 @@ enum QuestionType: string implements HasColor, HasLabel
             self::MultipleChoice => 'Multiple Choice',
             self::Lyric => 'Lyric',
             self::AudioClip => 'Audio Clip',
+            self::TextInput => 'Text Input',
+            self::TrueFalse => 'True/False',
         };
     }
 }

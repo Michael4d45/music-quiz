@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Filament\Resources\QuizQuestions\Schemas;
 
 use App\Enums\QuestionType;
+use App\Enums\Visibility;
 use App\Models\MusicTrack;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -33,6 +36,20 @@ class QuizQuestionForm
                 ->rows(3)
                 ->columnSpanFull(),
 
+            Textarea::make('rich_prompt_text')
+                ->label('Rich Prompt Text')
+                ->rows(3)
+                ->columnSpanFull(),
+
+            Textarea::make('explanation')
+                ->label('Explanation')
+                ->rows(2)
+                ->columnSpanFull(),
+
+            KeyValue::make('hints')
+                ->label('Hints')
+                ->columnSpanFull(),
+
             TextInput::make('correct_answer')->required()->maxLength(255),
 
             TextInput::make('base_points')
@@ -57,9 +74,17 @@ class QuizQuestionForm
                 ->default(1)
                 ->minValue(1)
                 ->maxValue(5),
-            TextInput::make('id')->required()->disabled(),
-            DateTimePicker::make('created_at')->disabled(),
-            DateTimePicker::make('updated_at')->disabled(),
+
+            Select::make('visibility')
+                ->options(Visibility::class)
+                ->required()
+                ->default(Visibility::Private),
+
+            Checkbox::make('is_draft')
+                ->label('Is Draft'),
+
+            DateTimePicker::make('last_tested_at')
+                ->label('Last Tested At'),
         ]);
     }
 }

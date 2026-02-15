@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\PlaylistStatus;
+use App\Enums\QuestionOrder;
+use App\Enums\Visibility;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,7 +22,14 @@ use Illuminate\Support\Carbon;
  * @property string $user_id
  * @property string $name
  * @property string|null $description
- * @property bool $is_public
+ * @property PlaylistStatus $status
+ * @property Visibility $visibility
+ * @property array<string, mixed>|null $tags
+ * @property int|null $estimated_duration_minutes
+ * @property string|null $target_audience
+ * @property QuestionOrder $question_order
+ * @property int|null $default_time_limit_seconds
+ * @property string|null $scoring_rule_id
  * @property int $play_count
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -43,7 +53,14 @@ class Playlist extends Model
         'user_id',
         'name',
         'description',
-        'is_public',
+        'status',
+        'visibility',
+        'tags',
+        'estimated_duration_minutes',
+        'target_audience',
+        'question_order',
+        'default_time_limit_seconds',
+        'scoring_rule_id',
         'play_count',
     ];
 
@@ -86,7 +103,12 @@ class Playlist extends Model
     protected function casts(): array
     {
         return [
-            'is_public' => 'boolean',
+            'status' => PlaylistStatus::class,
+            'visibility' => Visibility::class,
+            'question_order' => QuestionOrder::class,
+            'tags' => 'array',
+            'estimated_duration_minutes' => 'integer',
+            'default_time_limit_seconds' => 'integer',
             'play_count' => 'integer',
         ];
     }

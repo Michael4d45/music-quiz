@@ -17,7 +17,14 @@ return new class extends Migration {
             $table->uuid('user_id');
             $table->string('name');
             $table->text('description')->nullable();
-            $table->boolean('is_public')->default(false);
+            $table->string('status', 20)->default('draft');
+            $table->string('visibility', 20)->default('private');
+            $table->json('tags')->nullable();
+            $table->integer('estimated_duration_minutes')->nullable();
+            $table->string('target_audience')->nullable();
+            $table->string('question_order', 20)->default('fixed');
+            $table->integer('default_time_limit_seconds')->nullable();
+            $table->uuid('scoring_rule_id')->nullable();
             $table->integer('play_count')->default(0);
             $table->timestampsTz();
 
@@ -27,7 +34,8 @@ return new class extends Migration {
                 ->on('users')
                 ->onDelete('cascade');
             $table->index('user_id');
-            $table->index(['is_public', 'play_count']);
+            $table->index(['status', 'visibility']);
+            $table->index('scoring_rule_id');
         });
     }
 

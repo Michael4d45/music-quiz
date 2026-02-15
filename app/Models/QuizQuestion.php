@@ -28,6 +28,11 @@ use Illuminate\Support\Carbon;
  * @property int|null $media_end_seconds
  * @property int $difficulty_level
  * @property Visibility $visibility
+ * @property string|null $rich_prompt_text
+ * @property string|null $explanation
+ * @property array<string, mixed>|null $hints
+ * @property bool $is_draft
+ * @property Carbon|null $last_tested_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $created_at
  * @property-read User|null $user
@@ -54,12 +59,17 @@ class QuizQuestion extends Model
         'track_id',
         'question_type',
         'prompt_text',
+        'rich_prompt_text',
+        'explanation',
+        'hints',
         'correct_answer',
         'base_points',
         'media_start_seconds',
         'media_end_seconds',
         'difficulty_level',
         'visibility',
+        'is_draft',
+        'last_tested_at',
     ];
 
     /**
@@ -137,6 +147,9 @@ class QuizQuestion extends Model
             'media_end_seconds' => 'integer',
             'difficulty_level' => 'integer',
             'visibility' => Visibility::class,
+            'hints' => 'array',
+            'is_draft' => 'boolean',
+            'last_tested_at' => 'datetime',
         ];
     }
 }

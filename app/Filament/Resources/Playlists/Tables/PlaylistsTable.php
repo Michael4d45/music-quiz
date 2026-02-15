@@ -48,15 +48,24 @@ class PlaylistsTable
                     ->sortable()
                     ->toggleable(),
 
-                IconColumn::make('is_public')
-                    ->label('Public')
-                    ->boolean()
+                TextColumn::make('status')
+                    ->badge()
                     ->sortable()
                     ->toggleable(),
 
-                TextColumn::make('play_count')
-                    ->label('Play Count')
+                TextColumn::make('visibility')
+                    ->badge()
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('estimated_duration_minutes')
+                    ->label('Duration (min)')
                     ->numeric()
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('question_order')
+                    ->badge()
                     ->sortable()
                     ->toggleable(),
 
@@ -88,11 +97,12 @@ class PlaylistsTable
                     ->relationship('user', 'name')
                     ->searchable()
                     ->preload(),
-                TernaryFilter::make('is_public')
+                SelectFilter::make('status')
+                    ->label('Status')
+                    ->options(\App\Enums\PlaylistStatus::class),
+                SelectFilter::make('visibility')
                     ->label('Visibility')
-                    ->placeholder('All')
-                    ->trueLabel('Public')
-                    ->falseLabel('Private'),
+                    ->options(\App\Enums\Visibility::class),
             ])
             ->recordActions([])
             ->toolbarActions([
