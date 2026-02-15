@@ -51,20 +51,22 @@ class HandleGoogleCallback
             if (!is_bool($remember)) {
                 $remember = false;
             }
+
+            if (request()->hasSession()) {
+                request()->session()->invalidate();
+                request()->session()->regenerateToken();
+            }
+
             // Log the user in
             Auth::login($user, $remember);
 
+            if (request()->hasSession()) {
+                request()->session()->regenerate();
+                request()->session()->forget('guest_user_id');
+            }
+
             // Delete the guest user now that the real user is authenticated
             if ($currentUser instanceof User && $currentUser->is_guest) {
-                session()->forget('guest_user_id');
-
-                // Clear stale password hash from Sanctum's AuthenticateSession middleware
-                // to prevent hash mismatch between guest (null) and real user's password.
-                /** @var string $guard */
-                foreach (\Illuminate\Support\Arr::wrap(config('sanctum.guard', 'web')) as $guard) {
-                    session()->forget('password_hash_' . $guard);
-                }
-
                 $currentUser->delete();
             }
 
