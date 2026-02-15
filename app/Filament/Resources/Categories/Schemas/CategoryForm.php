@@ -7,6 +7,7 @@ namespace App\Filament\Resources\Categories\Schemas;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Flex;
 use Filament\Schemas\Schema;
 
 class CategoryForm
@@ -28,9 +29,12 @@ class CategoryForm
                 ->required()
                 ->default(0)
                 ->minValue(0),
-            TextInput::make('id')->required()->disabled(),
-            DateTimePicker::make('created_at')->disabled(),
-            DateTimePicker::make('updated_at')->disabled(),
+
+            Flex::make([
+                TextInput::make('id')->copyable()->disabled(),
+                DateTimePicker::make('created_at')->disabled(),
+                DateTimePicker::make('updated_at')->disabled(),
+            ])->columnSpanFull()->hiddenOn('create'),
         ]);
     }
 }

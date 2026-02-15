@@ -41,6 +41,8 @@ class UserForm
             TextInput::make('google_id')->disabled(),
             TextInput::make('verified_google_email')->email()->disabled(),
 
+            TextInput::make('remember_token')->disabled(),
+
             Flex::make([
                 TextInput::make('id')->copyable()->disabled(),
                 DateTimePicker::make('created_at')->disabled(),

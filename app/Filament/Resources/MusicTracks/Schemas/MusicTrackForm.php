@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\MusicTracks\Schemas;
 
-use App\Models\MusicSource;
-use App\Models\SubCategory;
+use App\Filament\Resources\MusicSources\MusicSourceResource;
+use App\Filament\Resources\SubCategories\SubCategoryResource;
+use App\Filament\Resources\Users\UserResource;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Flex;
 use Filament\Schemas\Schema;
 
 class MusicTrackForm
@@ -17,6 +20,21 @@ class MusicTrackForm
     {
         return $schema->components([
             TextInput::make('title')->required()->maxLength(255),
+
+            TextEntry::make('user.name')
+                ->label('User')
+                ->url(static fn($record) => (
+                    $record && $record->user_id
+                        ? UserResource::getUrl('edit', [
+                            'record' => $record->user_id,
+                        ]) : null
+                ))
+                ->placeholder('N/A'),
+
+            Select::make('user_id')
+                ->relationship('user', 'name')
+                ->label('User')
+                ->searchable(),
 
             TextInput::make('artist_name')
                 ->label('Artist')
@@ -34,20 +52,42 @@ class MusicTrackForm
                 ->numeric()
                 ->minValue(1000),
 
-            Select::make('sub_category_id')
+            TextEntry::make('subCategory.name')
                 ->label('Sub Category')
-                ->options(SubCategory::pluck('name', 'id'))
+                ->url(static fn($record) => (
+                    $record && $record->sub_category_id
+                        ? SubCategoryResource::getUrl('edit', [
+                            'record' => $record->sub_category_id,
+                        ]) : null
+                ))
+                ->placeholder('N/A'),
+
+            Select::make('sub_category_id')
+                ->relationship('subCategory', 'name')
+                ->label('Sub Category')
                 ->required()
                 ->searchable(),
 
-            Select::make('primary_source_id')
+            TextEntry::make('primarySource.name')
                 ->label('Primary Source')
-                ->options(MusicSource::pluck('name', 'id'))
+                ->url(static fn($record) => (
+                    $record && $record->primary_source_id
+                        ? MusicSourceResource::getUrl('edit', [
+                            'record' => $record->primary_source_id,
+                        ]) : null
+                ))
+                ->placeholder('N/A'),
+
+            Select::make('primary_source_id')
+                ->relationship('primarySource', 'name')
+                ->label('Primary Source')
                 ->required()
                 ->searchable(),
-            TextInput::make('id')->required()->disabled(),
-            DateTimePicker::make('created_at')->disabled(),
-            DateTimePicker::make('updated_at')->disabled(),
+            Flex::make([
+                TextInput::make('id')->copyable()->disabled(),
+                DateTimePicker::make('created_at')->disabled(),
+                DateTimePicker::make('updated_at')->disabled(),
+            ])->columnSpanFull()->hiddenOn('create'),
         ]);
     }
 }

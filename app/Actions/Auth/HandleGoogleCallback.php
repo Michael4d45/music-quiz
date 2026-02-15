@@ -19,7 +19,8 @@ class HandleGoogleCallback
     {
         /** @var User|null $currentUser */
         $currentUser = Auth::user();
-        $wasAuthenticated = $currentUser instanceof User && !$currentUser->is_guest;
+        $wasAuthenticated =
+            $currentUser instanceof User && !$currentUser->is_guest;
 
         try {
             /** @var \Laravel\Socialite\Two\GoogleProvider $driver */

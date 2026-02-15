@@ -108,14 +108,20 @@ it('browser: login -> csrf-cookie -> user with real cookies and referer', functi
     // Step 0b: Initial GET /api/user (AuthContext useEffect on mount)
     // This stores password_hash_web = HMAC(null) in the session via Sanctum's
     // AuthenticateSession middleware (guest user has null password).
-    $initialUserResponse = $this->withHeaders([
-        'Referer' => $origin . '/',
-        'Origin' => $origin,
-        'X-XSRF-TOKEN' => $cookies['XSRF-TOKEN'] ?? '',
-    ])->withUnencryptedCookies($cookies)->getJson('/api/user');
+    $initialUserResponse = $this
+        ->withHeaders([
+            'Referer' => $origin . '/',
+            'Origin' => $origin,
+            'X-XSRF-TOKEN' => $cookies['XSRF-TOKEN'] ?? '',
+        ])
+        ->withUnencryptedCookies($cookies)
+        ->getJson('/api/user');
     $initialUserResponse->assertStatus(200);
     expect($initialUserResponse->json('is_guest'))->toBeTrue();
-    $cookies = array_merge($cookies, extractCookiesFromResponse($initialUserResponse));
+    $cookies = array_merge(
+        $cookies,
+        extractCookiesFromResponse($initialUserResponse),
+    );
 
     // Reset guards — in production each request is a fresh PHP process, but in
     // tests the app instance is reused. auth:sanctum calls Auth::shouldUse('sanctum')
@@ -134,8 +140,13 @@ it('browser: login -> csrf-cookie -> user with real cookies and referer', functi
         'email' => 'test@example.com',
         'password' => 'password123',
     ]);
-    $loginResponse->assertStatus(200)->assertJson(['message' => 'Authentication successful']);
-    $cookies = array_merge($cookies, extractCookiesFromResponse($loginResponse));
+    $loginResponse
+        ->assertStatus(200)
+        ->assertJson(['message' => 'Authentication successful']);
+    $cookies = array_merge(
+        $cookies,
+        extractCookiesFromResponse($loginResponse),
+    );
 
     // Step 2: GET /sanctum/csrf-cookie (frontend ensureCsrfToken after login)
     $csrfResponse = $this->withHeaders([
@@ -151,11 +162,14 @@ it('browser: login -> csrf-cookie -> user with real cookies and referer', functi
     // Step 3: GET /api/user (AuthContext getUser after login)
     // Before the fix, AuthenticateSession would see password_hash_web = HMAC(null)
     // from the guest, compare against the real user's HMAC(bcrypt), mismatch → 401.
-    $userResponse = $this->withHeaders([
-        'Referer' => $origin . '/',
-        'Origin' => $origin,
-        'X-XSRF-TOKEN' => $cookies['XSRF-TOKEN'] ?? '',
-    ])->withUnencryptedCookies($cookies)->getJson('/api/user');
+    $userResponse = $this
+        ->withHeaders([
+            'Referer' => $origin . '/',
+            'Origin' => $origin,
+            'X-XSRF-TOKEN' => $cookies['XSRF-TOKEN'] ?? '',
+        ])
+        ->withUnencryptedCookies($cookies)
+        ->getJson('/api/user');
 
     $userResponse->assertStatus(200);
     expect($userResponse->json('id'))->toBe($user->id);

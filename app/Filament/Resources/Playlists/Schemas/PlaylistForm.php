@@ -7,13 +7,15 @@ namespace App\Filament\Resources\Playlists\Schemas;
 use App\Enums\PlaylistStatus;
 use App\Enums\QuestionOrder;
 use App\Enums\Visibility;
-use App\Models\ScoringRule;
-use App\Models\User;
-use Filament\Forms\Components\Checkbox;
+use App\Filament\Resources\ScoringRules\ScoringRuleResource;
+use App\Filament\Resources\Users\UserResource;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Flex;
 use Filament\Schemas\Schema;
 
 class PlaylistForm
@@ -21,9 +23,18 @@ class PlaylistForm
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
-            Select::make('user_id')
+            TextEntry::make('user.name')
                 ->label('Owner')
-                ->options(User::pluck('name', 'id'))
+                ->url(static fn($record) => (
+                    $record && $record->user_id
+                        ? UserResource::getUrl('edit', [
+                            'record' => $record->user_id,
+                        ]) : null
+                ))
+                ->placeholder('N/A'),
+
+            Select::make('user_id')
+                ->relationship('user', 'name')
                 ->required()
                 ->searchable(),
 
@@ -41,17 +52,14 @@ class PlaylistForm
                 ->required()
                 ->default(Visibility::Private),
 
-            KeyValue::make('tags')
-                ->label('Tags')
-                ->columnSpanFull(),
+            KeyValue::make('tags')->label('Tags')->columnSpanFull(),
 
             TextInput::make('estimated_duration_minutes')
                 ->label('Estimated Duration (minutes)')
                 ->numeric()
                 ->minValue(0),
 
-            TextInput::make('target_audience')
-                ->label('Target Audience'),
+            TextInput::make('target_audience')->label('Target Audience'),
 
             Select::make('question_order')
                 ->options(QuestionOrder::class)
@@ -63,9 +71,18 @@ class PlaylistForm
                 ->numeric()
                 ->minValue(0),
 
-            Select::make('scoring_rule_id')
+            TextEntry::make('scoringRule.name')
                 ->label('Scoring Rule')
-                ->options(ScoringRule::pluck('name', 'id'))
+                ->url(static fn($record) => (
+                    $record && $record->scoring_rule_id
+                        ? ScoringRuleResource::getUrl('edit', [
+                            'record' => $record->scoring_rule_id,
+                        ]) : null
+                ))
+                ->placeholder('N/A'),
+
+            Select::make('scoring_rule_id')
+                ->relationship('scoringRule', 'name')
                 ->searchable(),
 
             TextInput::make('play_count')
@@ -73,6 +90,12 @@ class PlaylistForm
                 ->numeric()
                 ->default(0)
                 ->minValue(0),
+
+            Flex::make([
+                TextInput::make('id')->copyable()->disabled(),
+                DateTimePicker::make('created_at')->disabled(),
+                DateTimePicker::make('updated_at')->disabled(),
+            ])->columnSpanFull()->hiddenOn('create'),
         ]);
     }
 }

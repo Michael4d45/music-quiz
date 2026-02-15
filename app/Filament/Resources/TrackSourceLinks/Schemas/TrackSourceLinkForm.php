@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\TrackSourceLinks\Schemas;
 
+use App\Filament\Resources\MusicSources\MusicSourceResource;
+use App\Filament\Resources\MusicTracks\MusicTrackResource;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Flex;
 use Filament\Schemas\Schema;
 
 class TrackSourceLinkForm
@@ -15,12 +19,32 @@ class TrackSourceLinkForm
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
+            TextEntry::make('track.title')
+                ->label('Track')
+                ->url(static fn($record) => (
+                    $record && $record->track_id
+                        ? MusicTrackResource::getUrl('edit', [
+                            'record' => $record->track_id,
+                        ]) : null
+                ))
+                ->placeholder('N/A'),
+
             Select::make('track_id')
                 ->label('Track')
                 ->relationship('track', 'title')
                 ->required()
                 ->searchable()
                 ->preload(),
+
+            TextEntry::make('source.name')
+                ->label('Source')
+                ->url(static fn($record) => (
+                    $record && $record->source_id
+                        ? MusicSourceResource::getUrl('edit', [
+                            'record' => $record->source_id,
+                        ]) : null
+                ))
+                ->placeholder('N/A'),
 
             Select::make('source_id')
                 ->label('Source')
@@ -61,9 +85,12 @@ class TrackSourceLinkForm
             DateTimePicker::make('last_checked_at')
                 ->label('Last Checked At')
                 ->default(now()),
-            TextInput::make('id')->required()->disabled(),
-            DateTimePicker::make('created_at')->disabled(),
-            DateTimePicker::make('updated_at')->disabled(),
+
+            Flex::make([
+                TextInput::make('id')->copyable()->disabled(),
+                DateTimePicker::make('created_at')->disabled(),
+                DateTimePicker::make('updated_at')->disabled(),
+            ])->columnSpanFull()->hiddenOn('create'),
         ]);
     }
 }

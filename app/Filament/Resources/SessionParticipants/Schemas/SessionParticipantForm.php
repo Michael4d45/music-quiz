@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Filament\Resources\SessionParticipants\Schemas;
 
 use App\Enums\Role;
+use App\Filament\Resources\GameSessions\GameSessionResource;
+use App\Filament\Resources\Users\UserResource;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
 class SessionParticipantForm
@@ -16,12 +19,31 @@ class SessionParticipantForm
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
-            Select::make('session_id')
+            TextEntry::make('session.room_code')
                 ->label('Session')
-                ->relationship('session', 'id')
+                ->url(static fn($record) => (
+                    $record && $record->session_id
+                        ? GameSessionResource::getUrl('edit', [
+                            'record' => $record->session_id,
+                        ]) : null
+                ))
+                ->placeholder('N/A'),
+
+            Select::make('session_id')
+                ->relationship('session', 'room_code')
                 ->required()
                 ->searchable()
                 ->preload(),
+
+            TextEntry::make('user.name')
+                ->label('User')
+                ->url(static fn($record) => (
+                    $record && $record->user_id
+                        ? UserResource::getUrl('edit', [
+                            'record' => $record->user_id,
+                        ]) : null
+                ))
+                ->placeholder('N/A'),
 
             Select::make('user_id')
                 ->label('User')
@@ -53,7 +75,8 @@ class SessionParticipantForm
                 ->default(now()),
 
             DateTimePicker::make('buzzed_in_at')->label('Buzzed In At'),
-            TextInput::make('id')->required()->disabled(),
+
+            TextInput::make('id')->copyable()->disabled(),
         ]);
     }
 }

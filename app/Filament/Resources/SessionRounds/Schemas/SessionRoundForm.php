@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\SessionRounds\Schemas;
 
+use App\Filament\Resources\GameSessions\GameSessionResource;
+use App\Filament\Resources\QuizQuestions\QuizQuestionResource;
+use App\Filament\Resources\SessionParticipants\SessionParticipantResource;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
 
 class SessionRoundForm
@@ -14,9 +18,18 @@ class SessionRoundForm
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
-            Select::make('session_id')
+            TextEntry::make('session.room_code')
                 ->label('Session')
-                ->relationship('session', 'id')
+                ->url(static fn($record) => (
+                    $record && $record->session_id
+                        ? GameSessionResource::getUrl('edit', [
+                            'record' => $record->session_id,
+                        ]) : null
+                ))
+                ->placeholder('N/A'),
+
+            Select::make('session_id')
+                ->relationship('session', 'room_code')
                 ->required()
                 ->searchable()
                 ->preload(),
@@ -26,6 +39,16 @@ class SessionRoundForm
                 ->numeric()
                 ->required()
                 ->minValue(1),
+
+            TextEntry::make('question.prompt_text')
+                ->label('Question')
+                ->url(static fn($record) => (
+                    $record && $record->question_id
+                        ? QuizQuestionResource::getUrl('edit', [
+                            'record' => $record->question_id,
+                        ]) : null
+                ))
+                ->placeholder('N/A'),
 
             Select::make('question_id')
                 ->label('Question')
@@ -38,12 +61,20 @@ class SessionRoundForm
 
             DateTimePicker::make('ended_at')->label('Ended At'),
 
-            Select::make('first_buzzer_id')
+            TextEntry::make('firstBuzzer.guest_name')
                 ->label('First Buzzer')
-                ->relationship('firstBuzzer', 'id')
+                ->url(static fn($record) => (
+                    $record && $record->first_buzzer_id
+                        ? SessionParticipantResource::getUrl('edit', [
+                            'record' => $record->first_buzzer_id,
+                        ]) : null
+                ))
+                ->placeholder('N/A'),
+
+            Select::make('first_buzzer_id')
+                ->relationship('firstBuzzer', 'guest_name')
                 ->searchable()
                 ->preload(),
-            TextInput::make('id')->required()->disabled(),
         ]);
     }
 }
