@@ -31,7 +31,6 @@ use Illuminate\Support\Carbon;
  * @property string|null $rich_prompt_text
  * @property string|null $explanation
  * @property array<string, mixed>|null $hints
- * @property bool $is_draft
  * @property Carbon|null $last_tested_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $created_at
@@ -68,7 +67,6 @@ class QuizQuestion extends Model
         'media_end_seconds',
         'difficulty_level',
         'visibility',
-        'is_draft',
         'last_tested_at',
     ];
 
@@ -148,7 +146,6 @@ class QuizQuestion extends Model
             'difficulty_level' => 'integer',
             'visibility' => Visibility::class,
             'hints' => 'array',
-            'is_draft' => 'boolean',
             'last_tested_at' => 'datetime',
         ];
     }

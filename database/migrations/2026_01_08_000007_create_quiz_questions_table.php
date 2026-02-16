@@ -33,7 +33,6 @@ return new class extends Migration {
             $table->integer('media_start_seconds')->nullable();
             $table->integer('media_end_seconds')->nullable();
             $table->integer('difficulty_level')->default(1);
-            $table->boolean('is_draft')->default(false);
             $table->timestampTz('last_tested_at')->nullable();
             $table->timestampsTz();
             $table

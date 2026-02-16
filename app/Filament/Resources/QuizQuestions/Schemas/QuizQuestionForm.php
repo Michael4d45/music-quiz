@@ -8,7 +8,6 @@ use App\Enums\QuestionType;
 use App\Enums\Visibility;
 use App\Filament\Resources\MusicTracks\MusicTrackResource;
 use App\Filament\Resources\Users\UserResource;
-use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
@@ -105,8 +104,6 @@ class QuizQuestionForm
                 ->options(Visibility::class)
                 ->required()
                 ->default(Visibility::Private),
-
-            Checkbox::make('is_draft')->label('Is Draft'),
 
             DateTimePicker::make('last_tested_at')->label('Last Tested At'),
 
