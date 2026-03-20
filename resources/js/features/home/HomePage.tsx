@@ -1,5 +1,5 @@
 import { RealtimeNotifications } from '@/components/realtime/RealtimeNotifications';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/features/auth/AuthContext';
 import { Link } from 'react-router-dom';
 
 export function HomePage() {
@@ -8,8 +8,8 @@ export function HomePage() {
 
     if (!isAuthenticated) {
         return (
-            <div className="mx-auto max-w-7xl">
-                <div className="flex h-screen flex-col items-center justify-center text-center">
+            <div className="mx-auto flex h-full min-h-full w-full max-w-7xl">
+                <div className="flex w-full flex-1 flex-col items-center justify-center text-center">
                     <h1 className="text-4xl">Welcome</h1>
                     <p className="text-muted mt-4 text-lg">
                         Get started by signing in or creating an account
@@ -33,10 +33,7 @@ export function HomePage() {
     return (
         <div className="container mx-auto space-y-8 px-4 py-8">
             <div>
-                <h1>
-                    {user.is_guest && 'Welcome!'}
-                    {user && !user.is_guest && `Welcome back, ${user.name}!`}
-                </h1>
+                <h1>Welcome back, {user.name}!</h1>
                 <p className="text-muted mt-2">
                     You're all set to get started.
                 </p>
@@ -51,31 +48,13 @@ export function HomePage() {
                     <p className="text-muted">Browse and explore content</p>
                 </Link>
 
-                {user && !user.is_guest && (
-                    <Link
-                        to="/profile"
-                        className="card block p-6 transition hover:shadow-lg"
-                    >
-                        <h2 className="mb-2 text-xl font-semibold">Profile</h2>
-                        <p className="text-muted">
-                            Manage your account settings
-                        </p>
-                    </Link>
-                )}
-                {user.is_guest && (
-                    <Link
-                        to="/register"
-                        className="card block p-6 transition hover:shadow-lg"
-                    >
-                        <h2 className="mb-2 text-xl font-semibold">
-                            Create Account
-                        </h2>
-                        <p className="text-muted">
-                            Sign up to save your progress and access more
-                            features
-                        </p>
-                    </Link>
-                )}
+                <Link
+                    to="/profile"
+                    className="card block p-6 transition hover:shadow-lg"
+                >
+                    <h2 className="mb-2 text-xl font-semibold">Profile</h2>
+                    <p className="text-muted">Manage your account settings</p>
+                </Link>
             </div>
 
             <RealtimeNotifications />

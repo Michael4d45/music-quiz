@@ -1,6 +1,6 @@
 import { Effect, Schema } from 'effect';
 import { apiCache } from './apiCache';
-import { authManager } from './auth';
+import { authManager } from '../features/auth/authManager';
 import { db } from './db';
 import { getCookieValue } from './utils';
 
@@ -413,7 +413,7 @@ export const withCacheFirst = <A>(cacheKey: string, ttlSeconds?: number) => {
 export const encodeUndefined =
     <A, I>(schema: Schema.Schema<A, I>) =>
     (data: A | undefined) =>
-        Schema.decodeUnknown(Schema.Union(schema, Schema.Undefined))(data);
+        Schema.encodeUnknown(Schema.Union(schema, Schema.Undefined))(data);
 
 export const decodeJson =
     <A, I>(schema: Schema.Schema<A, I>) =>

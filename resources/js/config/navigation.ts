@@ -1,4 +1,4 @@
-import { Home, LucideIcon } from 'lucide-react';
+import { Home, LucideIcon, Settings } from 'lucide-react';
 
 export interface NavigationItem {
     href: string;
@@ -19,6 +19,11 @@ export const navigationSections: NavigationSection[] = [
                 href: '/',
                 label: 'Home',
                 icon: Home,
+            },
+            {
+                href: '/content',
+                label: 'Content',
+                icon: Settings,
             },
         ],
     },

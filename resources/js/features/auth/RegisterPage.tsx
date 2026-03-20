@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/Button';
 import { Form, FormField } from '@/components/ui/Form';
 import { GoogleIcon } from '@/components/ui/GoogleIcon';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/features/auth/AuthContext';
 import { useOfflineBlock } from '@/hooks/useOfflineBlock';
 import { Link } from 'react-router-dom';
 
@@ -47,8 +47,8 @@ export function RegisterPage() {
     };
 
     return (
-        <div className="mx-auto max-w-md">
-            <div className="bg-card rounded-lg p-8 shadow-md">
+        <div className="mx-auto flex h-full max-w-md items-center justify-center">
+            <div className="bg-card w-full rounded-lg p-8 shadow-md">
                 <h1 className="mb-6 text-center text-2xl font-bold">
                     Create Account
                 </h1>
