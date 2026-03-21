@@ -1,8 +1,23 @@
 import { Button } from '@/components/ui/Button';
+import { useEffect } from 'react';
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
+
+const AUTH_PROVIDER_ERROR_MESSAGE =
+    'useAuth must be used within an AuthProvider';
 
 export function ErrorPage() {
     const error = useRouteError();
+
+    useEffect(() => {
+        if (
+            error instanceof Error &&
+            error.message === AUTH_PROVIDER_ERROR_MESSAGE
+        ) {
+            const id = setTimeout(() => window.location.reload(), 500);
+            return () => clearTimeout(id);
+        }
+        return undefined;
+    }, [error]);
 
     if (isRouteErrorResponse(error)) {
         return (

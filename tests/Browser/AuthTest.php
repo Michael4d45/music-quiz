@@ -1,0 +1,386 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Models\User;
+use Illuminate\Support\Facades\URL;
+
+it('can register a new user', function (): void {
+    $email = 'test-user-registration@example.com';
+    $logPath = setup_log_capture('auth.log');
+    $page = visit('/register')
+        ->assertNoJavaScriptErrors()
+        ->waitForText('Create Account')
+        ->type('#name', 'John Doe')
+        ->type('#email', $email)
+        ->type('#password', 'password1234')
+        ->type('#password_confirmation', 'password1234')
+        ->screenshot(filename: 'register.png')
+        ->click('@create-account')
+        ->waitForText('Sign out', 10);
+
+    assert_no_log_errors($logPath);
+
+    $page->assertNoJavaScriptErrors()->screenshot(
+        filename: 'register-after.png',
+    );
+
+    $page->assertDontSee('The email has already been taken');
+
+    $this->assertDatabaseHas('users', [
+        'name' => 'John Doe',
+        'email' => $email,
+    ]);
+});
+
+it('can login with valid credentials', function (): void {
+    $user = User::factory()->create([
+        'email' => 'test@example.com',
+        'password' => bcrypt('password1234'),
+    ]);
+
+    $page = visit('/login')
+        ->assertNoJavaScriptErrors()
+        ->waitForText('Login', 10)
+        ->type('#email', 'test@example.com')
+        ->type('#password', 'password1234')
+        ->click('@login')
+        ->waitForText('Sign out', 10)
+        ->assertNoJavaScriptErrors()
+        ->assertDontSee('Login failed'); // Should not show login error
+
+    // Verify we're logged in by checking for logout button
+    $page->assertSee('Sign out')->assertPathIs('/');
+});
+
+it('shows validation errors for invalid login', function (): void {
+    visit('/login')
+        ->assertNoJavaScriptErrors()
+        ->waitForText('Login')
+        ->type('#email', 'invalid@example.com')
+        ->type('#password', 'wrongpassword')
+        ->click('@login')
+        ->waitForText('Login', 10)
+        ->assertNoJavaScriptErrors()
+        ->assertPathIs('/login') // Should stay on login page with errors
+        ->assertNoJavaScriptErrors();
+});
+
+it('validates password requirements during registration', function (): void {
+    visit('/register')
+        ->assertNoJavaScriptErrors()
+        ->waitForText('Create Account')
+        // Test password too short (less than 8 characters)
+        ->type('#name', 'John Doe')
+        ->type('#email', 'test@example.com')
+        ->type('#password', '123') // Too short
+        ->type('#password_confirmation', '123')
+        ->click('@create-account')
+        ->waitForText('Create Account', 10)
+        // Check that we're still on the registration page (validation prevented redirect)
+        ->assertPathIs('/register')
+        // Verify no JavaScript errors occurred during validation
+        ->assertNoJavaScriptErrors()
+        // Verify that no success toast or redirect occurred
+        ->assertDontSee('Account created successfully');
+});
+
+it('validates password confirmation matching during registration', function (): void {
+    visit('/register')
+        ->assertNoJavaScriptErrors()
+        ->waitForText('Create Account')
+        // Test password confirmation doesn't match
+        ->type('#name', 'John Doe')
+        ->type('#email', 'test@example.com')
+        ->type('#password', 'password123')
+        ->type('#password_confirmation', 'different123') // Doesn't match
+        ->click('@create-account')
+        ->waitForText('Create Account', 10)
+        // Check that we're still on the registration page (validation prevented redirect)
+        ->assertPathIs('/register')
+        // Verify no JavaScript errors occurred during validation
+        ->assertNoJavaScriptErrors()
+        // Verify that no success toast or redirect occurred
+        ->assertDontSee('Account created successfully');
+});
+
+it('validates both password length and confirmation during registration', function (): void {
+    visit('/register')
+        ->assertNoJavaScriptErrors()
+        ->waitForText('Create Account')
+        // Test both password too short AND confirmation doesn't match
+        ->type('#name', 'John Doe')
+        ->type('#email', 'test@example.com')
+        ->type('#password', '123456789')
+        ->type('#password_confirmation', '1234567890')
+        ->click('@create-account')
+        ->waitForText('Create Account', 10)
+        ->screenshot(filename: 'password-validation-failed1.png')
+        // Check that we're still on the registration page (validation prevented redirect)
+        ->assertPathIs('/register')
+        // Verify that the form still contains our invalid input (form wasn't cleared)
+        ->assertValue('#password', '123456789')
+        ->assertValue('#password_confirmation', '1234567890')
+        // Verify no JavaScript errors occurred during validation
+        ->assertNoJavaScriptErrors()
+        // Verify that no success toast or redirect occurred
+        ->assertDontSee('Account created successfully')
+        ->assertPathIs('/register')
+        // Take a screenshot to verify visual state
+        ->screenshot(filename: 'password-validation-failed2.png');
+});
+
+it('validates email uniqueness during registration', function (): void {
+    User::factory()->create([
+        'email' => 'test@example.com',
+    ]);
+
+    visit('/register')
+        ->assertNoJavaScriptErrors()
+        ->waitForText('Create Account')
+        // Test both password too short AND confirmation doesn't match
+        ->type('#name', 'John Doe')
+        ->type('#email', 'test@example.com')
+        ->type('#password', '123456789')
+        ->type('#password_confirmation', '123456789')
+        ->click('@create-account')
+        ->waitForText('Create Account', 10)
+        ->screenshot(filename: 'email-validation-failed1.png')
+        // Check that we're still on the registration page (validation prevented redirect)
+        ->assertPathIs('/register')
+        // Verify that the form still contains our invalid input (form wasn't cleared)
+        ->assertValue('#email', 'test@example.com')
+        ->assertValue('#password', '123456789')
+        ->assertValue('#password_confirmation', '123456789')
+        // Verify no JavaScript errors occurred during validation
+        ->assertNoJavaScriptErrors()
+        // Verify that no success toast or redirect occurred
+        ->assertDontSee('Account created successfully')
+        ->assertPathIs('/register')
+        // Wait for the validation error to be displayed
+        ->waitForText('The email has already been taken')
+        // Take a screenshot to verify visual state
+        ->screenshot(filename: 'email-validation-failed2.png');
+});
+
+it('shows validation errors for invalid registration', function (): void {
+    visit('/register')
+        ->assertNoJavaScriptErrors()
+        ->waitForText('Create Account')
+        ->type('#name', 'John')
+        ->type('#email', 'invalid-email')
+        ->type('#password', 'short')
+        ->type('#password_confirmation', 'different')
+        ->click('@create-account')
+        ->waitForText('Create Account', 10)
+        ->assertNoJavaScriptErrors()
+        ->assertPathIs('/register') // Should stay on register page with errors
+        ->assertNoJavaScriptErrors();
+});
+
+it('shows google login button on login page', function (): void {
+    visit('/login')
+        ->assertNoJavaScriptErrors()
+        ->waitForText('Login')
+        ->assertSee('Continue with Google')
+        ->assertSee('Or'); // The divider text
+});
+
+it('shows google login button on register page', function (): void {
+    visit('/register')
+        ->assertNoJavaScriptErrors()
+        ->waitForText('Create Account')
+        ->assertSee('Continue with Google')
+        ->assertSee('Or'); // The divider text
+});
+
+it('shows google account connection on profile page', function (): void {
+    $user = User::factory()->create([
+        'email' => 'test@example.com',
+        'password' => bcrypt('password1234'),
+    ]);
+
+    $this->actingAs($user);
+
+    visit('/profile')
+        ->assertNoJavaScriptErrors()
+        ->waitForText('Sign out', 3)
+        ->assertSee('Google Account')
+        ->assertSee('Connect Google Account');
+});
+
+it('shows google account as connected on profile page', function (): void {
+    $user = User::factory()->create([
+        'email' => 'test@example.com',
+        'password' => bcrypt('password1234'),
+        'google_id' => '123456789',
+        'verified_google_email' => 'test@example.com',
+    ]);
+
+    $this->actingAs($user);
+
+    visit('/profile')
+        ->assertNoJavaScriptErrors()
+        ->waitForText('Sign out', 3)
+        ->assertSee('Google Account')
+        ->assertSee('Connected');
+});
+
+it('can logout', function (): void {
+    $logPath = setup_log_capture('auth.log');
+
+    // Create and authenticate user (Laravel session) - frontend should auto-fetch JWT token
+    $user = User::factory()->create();
+
+    $this->actingAs($user);
+
+    visit_with_error_init('/profile')
+        ->assertNoJavaScriptErrors()
+        ->screenshot(filename: 'before-logout.png')
+        ->click('@profile-logout')
+        ->waitForText('Welcome', 10)
+        ->assertNoJavaScriptErrors()
+        ->screenshot(filename: 'after-logout.png')
+        ->assertPathIs('/');
+
+    assert_no_log_errors($logPath);
+});
+
+it('does not restore stale cached user when booting offline', function (): void {
+    $staleUserName = 'Stale Offline User';
+
+    visit_with_error_init(
+        '/profile',
+        [],
+        [
+            <<<'JS'
+                Object.defineProperty(Navigator.prototype, 'onLine', {
+                    configurable: true,
+                    get: () => false,
+                });
+
+                window.fetch = async () => {
+                    throw new TypeError('Failed to fetch');
+                };
+
+                localStorage.setItem('auth_user', JSON.stringify({
+                    id: '999',
+                    name: 'Stale Offline User',
+                    display_name: null,
+                    email: 'stale@example.com',
+                    verified_google_email: null,
+                    email_verified_at: null,
+                    strava_id: null,
+                    strava_token_expires_at: null,
+                    avatar: null,
+                    bio: null,
+                    location: null,
+                    units: 'imperial',
+                    timezone: null,
+                    visibility: 'Public',
+                    created_at: null,
+                    updated_at: null,
+                    deleted_at: null,
+                    is_admin: false,
+                }));
+
+                window.dispatchEvent(new Event('offline'));
+                JS,
+        ],
+    )
+        ->wait(2)
+        ->assertPathIs('/login')
+        ->assertDontSee($staleUserName);
+});
+
+it('restores trusted cached user when booting offline', function (): void {
+    $trustedUserName = 'Trusted Offline User';
+
+    visit_with_error_init(
+        '/profile',
+        [],
+        [
+            <<<'JS'
+                Object.defineProperty(Navigator.prototype, 'onLine', {
+                    configurable: true,
+                    get: () => false,
+                });
+
+                window.fetch = async () => {
+                    throw new TypeError('Failed to fetch');
+                };
+
+                localStorage.setItem('auth_user_trusted_offline', '1');
+                localStorage.setItem('auth_user', JSON.stringify({
+                    id: '1000',
+                    name: 'Trusted Offline User',
+                    display_name: null,
+                    email: 'trusted@example.com',
+                    verified_google_email: null,
+                    email_verified_at: null,
+                    strava_id: null,
+                    strava_token_expires_at: null,
+                    avatar: null,
+                    bio: null,
+                    location: null,
+                    units: 'imperial',
+                    timezone: null,
+                    visibility: 'Public',
+                    created_at: null,
+                    updated_at: null,
+                    deleted_at: null,
+                    is_admin: false,
+                }));
+
+                window.dispatchEvent(new Event('offline'));
+                JS,
+        ],
+    )
+        ->wait(2)
+        ->assertPathIs('/profile')
+        ->assertSee($trustedUserName);
+});
+
+it('shows forgot password page', function (): void {
+    visit('/forgot-password')
+        ->assertNoJavaScriptErrors()
+        ->waitForText('Forgot Password')
+        ->assertSee('Send Reset Link')
+        ->assertSee('Remember your password?')
+        ->assertSee('Sign in');
+});
+
+it('can navigate to forgot password from login page', function (): void {
+    visit('/login')
+        ->assertNoJavaScriptErrors()
+        ->waitForText('Login')
+        ->assertSee('Forgot password?')
+        ->click('@forgot-password-link')
+        ->assertSee('Forgot Password')
+        ->assertNoJavaScriptErrors()
+        ->assertPathIs('/forgot-password')
+        ->assertSee('Forgot Password');
+});
+
+it('shows reset password form structure', function (): void {
+    // Generate a valid signed URL for testing
+    $signedUrl = URL::signedRoute('password.reset', [
+        'email' => 'test@example.com',
+        'token' => 'dummytoken',
+    ]);
+
+    // Extract the path from the signed URL
+    $url =
+        parse_url($signedUrl, PHP_URL_PATH)
+        . '?'
+        . parse_url($signedUrl, PHP_URL_QUERY);
+
+    visit($url)
+        ->assertNoJavaScriptErrors()
+        ->waitForText('Reset Password', 10)
+        ->assertSee('New Password')
+        ->assertSee('Confirm New Password')
+        ->assertSee('Reset Password')
+        ->assertSee('Remember your password?')
+        ->assertSee('Sign in');
+});
