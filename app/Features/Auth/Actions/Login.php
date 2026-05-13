@@ -6,6 +6,9 @@ namespace App\Features\Auth\Actions;
 
 use App\Features\Auth\Requests\LoginRequest;
 use App\Features\Auth\Responses\MessageResponse;
+use App\Models\User;
+use App\Services\GuestUserMergeService;
+use App\Support\SanctumSessionPasswordVerifier;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -89,14 +92,39 @@ class Login
      */
     public function __invoke(LoginRequest $loginData): JsonResponse
     {
+        $guestId = null;
+        $maybeGuest = Auth::user();
+        if ($maybeGuest instanceof User && $maybeGuest->is_guest) {
+            $guestId = $maybeGuest->id;
+        }
+
         $this->authenticate(
             $loginData->email,
             $loginData->password,
             $loginData->remember,
         );
 
-        if (request()->hasSession()) {
-            request()->session()->regenerate();
+        $authenticated = Auth::user();
+        if (
+            $guestId !== null
+            && $authenticated instanceof User
+            && (string) $authenticated->id !== (string) $guestId
+        ) {
+            $guest = User::query()->find($guestId);
+            if ($guest instanceof User && $guest->is_guest) {
+                app(GuestUserMergeService::class)->mergeGuestIntoUser(
+                    $guest,
+                    $authenticated,
+                );
+            }
+        }
+
+        $request = request();
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+            SanctumSessionPasswordVerifier::forgetCachedPasswordHashes(
+                $request,
+            );
         }
 
         RateLimiter::clear($this->throttleKey($loginData->email));

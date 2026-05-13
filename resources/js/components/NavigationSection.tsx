@@ -1,4 +1,6 @@
 import { NavigationSection as NavigationSectionType } from '@/config/navigation';
+import { isRegisteredUser } from '@/features/auth/authSession';
+import { useAuth } from '@/features/auth/AuthContext';
 import { cn } from '@/lib/utils';
 import NavigationItem from './NavigationItem';
 
@@ -13,6 +15,13 @@ export default function NavigationSection({
     onItemClick,
     compact = false,
 }: NavigationSectionProps) {
+    const { authState } = useAuth();
+    const registered = isRegisteredUser(authState.user);
+
+    const visibleItems = section.items.filter(
+        (item) => !item.requiresRegistered || registered,
+    );
+
     return (
         <li>
             <ul
@@ -32,16 +41,21 @@ export default function NavigationSection({
                             compact ? 'mt-0' : 'mt-2 md:mt-2',
                         )}
                     >
-                        {section.items.map((item) => (
-                            <NavigationItem
-                                key={item.href}
-                                {...item}
-                                compact={compact}
-                                {...(onItemClick
-                                    ? { onClick: onItemClick }
-                                    : {})}
-                            />
-                        ))}
+                        {visibleItems.map(
+                            ({
+                                requiresRegistered: _requiresRegistered,
+                                ...item
+                            }) => (
+                                <NavigationItem
+                                    key={item.href}
+                                    {...item}
+                                    compact={compact}
+                                    {...(onItemClick
+                                        ? { onClick: onItemClick }
+                                        : {})}
+                                />
+                            ),
+                        )}
                     </ul>
                 </li>
             </ul>

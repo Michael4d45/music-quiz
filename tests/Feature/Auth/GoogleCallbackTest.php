@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteTwoUser;
 
@@ -253,7 +254,8 @@ it('rejects when Google does not provide email', function (): void {
     );
 
     // Should not be authenticated
-    $this->assertGuest();
+    $this->assertAuthenticated();
+    expect(Auth::user()?->is_guest)->toBeTrue();
 });
 
 it('rejects when Google does not provide email and user is authenticated', function (): void {
@@ -300,7 +302,8 @@ it('handles exceptions gracefully', function (): void {
     $response->assertRedirect('/login');
 
     // Should not be authenticated
-    $this->assertGuest();
+    $this->assertAuthenticated();
+    expect(Auth::user()?->is_guest)->toBeTrue();
 });
 
 it('handles exceptions gracefully when user is authenticated', function (): void {

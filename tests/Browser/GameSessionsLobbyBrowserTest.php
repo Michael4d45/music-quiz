@@ -29,6 +29,7 @@ it('displays back to home and refresh on lobby page', function (): void {
     visit_with_custom_init('/game-sessions/lobby')
         ->assertNoJavaScriptErrors()
         ->waitForText('Game lobby', 10)
+        ->assertSee('Join by room code')
         ->assertSee('Refresh list');
 });
 

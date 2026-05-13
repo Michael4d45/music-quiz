@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 
 uses(RefreshDatabase::class);
 
@@ -48,7 +49,8 @@ it('rejects invalid credentials', function (): void {
     ]);
 
     $response->assertStatus(422);
-    $this->assertGuest();
+    $this->assertAuthenticated();
+    expect(Auth::user()?->is_guest)->toBeTrue();
 });
 
 it('rate limits login attempts', function (): void {
@@ -81,4 +83,28 @@ it('rate limits login attempts', function (): void {
 
     $response->assertStatus(422);
     expect($response->json('message'))->toContain('Too many login attempts');
+});
+
+it('allows stateful API user fetch after login from guest session', function (): void {
+    $user = User::factory()->create([
+        'email' => 'member@example.com',
+        'password' => bcrypt('password123'),
+    ]);
+    $guest = User::factory()->guest()->create();
+    $this->actingAs($guest, 'web');
+
+    $csrfToken = csrf_token();
+    $this->withSession([
+        '_token' => $csrfToken,
+    ])
+        ->postJson('/login', [
+            'email' => 'member@example.com',
+            'password' => 'password123',
+            '_token' => $csrfToken,
+        ])
+        ->assertSuccessful();
+
+    $this->assertAuthenticatedAs($user);
+
+    $this->getJson('/api/user')->assertSuccessful();
 });

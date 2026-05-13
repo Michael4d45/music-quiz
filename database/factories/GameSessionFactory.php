@@ -21,7 +21,7 @@ class GameSessionFactory extends Factory
     {
         return [
             'host_id' => User::factory(),
-            'room_code' => fake()->unique()->bothify('???###'),
+            'room_code' => strtoupper(fake()->unique()->bothify('???###')),
             'status' => SessionStatus::Lobby,
             'quiz_mode_id' => QuizMode::factory(),
             'scoring_rule_id' => ScoringRule::factory(),

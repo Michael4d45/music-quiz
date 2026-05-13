@@ -42,4 +42,16 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    public function guest(): static
+    {
+        return $this->state(fn(array $attributes): array => [
+            'is_guest' => true,
+            'email' => null,
+            'password' => null,
+            'email_verified_at' => null,
+            'google_id' => null,
+            'verified_google_email' => null,
+        ]);
+    }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Features\Auth\Actions;
 
 use App\Models\User;
+use App\Services\GuestUserMergeService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -13,13 +14,14 @@ use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-//TODO: account for $user->is_guest.
 class HandleGoogleCallback
 {
-    function __invoke(): RedirectResponse
+    public function __invoke(): RedirectResponse
     {
         /** @var User|null $currentUser */
         $currentUser = Auth::user();
+        $hadRegisteredSession =
+            $currentUser instanceof User && !$currentUser->is_guest;
         $wasAuthenticated = $currentUser instanceof User;
 
         try {
@@ -31,10 +33,9 @@ class HandleGoogleCallback
             $email = $googleUser->getEmail();
 
             if (!$email) {
-                return $this->rejectMissingEmail($wasAuthenticated);
+                return $this->rejectMissingEmail($hadRegisteredSession);
             }
 
-            // Determine the user
             $user = $this->resolveUser(
                 googleId: $googleId,
                 email: $email,
@@ -44,7 +45,6 @@ class HandleGoogleCallback
             );
 
             if ($user instanceof RedirectResponse) {
-                // resolveUser returned an error redirect
                 return $user;
             }
 
@@ -52,26 +52,24 @@ class HandleGoogleCallback
             if (!is_bool($remember)) {
                 $remember = false;
             }
-            // Log the user in
             Auth::login($user, $remember);
 
             return redirect(
-                ($wasAuthenticated ? '/profile' : '/') . '?auth=success',
+                ($hadRegisteredSession ? '/profile' : '/') . '?auth=success',
             );
         } catch (\Throwable $e) {
             Log::error('Google Error', [
                 'error' => $e->getMessage(),
             ]);
 
-            $redirectPath = $wasAuthenticated ? '/profile' : '/login';
+            $redirectPath = $hadRegisteredSession ? '/profile' : '/login';
+
             return redirect($redirectPath);
         }
     }
 
     /**
-     * Resolve which user to authenticate based on Google data.
-     *
-     * @return User|RedirectResponse Returns User on success, RedirectResponse on error
+     * @return User|RedirectResponse
      */
     private function resolveUser(
         string $googleId,
@@ -80,15 +78,28 @@ class HandleGoogleCallback
         null|User $currentUser,
         bool $wasAuthenticated,
     ): User|RedirectResponse {
-        // Step 1: Check if Google account is already linked to a user
-        $googleAccountUser = User::where('google_id', $googleId)->first();
+        $googleAccountUser = User::query()->where('google_id', $googleId)->first();
 
         if ($googleAccountUser instanceof User) {
-            // Reject if logged in as different user
             if (
                 $wasAuthenticated
                 && $currentUser instanceof User
                 && $currentUser->id !== $googleAccountUser->id
+                && $currentUser->is_guest
+            ) {
+                app(GuestUserMergeService::class)->mergeGuestIntoUser(
+                    $currentUser,
+                    $googleAccountUser,
+                );
+
+                return $googleAccountUser;
+            }
+
+            if (
+                $wasAuthenticated
+                && $currentUser instanceof User
+                && $currentUser->id !== $googleAccountUser->id
+                && !$currentUser->is_guest
             ) {
                 return $this->rejectGoogleAlreadyLinked();
             }
@@ -96,13 +107,23 @@ class HandleGoogleCallback
             return $googleAccountUser;
         }
 
-        // Step 2: Check if email matches existing user
-        $emailUser = User::where('email', $email)->first();
+        $emailUser = User::query()->where('email', $email)->first();
 
         if ($emailUser instanceof User) {
             if (
                 $wasAuthenticated
                 && $currentUser instanceof User
+                && $currentUser->is_guest
+                && $currentUser->id !== $emailUser->id
+            ) {
+                app(GuestUserMergeService::class)->mergeGuestIntoUser(
+                    $currentUser,
+                    $emailUser,
+                );
+            } elseif (
+                $wasAuthenticated
+                && $currentUser instanceof User
+                && !$currentUser->is_guest
                 && $currentUser->id !== $emailUser->id
             ) {
                 return $this->rejectEmailMismatch();
@@ -119,9 +140,10 @@ class HandleGoogleCallback
             return $emailUser;
         }
 
-        // Step 3: Link to current authenticated user
         if ($wasAuthenticated && $currentUser instanceof User) {
-            $emailToUse = $currentUser->email ?? $email;
+            $emailToUse = $currentUser->is_guest
+                ? $email
+                : ($currentUser->email ?? $email);
 
             $name = $googleUser->getName() ?? $currentUser->name ?? 'User';
             $currentUser->update([
@@ -129,31 +151,34 @@ class HandleGoogleCallback
                 'email' => $emailToUse,
                 'google_id' => $googleId,
                 'verified_google_email' => $email,
-                'email_verified_at' =>
-                    $currentUser->email_verified_at
-                        ?? ($emailToUse === $email ? now() : null),
+                'email_verified_at' => $currentUser->email_verified_at
+                    ?? ($emailToUse === $email ? now() : null),
+                'is_guest' => false,
             ]);
 
             return $currentUser;
         }
 
-        // Step 4: Create new user
         $name = $googleUser->getName();
         assert(is_string($name), 'User name must be a string');
-        return User::create([
+
+        return User::query()->create([
             'name' => Str::limit($name, 255),
             'email' => $email,
             'password' => Hash::make(Str::random(32)),
             'google_id' => $googleId,
             'verified_google_email' => $email,
             'email_verified_at' => now(),
+            'is_guest' => false,
+            'is_admin' => false,
         ]);
     }
 
-    private function rejectMissingEmail(bool $authenticated): RedirectResponse
+    private function rejectMissingEmail(bool $hadRegisteredSession): RedirectResponse
     {
-        $redirectPath = $authenticated ? '/profile' : '/login';
+        $redirectPath = $hadRegisteredSession ? '/profile' : '/login';
         $message = 'Google did not provide an email address. Please grant email access and try again.';
+
         return redirect(
             $redirectPath . '?auth=error&message=' . urlencode($message),
         );
@@ -162,12 +187,14 @@ class HandleGoogleCallback
     private function rejectGoogleAlreadyLinked(): RedirectResponse
     {
         $message = 'This Google account is already connected to another user.';
+
         return redirect('/profile?auth=error&message=' . urlencode($message));
     }
 
     private function rejectEmailMismatch(): RedirectResponse
     {
         $message = 'A user with this email already exists. Please use the same email account.';
+
         return redirect('/profile?auth=error&message=' . urlencode($message));
     }
 }

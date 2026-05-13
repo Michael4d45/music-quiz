@@ -1,9 +1,11 @@
 import { Button } from '@/components/ui/Button';
+import { ButtonLink } from '@/components/ui/ButtonLink';
 import { useOfflineBlock } from '@/hooks/useOfflineBlock';
 import type { GameSessionsLobbyResponseData } from '@/schemas/App/Data/Models/GameSessionsLobbyResponseData';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { Link, useLoaderData } from 'react-router-dom';
-import { fetchGameSessionsLobby } from './api';
+import { useLoaderData, useNavigate } from 'react-router-dom';
+import { fetchGameSessionsLobby, joinGameSession } from './api';
 
 export async function gameSessionsLobbyLoader(): Promise<GameSessionsLobbyResponseData> {
     const result = await fetchGameSessionsLobby();
@@ -21,6 +23,8 @@ export async function gameSessionsLobbyLoader(): Promise<GameSessionsLobbyRespon
 export function GameSessionsLobbyPage() {
     const { sessions } = useLoaderData<GameSessionsLobbyResponseData>();
     const { isBlocked, blockReason } = useOfflineBlock();
+    const navigate = useNavigate();
+    const [joinCode, setJoinCode] = useState('');
 
     const copyRoomCode = async (code: string) => {
         if (isBlocked) {
@@ -35,12 +39,66 @@ export function GameSessionsLobbyPage() {
         }
     };
 
+    const goToRoomAfterJoin = async (code: string) => {
+        if (isBlocked) {
+            toast.error(blockReason || 'Cannot join while offline');
+            return;
+        }
+        const normalized = code.trim().toUpperCase();
+        if (normalized.length !== 6) {
+            toast.error('Room code must be 6 characters');
+            return;
+        }
+        const result = await joinGameSession(normalized);
+        if (result._tag === 'Success') {
+            toast.success('Joined');
+            navigate(`/game-sessions/room/${normalized}`);
+        } else {
+            toast.error('Could not join this room');
+        }
+    };
+
     return (
         <div className="mx-auto max-w-4xl px-4 py-6">
+            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <h1 className="text-2xl font-bold">Game lobby</h1>
+                <ButtonLink to="/my/game-sessions" variant="secondary">
+                    Host a session
+                </ButtonLink>
+            </div>
+
             <p className="text-muted mb-6 max-w-2xl">
-                Public games that have not started yet. Use the room code to join
-                from your device when in-game join is available.
+                Public games that have not started yet. Join with a room code,
+                or open a session you host from My game sessions.
             </p>
+
+            <div className="bg-card mb-6 flex flex-col gap-3 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10 sm:flex-row sm:items-end">
+                <div className="grow">
+                    <label
+                        htmlFor="join-code"
+                        className="text-muted mb-1 block text-sm font-medium"
+                    >
+                        Join by room code
+                    </label>
+                    <input
+                        id="join-code"
+                        maxLength={6}
+                        className="border-input bg-background w-full rounded-md border px-3 py-2 font-mono text-lg tracking-widest uppercase"
+                        value={joinCode}
+                        onChange={(e) =>
+                            setJoinCode(e.target.value.toUpperCase())
+                        }
+                        placeholder="ABC123"
+                    />
+                </div>
+                <Button
+                    type="button"
+                    disabled={isBlocked}
+                    onClick={() => void goToRoomAfterJoin(joinCode)}
+                >
+                    Join
+                </Button>
+            </div>
 
             <div className="mb-6">
                 <Button
@@ -120,6 +178,17 @@ export function GameSessionsLobbyPage() {
                                             </dd>
                                         </div>
                                     </dl>
+                                    <Button
+                                        type="button"
+                                        disabled={isBlocked || isFull}
+                                        onClick={() =>
+                                            void goToRoomAfterJoin(
+                                                session.room_code,
+                                            )
+                                        }
+                                    >
+                                        {isFull ? 'Full' : 'Join this game'}
+                                    </Button>
                                 </div>
                             </li>
                         );

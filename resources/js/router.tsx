@@ -2,13 +2,37 @@ import { createBrowserRouter } from 'react-router-dom';
 import { App } from './app';
 import { authRoutes } from './features/auth/routes';
 import {
+    GameSessionRoomPage,
+    gameSessionRoomLoader,
+} from './features/game-sessions/GameSessionRoomPage';
+import {
     GameSessionsLobbyPage,
     gameSessionsLobbyLoader,
 } from './features/game-sessions/GameSessionsLobbyPage';
+import {
+    MyGameSessionsPage,
+    myGameSessionsLoader,
+} from './features/game-sessions/MyGameSessionsPage';
 import { ErrorPage } from './features/ErrorPage';
 import { HomePage } from './features/home/HomePage';
+import {
+    MyMusicTracksPage,
+    myMusicTracksLoader,
+} from './features/music-tracks/MyMusicTracksPage';
 import { NotFoundPage } from './features/NotFoundPage';
+import {
+    MyPlaylistsPage,
+    myPlaylistsLoader,
+} from './features/playlists/MyPlaylistsPage';
+import {
+    PlaylistDetailPage,
+    playlistDetailLoader,
+} from './features/playlists/PlaylistDetailPage';
 import { ProfilePage, profileLoader } from './features/profile/ProfilePage';
+import {
+    MyQuizQuestionsPage,
+    myQuizQuestionsLoader,
+} from './features/quiz-questions/MyQuizQuestionsPage';
 
 export const router = createBrowserRouter([
     {
@@ -25,6 +49,48 @@ export const router = createBrowserRouter([
                 element: <GameSessionsLobbyPage />,
                 loader: gameSessionsLobbyLoader,
                 errorElement: <ErrorPage />,
+            },
+            {
+                path: 'game-sessions/room/:roomCode',
+                element: <GameSessionRoomPage />,
+                loader: gameSessionRoomLoader,
+                errorElement: <ErrorPage />,
+                handle: { isProtected: true, requiresFullAccount: false },
+            },
+            {
+                path: 'my/game-sessions',
+                element: <MyGameSessionsPage />,
+                loader: myGameSessionsLoader,
+                errorElement: <ErrorPage />,
+                handle: { isProtected: true, requiresFullAccount: true },
+            },
+            {
+                path: 'my/playlists',
+                element: <MyPlaylistsPage />,
+                loader: myPlaylistsLoader,
+                errorElement: <ErrorPage />,
+                handle: { isProtected: true, requiresFullAccount: true },
+            },
+            {
+                path: 'my/playlists/:playlistId',
+                element: <PlaylistDetailPage />,
+                loader: playlistDetailLoader,
+                errorElement: <ErrorPage />,
+                handle: { isProtected: true, requiresFullAccount: true },
+            },
+            {
+                path: 'my/quiz-questions',
+                element: <MyQuizQuestionsPage />,
+                loader: myQuizQuestionsLoader,
+                errorElement: <ErrorPage />,
+                handle: { isProtected: true, requiresFullAccount: true },
+            },
+            {
+                path: 'my/music-tracks',
+                element: <MyMusicTracksPage />,
+                loader: myMusicTracksLoader,
+                errorElement: <ErrorPage />,
+                handle: { isProtected: true, requiresFullAccount: true },
             },
             {
                 path: 'profile',

@@ -33,6 +33,17 @@ it('can register a new user', function (): void {
     ]);
 });
 
+it('redirects registered users away from login to home', function (): void {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    visit('/login')
+        ->assertNoJavaScriptErrors()
+        ->waitForText('Welcome back', 15)
+        ->assertPathIs('/')
+        ->assertDontSee('Forgot password?');
+});
+
 it('can login with valid credentials', function (): void {
     $user = User::factory()->create([
         'email' => 'test@example.com',

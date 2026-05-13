@@ -1,0 +1,36 @@
+---
+description: How to run PHPUnit/Laravel tests in the shell so output is visible and agents do not stall on empty pipes
+alwaysApply: true
+---
+
+# Shell output when running tests
+
+## Why `| tail -N` looks broken
+
+When `tail` reads a **pipe** (not a seekable file), it must consume the **entire** upstream stream before it can know which lines are the “last N”. Until the test process exits, `tail` emits nothing. Cursor’s terminal view then shows no progress for a long run, which looks like a hang or a buffering bug.
+
+This is expected `tail` behavior, not a PHPUnit bug.
+
+## What to do instead
+
+1. **Prefer no tail on the pipe** — run tests directly so progress and the summary print as they go:
+
+   `php artisan test --compact`
+
+   Or scope the run: `php artisan test --compact tests/Feature/SomeTest.php` / `--filter=Name`.
+
+2. **If you only need a post-hoc tail** — write to a file, then read the end (or use the Read tool on the file after the command returns):
+
+   `php artisan test --compact > /tmp/phpunit.log 2>&1; tail -n 40 /tmp/phpunit.log`
+
+   Here `tail` reads a normal file after the suite finishes, which is fine.
+
+3. **Do not use** `php artisan test ... 2>&1 | tail -25` **for long suites** when you need live or incremental visibility in the agent terminal.
+
+4. **Background jobs** — the terminal transcript file is mostly **empty until the command exits**. With `php artisan test … | tail`, that exit is **after the full suite** (and `tail` only then writes), so for a long run it can look like the harness “returns nothing” for many minutes even though PHPUnit is still running. **AwaitShell** / re-read the transcript **after** completion, or avoid background for runs where you need the summary in the same turn.
+
+5. **Synchronous runs** — when the shell tool **waits** for the command (not `block_until_ms: 0`), the tool result includes **stdout/stderr** once the process finishes. You do **not** need `tail` to “capture” that; `tail` on a pipe only delays or hides output.
+
+## Short rule of thumb
+
+Stream: no `tail` on the pipe. Summary after: file redirect, then `tail`/`Read` the file. Same-turn summary: run **synchronously** without `| tail`, or redirect to a file and `Read` the file after.

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Data\Models;
 
+use App\Enums\PlaylistStatus;
+use App\Enums\QuestionOrder;
+use App\Enums\Visibility;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Spatie\LaravelData\Data;
@@ -16,7 +19,15 @@ class PlaylistData extends Data
         public string $user_id,
         public string $name,
         public null|string $description,
-        public bool $is_public,
+        public PlaylistStatus $status,
+        public Visibility $visibility,
+        /** @var array<string, mixed>|null */
+        public null|array $tags,
+        public null|int $estimated_duration_minutes,
+        public null|string $target_audience,
+        public QuestionOrder $question_order,
+        public null|int $default_time_limit_seconds,
+        public null|string $scoring_rule_id,
         public int $play_count,
         public null|Carbon $created_at,
         public null|Carbon $updated_at,
