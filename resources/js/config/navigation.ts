@@ -1,4 +1,4 @@
-import { Home, LucideIcon, Settings } from 'lucide-react';
+import { Gamepad2, Home, type LucideIcon } from 'lucide-react';
 
 export interface NavigationItem {
     href: string;
@@ -21,9 +21,9 @@ export const navigationSections: NavigationSection[] = [
                 icon: Home,
             },
             {
-                href: '/content',
-                label: 'Content',
-                icon: Settings,
+                href: '/game-sessions/lobby',
+                label: 'Game lobby',
+                icon: Gamepad2,
             },
         ],
     },

@@ -24,11 +24,19 @@ test('it can fetch the authenticated user', function () {
     ]);
 });
 
-test('it returns unauthorized when not authenticated', function () {
+test('it creates and returns a guest user when no session user exists', function () {
     $response = $this->getJson('/api/user');
 
-    $response->assertStatus(401);
-    $response->assertJson([
-        'message' => 'Unauthenticated.',
-    ]);
+    $response->assertSuccessful();
+    $response->assertJsonPath('is_guest', true);
+});
+
+test('it returns guest for first-party api request with origin header', function () {
+    $response = $this->withHeader('Origin', rtrim(
+        (string) config('app.url'),
+        '/',
+    ))->getJson('/api/user');
+
+    $response->assertSuccessful();
+    $response->assertJsonPath('is_guest', true);
 });

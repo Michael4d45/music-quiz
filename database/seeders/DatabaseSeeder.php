@@ -327,6 +327,9 @@ class DatabaseSeeder extends Seeder
                     'quiz_mode_id' => $modes->random()->id,
                     'scoring_rule_id' => $rules->random()->id,
                     'max_players' => rand(2, 8),
+                    'is_public' =>
+                        $status === SessionStatus::Lobby->value
+                            && rand(1, 10) <= 5,
                     'created_at' => now()->subDays(rand(0, 30)),
                     'updated_at' => now(),
                 ];
@@ -1823,27 +1826,33 @@ class DatabaseSeeder extends Seeder
         // Return a wrong answer based on question type
         switch ($question->question_type) {
             case QuestionType::Artist:
-                return MusicTrack::where('id', '!=', $question->track_id)
-                    ->inRandomOrder()
-                    ->first()
-                    ->artist_name ?? 'Unknown Artist';
+                return (
+                    MusicTrack::where('id', '!=', $question->track_id)
+                        ->inRandomOrder()
+                        ->first()
+                        ->artist_name ?? 'Unknown Artist'
+                );
 
             case QuestionType::Title:
-                return MusicTrack::where('id', '!=', $question->track_id)
-                    ->inRandomOrder()
-                    ->first()
-                    ->title ?? 'Unknown Title';
+                return (
+                    MusicTrack::where('id', '!=', $question->track_id)
+                        ->inRandomOrder()
+                        ->first()
+                        ->title ?? 'Unknown Title'
+                );
 
             case QuestionType::Year:
                 $correctYear = (int) $question->correct_answer;
                 return (string) ($correctYear + rand(1, 10));
 
             case QuestionType::MultipleChoice:
-                return MultipleChoiceOption::where('question_id', $question->id)
-                    ->where('is_correct', false)
-                    ->inRandomOrder()
-                    ->first()
-                    ->option_text ?? 'Wrong Answer';
+                return (
+                    MultipleChoiceOption::where('question_id', $question->id)
+                        ->where('is_correct', false)
+                        ->inRandomOrder()
+                        ->first()
+                        ->option_text ?? 'Wrong Answer'
+                );
 
             default:
                 return 'Wrong Answer';
@@ -2030,15 +2039,13 @@ class DatabaseSeeder extends Seeder
                 ) {
                     // @phpstan-ignore argument.type
                     $query->where('user_id', $user->id);
-                })->max('final_score')
-                ?? 0;
+                })->max('final_score') ?? 0;
             $avgRank = (float) (
                 SessionFinalScore::whereHas('participant', function ($query) use (
                     $user,
                 ) {
                     $query->where('user_id', $user->id); // @phpstan-ignore argument.type
-                })->avg('final_rank')
-                ?? 0
+                })->avg('final_rank') ?? 0
             );
 
             // Calculate total wins (1st place finishes)

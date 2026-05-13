@@ -20,6 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->appendToGroup('web', EnsureGuestUser::class);
+        $middleware->prependToPriorityList(
+            \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
+            EnsureGuestUser::class,
+        );
         $middleware->append(RequestContextMiddleware::class);
         $middleware->append(EmitContextMiddleware::class);
 

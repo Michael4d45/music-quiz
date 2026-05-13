@@ -13,7 +13,10 @@ test('user edit form does not expose the stored password hash', function (): voi
 
     $this->actingAs($admin);
 
-    $response = $this->get(route('filament.admin.resources.users.edit', $admin));
+    $response = $this->get(route(
+        'filament.admin.resources.users.edit',
+        $admin,
+    ));
 
     $response->assertOk();
     $response->assertDontSee($admin->password, false);

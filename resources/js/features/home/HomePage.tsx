@@ -1,12 +1,12 @@
 import { RealtimeNotifications } from '@/components/realtime/RealtimeNotifications';
 import { useAuth } from '@/features/auth/AuthContext';
+import { isRegisteredUser } from '@/features/auth/authSession';
 import { Link } from 'react-router-dom';
 
 export function HomePage() {
     const { user } = useAuth();
-    const isAuthenticated = !!user;
 
-    if (!isAuthenticated) {
+    if (!isRegisteredUser(user)) {
         return (
             <div className="mx-auto flex h-full min-h-full w-full max-w-7xl">
                 <div className="flex w-full flex-1 flex-col items-center justify-center text-center">
@@ -41,11 +41,13 @@ export function HomePage() {
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                 <Link
-                    to="/content"
+                    to="/game-sessions/lobby"
                     className="card block p-6 transition hover:shadow-lg"
                 >
-                    <h2 className="mb-2 text-xl font-semibold">Content</h2>
-                    <p className="text-muted">Browse and explore content</p>
+                    <h2 className="mb-2 text-xl font-semibold">Game lobby</h2>
+                    <p className="text-muted">
+                        Join public games that have not started yet
+                    </p>
                 </Link>
 
                 <Link

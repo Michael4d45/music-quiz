@@ -13,14 +13,12 @@ use Symfony\Component\HttpFoundation\Response;
 class EnsureGuestUser
 {
     /**
-     * Handle an incoming request.
-     *
-     * Create a guest user on first meaningful interaction (POST requests or specific pages).
-     * This ensures auth()->user() exists when users start interacting with features.
+     * When the request is not already authenticated, create a guest user if needed,
+     * persist their id in the session, and log them in so routes using auth:sanctum
+     * resolve to a user (guest or registered).
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Don't create guest users on initial home page visits
         if (Auth::check()) {
             return $next($request);
         }

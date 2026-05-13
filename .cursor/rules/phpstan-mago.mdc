@@ -1,0 +1,15 @@
+---
+description: Use project-local PhpStan and Mago from vendor/bin for PHP quality checks
+globs: "**/*.php"
+alwaysApply: false
+---
+
+# PhpStan and Mago (PHP)
+
+When changing PHP code (or before finishing a PHP-related task), run these **from the project root** so the agent uses the repo’s pinned tools, not global installs:
+
+1. **`./vendor/bin/phpstan`** — static analysis (uses `phpstan.neon`; default command is analyse).
+2. **`./vendor/bin/mago lint`** — Mago linter. (`./vendor/bin/mago lint --fix` for auto fixing some issues).
+3. **`./vendor/bin/mago fmt`** — Mago formatter; run after substantive edits so style matches the project.
+
+Fix reported issues before considering the task done. If only `mago.toml` changed, still run **`./vendor/bin/mago lint`** and **`./vendor/bin/mago fmt`**.

@@ -1,4 +1,5 @@
 import { authManager, AuthState } from '@/features/auth/authManager';
+import { isRegisteredUser } from '@/features/auth/authSession';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { UserData } from '@/schemas/App/Data/Models/UserData';
 import { LoginRequest } from '@/schemas/App/Features/Auth/Requests/LoginRequest';
@@ -6,6 +7,7 @@ import { RegisterRequest } from '@/schemas/App/Features/Auth/Requests/RegisterRe
 import {
     createContext,
     ReactNode,
+    useCallback,
     useContext,
     useEffect,
     useRef,
@@ -36,6 +38,7 @@ interface AuthContextType {
     googleLogin: (reconnect?: boolean, remember?: boolean) => Promise<void>;
     disconnectGoogle: typeof apiDisconnectGoogle;
     isLoading: boolean;
+    refreshUser: () => ReturnType<typeof showUser>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -127,6 +130,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
                     return { ...previousState, hasFetchedUser: true };
                 });
             });
+    };
+
+    const refreshUser = () => {
+        return showUser().then((result) => {
+            if (result._tag === 'Success') {
+                setOfflineAuthTrust(true);
+                authManager.setUser(result.data);
+            } else if (result._tag === 'AuthenticationError') {
+                setOfflineAuthTrust(false);
+                authManager.clearAuthData();
+            }
+
+            return result;
+        });
     };
 
     useEffect(() => {
@@ -233,6 +250,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         googleLogin,
         disconnectGoogle,
         isLoading,
+        refreshUser,
     };
 
     return (
@@ -260,32 +278,48 @@ export function AuthGuard({ children }: { children: ReactNode }) {
     const isOnProtectedPage = matches.some(
         (match) => (match.handle as any)?.isProtected,
     );
+    const requiresFullAccount = matches.some(
+        (match) => (match.handle as any)?.requiresFullAccount === true,
+    );
+
+    const registered = isRegisteredUser(authState.user);
 
     useEffect(() => {
         if (!(isOnProtectedPage || isOnAuthPage) || !authState.hasFetchedUser) {
             return;
         }
 
-        if (authState.isAuthenticated && isOnAuthPage) {
+        if (registered && isOnAuthPage) {
             navigate('/', { replace: true });
         }
 
-        if (!authState.isAuthenticated && !isOnAuthPage) {
+        const needsLogin =
+            isOnProtectedPage &&
+            !isOnAuthPage &&
+            ((!authState.user && authState.hasFetchedUser) ||
+                (requiresFullAccount && !registered));
+
+        if (needsLogin) {
             navigate('/login', { replace: true });
         }
     }, [
-        authState.isAuthenticated,
+        authState.user,
         authState.hasFetchedUser,
         isOnAuthPage,
+        registered,
         navigate,
         isOnProtectedPage,
+        requiresFullAccount,
     ]);
+
+    const allowedOnProtected =
+        authState.user && (!requiresFullAccount || registered);
 
     if (
         isOnProtectedPage &&
         (!authState.hasFetchedUser ||
-            (authState.isAuthenticated && isOnAuthPage) ||
-            (!authState.isAuthenticated && !isOnAuthPage))
+            (registered && isOnAuthPage) ||
+            (!allowedOnProtected && !isOnAuthPage))
     ) {
         return null;
     }

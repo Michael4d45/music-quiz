@@ -21,6 +21,7 @@ class GameSessionData extends Data
         public string $scoring_rule_id,
         public null|string $playlist_id,
         public int $max_players,
+        public bool $is_public,
         public null|Carbon $started_at,
         public null|Carbon $ended_at,
         public null|Carbon $created_at,

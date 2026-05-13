@@ -24,6 +24,7 @@ use Illuminate\Support\Carbon;
  * @property string $scoring_rule_id
  * @property string|null $playlist_id
  * @property int $max_players
+ * @property bool $is_public
  * @property Carbon|null $updated_at
  * @property Carbon|null $created_at
  * @property Carbon|null $started_at
@@ -57,6 +58,7 @@ class GameSession extends Model
         'scoring_rule_id',
         'playlist_id',
         'max_players',
+        'is_public',
         'started_at',
         'ended_at',
     ];
@@ -159,6 +161,7 @@ class GameSession extends Model
         return [
             'status' => SessionStatus::class,
             'max_players' => 'integer',
+            'is_public' => 'boolean',
             'started_at' => 'datetime',
             'ended_at' => 'datetime',
         ];

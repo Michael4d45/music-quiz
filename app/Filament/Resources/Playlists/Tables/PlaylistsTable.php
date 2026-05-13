@@ -46,10 +46,7 @@ class PlaylistsTable
                     ->sortable()
                     ->toggleable(),
 
-                TextColumn::make('status')
-                    ->badge()
-                    ->sortable()
-                    ->toggleable(),
+                TextColumn::make('status')->badge()->sortable()->toggleable(),
 
                 TextColumn::make('visibility')
                     ->badge()

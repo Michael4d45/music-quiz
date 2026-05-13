@@ -33,7 +33,7 @@ This application’s React SPA lives under **`resources/js`**. Follow these guid
 - **Entry:** [`resources/js/main.tsx`](resources/js/main.tsx) — `AuthProvider`, `RouterProvider` with [`router.tsx`](resources/js/router.tsx); theme init via `useAppearance`.
 - **Shell:** [`resources/js/app.tsx`](resources/js/app.tsx) — `Sidebar` (md+), `Header` (mobile), `OfflineBanner`, `GlobalRealtimeListener`, `AuthGuard` wrapping `Outlet`, `ModalRenderer`, `Toaster`.
 - **Router:** [`resources/js/router.tsx`](resources/js/router.tsx) — root layout route `/` with `App`, `errorElement: ErrorPage`; wildcard `*` → `NotFoundPage`.
-- **Features:** Folders under [`resources/js/features/`](resources/js/features/) — e.g. `auth`, `content`, `home`, `profile`, plus shared [`ErrorPage`](resources/js/features/ErrorPage.tsx) / [`NotFoundPage`](resources/js/features/NotFoundPage.tsx).
+- **Features:** Folders under [`resources/js/features/`](resources/js/features/) — e.g. `auth`, `game-sessions`, `home`, `profile`, plus shared [`ErrorPage`](resources/js/features/ErrorPage.tsx) / [`NotFoundPage`](resources/js/features/NotFoundPage.tsx).
 - **Shared:** [`resources/js/components/`](resources/js/components/), [`resources/js/lib/`](resources/js/lib/), [`resources/js/hooks/`](resources/js/hooks/), [`resources/js/config/`](resources/js/config/) (e.g. navigation).
 
 ## Feature structure
@@ -41,8 +41,8 @@ This application’s React SPA lives under **`resources/js`**. Follow these guid
 Patterns in this repo:
 
 - **`features/auth/routes.tsx`** — Exports `authRoutes` (`RouteObject[]`) for login, register, password flows; each auth screen sets `handle: { isAuthPage: true }`.
-- **Other routes** — Declared inline in `router.tsx` (e.g. `/`, `/content`, `/profile`) or added there as the app grows.
-- **Page + loader** — Co-located in the same module when used (e.g. `ContentPage` + `contentLoader`, `ProfilePage` + `profileLoader`).
+- **Other routes** — Declared inline in `router.tsx` (e.g. `/`, `/game-sessions/lobby`, `/profile`) or added there as the app grows.
+- **Page + loader** — Co-located in the same module when used (e.g. `GameSessionsLobbyPage` + `gameSessionsLobbyLoader`, `ProfilePage` + `profileLoader`).
 - **`api.ts`** per feature where needed — call through `@/lib/apiCore`; return tagged results (`_tag: 'Success'` vs error tags) from `runEffect(...)`.
 
 === types and schemas ===
@@ -91,7 +91,7 @@ Patterns in this repo:
 
 - **Router:** Add or extend routes in `router.tsx` and/or feature `routes.tsx`; use `RouteObject` from `react-router-dom`.
 - **Loaders:** Attach to the route that owns the data; keep them free of unrelated side effects beyond fetch/decode.
-- **`AuthGuard`:** Routes are **public by default**. Mark **protected** routes with **`handle: { isProtected: true }`** (see `/profile`). Mark **auth-only pages** (login, register, etc.) with **`handle: { isAuthPage: true }`** so logged-in users are redirected home. There is no `isGuestPage` handle in this app.
+- **`AuthGuard`:** Routes are **public by default**. Mark **protected** routes with **`handle: { isProtected: true }`** (see `/profile`). **`/game-sessions/lobby`** stays public for the guard so guests can open it; the lobby API still uses session auth. Mark **auth-only pages** (login, register, etc.) with **`handle: { isAuthPage: true }`** so logged-in users are redirected home. There is no `isGuestPage` handle in this app.
 
 === quality and tooling ===
 

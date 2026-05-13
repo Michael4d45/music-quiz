@@ -1,5 +1,9 @@
 import AppearanceToggleTab from '@/components/ui/AppearanceToggleTab';
 import { useAuth } from '@/features/auth/AuthContext';
+import {
+    isRegisteredUser,
+    showPublicAuthLinks,
+} from '@/features/auth/authSession';
 import { useSidebarMode } from '@/hooks/useSidebarMode';
 import { cn } from '@/lib/utils';
 import {
@@ -88,7 +92,7 @@ export default function UserActions({
                         )}
                     </a>
                 )}
-                {user && !user.is_guest && (
+                {isRegisteredUser(user) && user && (
                     <ActionItem
                         href="/profile"
                         label={user.name ?? 'Profile'}
@@ -97,7 +101,7 @@ export default function UserActions({
                         compact={useCompact}
                     />
                 )}
-                {user?.is_guest && (
+                {showPublicAuthLinks(user) && (
                     <ActionItem
                         href="/login"
                         label="Log in"
@@ -106,7 +110,7 @@ export default function UserActions({
                         compact={useCompact}
                     />
                 )}
-                {user?.is_guest && (
+                {showPublicAuthLinks(user) && (
                     <ActionItem
                         href="/register"
                         label="Sign up"
@@ -115,7 +119,7 @@ export default function UserActions({
                         compact={useCompact}
                     />
                 )}
-                {user && !user.is_guest && (
+                {isRegisteredUser(user) && (
                     <ActionItem
                         href="/"
                         label="Sign out"

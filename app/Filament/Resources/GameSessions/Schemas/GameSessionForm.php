@@ -12,6 +12,7 @@ use App\Filament\Resources\Users\UserResource;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Flex;
 use Filament\Schemas\Schema;
@@ -101,6 +102,13 @@ class GameSessionForm
                 ->default(10)
                 ->minValue(1)
                 ->maxValue(50),
+
+            Toggle::make('is_public')
+                ->label('Public lobby')
+                ->helperText(
+                    'When enabled, this session appears in the joinable games list before it starts.',
+                )
+                ->default(false),
 
             DateTimePicker::make('started_at'),
             DateTimePicker::make('ended_at'),

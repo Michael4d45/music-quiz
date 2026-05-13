@@ -79,9 +79,7 @@ class SessionRoundForm
 
             Flex::make([
                 TextInput::make('id')->copyable()->disabled(),
-            ])
-                ->columnSpanFull()
-                ->hiddenOn('create'),
+            ])->columnSpanFull()->hiddenOn('create'),
         ]);
     }
 }

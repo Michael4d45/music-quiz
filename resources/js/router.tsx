@@ -1,7 +1,10 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { App } from './app';
 import { authRoutes } from './features/auth/routes';
-import { ContentPage, contentLoader } from './features/content/ContentPage';
+import {
+    GameSessionsLobbyPage,
+    gameSessionsLobbyLoader,
+} from './features/game-sessions/GameSessionsLobbyPage';
 import { ErrorPage } from './features/ErrorPage';
 import { HomePage } from './features/home/HomePage';
 import { NotFoundPage } from './features/NotFoundPage';
@@ -18,9 +21,9 @@ export const router = createBrowserRouter([
                 element: <HomePage />,
             },
             {
-                path: 'content',
-                element: <ContentPage />,
-                loader: contentLoader,
+                path: 'game-sessions/lobby',
+                element: <GameSessionsLobbyPage />,
+                loader: gameSessionsLobbyLoader,
                 errorElement: <ErrorPage />,
             },
             {
@@ -28,7 +31,7 @@ export const router = createBrowserRouter([
                 element: <ProfilePage />,
                 loader: profileLoader,
                 errorElement: <ErrorPage />,
-                handle: { isProtected: true },
+                handle: { isProtected: true, requiresFullAccount: true },
             },
             ...authRoutes,
         ],

@@ -42,10 +42,7 @@ class GameSessionsRelationManager extends RelationManager
                     ->sortable()
                     ->toggleable(),
 
-                TextColumn::make('status')
-                    ->badge()
-                    ->sortable()
-                    ->toggleable(),
+                TextColumn::make('status')->badge()->sortable()->toggleable(),
 
                 TextColumn::make('quizMode.name')
                     ->label('Quiz Mode')

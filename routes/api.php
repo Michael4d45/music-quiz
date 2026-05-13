@@ -18,4 +18,5 @@ Route::middleware([
 ])->group(function (): void {
     require base_path('app/Features/Auth/routes.php');
     require base_path('app/Features/Broadcasting/routes.php');
+    require base_path('app/Features/GameSessions/routes.php');
 });
