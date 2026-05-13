@@ -9,11 +9,12 @@ import { laravelDataTypes } from './laravelDataTypes';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
-    // Single dev URL: hot file, script tags, and HMR. From VITE_DEV_SERVER_URL or built from APP_*.
+    // Dev server URL for @vite / public/hot. Do not default to APP_PORT: it often matches
+    // Reverb (8080) while Vite listens on VITE_DEV_PORT (5173).
     const s = env.APP_SCHEME || 'http';
     const h = env.HOST_NAME || 'localhost';
-    const p = env.APP_PORT || '8080';
-    const built = `${s}://${h}${p ? `:${p}` : ''}`;
+    const viteDevPort = env.VITE_DEV_PORT || '5173';
+    const built = `${s}://${h}:${viteDevPort}`;
     const devServerUrl = env.VITE_DEV_SERVER_URL || built;
     let parsed;
     try {
@@ -155,7 +156,9 @@ export default defineConfig(({ mode }) => {
             host: env.VITE_DEV_HOST || false,
             port: Number(env.VITE_DEV_PORT || 5173),
             strictPort: true,
-            origin: devServerUrl,
+            // Do not set `origin` to the Vite dev URL: laravel-vite-plugin uses it as the
+            // sole CORS allow-list when present, which blocks Laravel on another port (e.g. :8000).
+            cors: true,
             hmr: {
                 host: parsed.hostname,
                 protocol: parsed.protocol === 'https:' ? 'wss' : 'ws',

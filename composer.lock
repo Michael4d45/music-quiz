@@ -2868,16 +2868,16 @@
         },
         {
             "name": "laravel/surveyor",
-            "version": "v0.1.10",
+            "version": "v0.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/surveyor.git",
-                "reference": "1e91a7fd195beaac168c527fe568bf5870254037"
+                "reference": "f6cab63df36587940831273807d803e0e1e761e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/surveyor/zipball/1e91a7fd195beaac168c527fe568bf5870254037",
-                "reference": "1e91a7fd195beaac168c527fe568bf5870254037",
+                "url": "https://api.github.com/repos/laravel/surveyor/zipball/f6cab63df36587940831273807d803e0e1e761e0",
+                "reference": "f6cab63df36587940831273807d803e0e1e761e0",
                 "shasum": ""
             },
             "require": {
@@ -2932,7 +2932,7 @@
                 "issues": "https://github.com/laravel/surveyor/issues",
                 "source": "https://github.com/laravel/surveyor"
             },
-            "time": "2026-04-30T18:58:11+00:00"
+            "time": "2026-05-07T15:20:21+00:00"
         },
         {
             "name": "league/commonmark",
@@ -3883,28 +3883,28 @@
         },
         {
             "name": "michael4d45/effect-schema-generator",
-            "version": "v0.6.0",
+            "version": "v0.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Michael4d45/Laravel-Effect-Generator.git",
-                "reference": "c1c788a9e43b23154cd141cab20ec126db7fbc88"
+                "reference": "ba3f94cc7d3ec8b13b67484f8c3fa4c0a27e33c7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Michael4d45/Laravel-Effect-Generator/zipball/c1c788a9e43b23154cd141cab20ec126db7fbc88",
-                "reference": "c1c788a9e43b23154cd141cab20ec126db7fbc88",
+                "url": "https://api.github.com/repos/Michael4d45/Laravel-Effect-Generator/zipball/ba3f94cc7d3ec8b13b67484f8c3fa4c0a27e33c7",
+                "reference": "ba3f94cc7d3ec8b13b67484f8c3fa4c0a27e33c7",
                 "shasum": ""
             },
             "require": {
-                "laravel/framework": "^11.0|^12.0|^13.0",
-                "laravel/surveyor": "^0.1",
+                "laravel/framework": "^12.0|^13.0",
+                "laravel/surveyor": "^0.2",
                 "nikic/php-parser": "^5.4",
                 "php": "^8.3",
                 "phpdocumentor/reflection-docblock": "^5.3",
                 "spatie/laravel-data": "^4.0"
             },
             "require-dev": {
-                "carthage-software/mago": "^1.2",
+                "carthage-software/mago": "^1.15",
                 "michael4d45/coverage-treemap": "^1.0.0",
                 "orchestra/testbench": "^10.0|^11.0",
                 "pestphp/pest": "^4.0"
@@ -3942,9 +3942,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Michael4d45/Laravel-Effect-Generator/issues",
-                "source": "https://github.com/Michael4d45/Laravel-Effect-Generator/tree/v0.6.0"
+                "source": "https://github.com/Michael4d45/Laravel-Effect-Generator/tree/v0.6.1"
             },
-            "time": "2026-03-18T21:02:31+00:00"
+            "time": "2026-05-13T15:53:27+00:00"
         },
         {
             "name": "michael4d45/filament-system-info-widget",
@@ -12506,21 +12506,21 @@
         },
         {
             "name": "michael4d45/laravel-resource-checker",
-            "version": "1.2.0",
+            "version": "v1.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Michael4d45/Laravel-Resource-Checker.git",
-                "reference": "e3e2b0dd203455c8f7f3404a1a96400d42b49124"
+                "reference": "42378417ed9a69f948bc62df3c5a1f12d4fa7968"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Michael4d45/Laravel-Resource-Checker/zipball/e3e2b0dd203455c8f7f3404a1a96400d42b49124",
-                "reference": "e3e2b0dd203455c8f7f3404a1a96400d42b49124",
+                "url": "https://api.github.com/repos/Michael4d45/Laravel-Resource-Checker/zipball/42378417ed9a69f948bc62df3c5a1f12d4fa7968",
+                "reference": "42378417ed9a69f948bc62df3c5a1f12d4fa7968",
                 "shasum": ""
             },
             "require": {
                 "laravel/framework": "^12.0|^13.0",
-                "laravel/surveyor": "^0.1.9",
+                "laravel/surveyor": "^0.2",
                 "nikic/php-parser": "^4.0|^5.0",
                 "php": "^8.3",
                 "phpdocumentor/reflection-docblock": "^5.3|^6.0"
@@ -12558,9 +12558,9 @@
             "description": "A Laravel package to check migrations against Filament resources and models",
             "support": {
                 "issues": "https://github.com/Michael4d45/Laravel-Resource-Checker/issues",
-                "source": "https://github.com/Michael4d45/Laravel-Resource-Checker/tree/1.2.0"
+                "source": "https://github.com/Michael4d45/Laravel-Resource-Checker/tree/v1.3.1"
             },
-            "time": "2026-03-19T20:18:21+00:00"
+            "time": "2026-05-13T16:08:01+00:00"
         },
         {
             "name": "mockery/mockery",
