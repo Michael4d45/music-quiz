@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\MusicTrackOriginKind;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,6 +24,10 @@ use Illuminate\Support\Carbon;
  * @property int|null $release_year
  * @property string|null $genre
  * @property int|null $duration_ms
+ * @property MusicTrackOriginKind|null $origin_kind
+ * @property string|null $origin_title
+ * @property string|null $user_upload_path
+ * @property string|null $user_upload_original_name
  * @property string $sub_category_id
  * @property string $primary_source_id
  * @property Carbon|null $created_at
@@ -53,6 +58,10 @@ class MusicTrack extends Model
         'release_year',
         'genre',
         'duration_ms',
+        'origin_kind',
+        'origin_title',
+        'user_upload_path',
+        'user_upload_original_name',
         'sub_category_id',
         'primary_source_id',
     ];
@@ -118,6 +127,7 @@ class MusicTrack extends Model
         return [
             'release_year' => 'integer',
             'duration_ms' => 'integer',
+            'origin_kind' => MusicTrackOriginKind::class,
         ];
     }
 }

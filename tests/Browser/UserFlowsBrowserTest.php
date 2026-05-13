@@ -37,8 +37,8 @@ it('guest can see a public lobby game and join from the card', function (): void
         ->waitForText($code, 15)
         ->assertSee('Join this game')
         ->click('Join this game')
-        ->waitForText('Room '.$code, 15)
-        ->assertPathIs('/game-sessions/room/'.$code)
+        ->waitForText('Room ' . $code, 15)
+        ->assertPathIs('/game-sessions/room/' . $code)
         ->assertNoJavaScriptErrors();
 });
 
@@ -56,8 +56,8 @@ it('guest can join using the room code field', function (): void {
         ->waitForText('Join by room code', 15)
         ->type('#join-code', $code)
         ->click('Join')
-        ->waitForText('Room '.$code, 15)
-        ->assertPathIs('/game-sessions/room/'.$code)
+        ->waitForText('Room ' . $code, 15)
+        ->assertPathIs('/game-sessions/room/' . $code)
         ->assertNoJavaScriptErrors();
 });
 

@@ -24,7 +24,10 @@ class GameSessionPolicy
             return true;
         }
 
-        return $gameSession->participants()->where('user_id', $user->id)->exists();
+        return $gameSession
+            ->participants()
+            ->where('user_id', $user->id)
+            ->exists();
     }
 
     public function create(User $user): bool

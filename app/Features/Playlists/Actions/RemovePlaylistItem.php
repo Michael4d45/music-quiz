@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Features\Playlists\Actions;
 
+use App\Features\Auth\Responses\MessageResponse;
 use App\Models\Playlist;
 use App\Models\PlaylistItem;
 use Illuminate\Support\Facades\Gate;
@@ -11,8 +12,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class RemovePlaylistItem
 {
-    public function __invoke(Playlist $playlist, PlaylistItem $playlistItem): Response
-    {
+    public function __invoke(
+        Playlist $playlist,
+        PlaylistItem $playlistItem,
+    ): Response {
         Gate::authorize('update', $playlist);
 
         if ($playlistItem->playlist_id !== $playlist->id) {
@@ -21,6 +24,8 @@ class RemovePlaylistItem
 
         $playlistItem->delete();
 
-        return response()->json(['message' => 'Item removed']);
+        return response()->json(MessageResponse::from([
+            'message' => 'Item removed',
+        ]));
     }
 }

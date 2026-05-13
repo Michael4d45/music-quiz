@@ -21,7 +21,10 @@ class CreateGameSession
         Gate::authorize('create', GameSession::class);
 
         if ($request->playlist_id !== null) {
-            Gate::authorize('view', Playlist::query()->findOrFail($request->playlist_id));
+            Gate::authorize(
+                'view',
+                Playlist::query()->findOrFail($request->playlist_id),
+            );
         }
 
         $session = GameSession::query()->create([

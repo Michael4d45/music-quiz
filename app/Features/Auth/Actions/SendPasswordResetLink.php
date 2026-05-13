@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\Features\Auth\Actions;
 
+use App\Features\Auth\Requests\SendPasswordResetLinkRequest;
+use App\Features\Auth\Responses\MessageResponse;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 
@@ -21,22 +22,12 @@ class SendPasswordResetLink
      *
      * @throws ValidationException
      */
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(SendPasswordResetLinkRequest $data): JsonResponse
     {
-        $request->validate([
-            'email' => ['required', 'email'],
-        ]);
+        Password::sendResetLink(['email' => $data->email]);
 
-        $email = $request->string('email')->toString();
-
-        // Send password reset link
-        // The Password facade handles token creation and email sending
-        $status = Password::sendResetLink($request->only('email'));
-
-        // SECURITY: Always return the same message to prevent email enumeration attacks
-        // This prevents attackers from determining which emails are registered
-        return response()->json([
+        return response()->json(MessageResponse::from([
             'message' => 'If an account exists with that email, a password reset link has been sent.',
-        ]);
+        ]));
     }
 }

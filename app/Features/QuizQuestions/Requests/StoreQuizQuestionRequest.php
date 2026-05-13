@@ -6,31 +6,38 @@ namespace App\Features\QuizQuestions\Requests;
 
 use App\Enums\QuestionType;
 use App\Enums\Visibility;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\Enum;
+use Spatie\LaravelData\Attributes\Validation\Enum as EnumRule;
+use Spatie\LaravelData\Attributes\Validation\Exists;
+use Spatie\LaravelData\Attributes\Validation\IntegerType;
+use Spatie\LaravelData\Attributes\Validation\Max;
+use Spatie\LaravelData\Attributes\Validation\Min;
+use Spatie\LaravelData\Attributes\Validation\Nullable;
+use Spatie\LaravelData\Attributes\Validation\Required;
+use Spatie\LaravelData\Attributes\Validation\Sometimes;
+use Spatie\LaravelData\Attributes\Validation\StringType;
+use Spatie\LaravelData\Attributes\Validation\Uuid;
+use Spatie\LaravelData\Data;
 
-class StoreQuizQuestionRequest extends FormRequest
+class StoreQuizQuestionRequest extends Data
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    /**
-     * @return array<string, list<mixed>>
-     */
-    public function rules(): array
-    {
-        return [
-            'track_id' => ['nullable', 'uuid', 'exists:music_tracks,id'],
-            'question_type' => ['required', new Enum(QuestionType::class)],
-            'prompt_text' => ['nullable', 'string'],
-            'correct_answer' => ['required', 'string', 'max:2000'],
-            'base_points' => ['required', 'integer', 'min:0', 'max:100000'],
-            'media_start_seconds' => ['nullable', 'integer', 'min:0'],
-            'media_end_seconds' => ['nullable', 'integer', 'min:0'],
-            'difficulty_level' => ['required', 'integer', 'min:1', 'max:10'],
-            'visibility' => ['sometimes', new Enum(Visibility::class)],
-        ];
-    }
+    public function __construct(
+        #[Required, EnumRule(QuestionType::class)]
+        public QuestionType $question_type,
+        #[Required, StringType, Max(2000)]
+        public string $correct_answer,
+        #[Required, IntegerType, Min(0), Max(100_000)]
+        public int $base_points,
+        #[Required, IntegerType, Min(1), Max(10)]
+        public int $difficulty_level,
+        #[Nullable, Uuid, Exists('music_tracks', 'id')]
+        public null|string $track_id = null,
+        #[Nullable, StringType]
+        public null|string $prompt_text = null,
+        #[Nullable, IntegerType, Min(0)]
+        public null|int $media_start_seconds = null,
+        #[Nullable, IntegerType, Min(0)]
+        public null|int $media_end_seconds = null,
+        #[Sometimes, EnumRule(Visibility::class)]
+        public null|Visibility $visibility = null,
+    ) {}
 }

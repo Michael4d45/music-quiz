@@ -17,18 +17,19 @@ class CreateMusicTrack
         Gate::authorize('create', MusicTrack::class);
 
         $user = assertedUser();
-        $validated = $request->validated();
 
         $track = MusicTrack::query()->create([
             'user_id' => $user->id,
-            'title' => $validated['title'],
-            'artist_name' => $validated['artist_name'],
-            'album_name' => $validated['album_name'] ?? null,
-            'release_year' => $validated['release_year'] ?? null,
-            'genre' => $validated['genre'] ?? null,
-            'duration_ms' => $validated['duration_ms'] ?? null,
-            'sub_category_id' => $validated['sub_category_id'],
-            'primary_source_id' => $validated['primary_source_id'],
+            'title' => $request->title,
+            'artist_name' => $request->artist_name,
+            'album_name' => $request->album_name,
+            'release_year' => $request->release_year,
+            'genre' => $request->genre,
+            'duration_ms' => $request->duration_ms,
+            'origin_kind' => $request->origin_kind,
+            'origin_title' => $request->origin_title,
+            'sub_category_id' => $request->sub_category_id,
+            'primary_source_id' => $request->primary_source_id,
         ]);
 
         $track->load(['subCategory', 'primarySource']);

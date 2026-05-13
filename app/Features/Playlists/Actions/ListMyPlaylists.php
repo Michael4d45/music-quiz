@@ -23,9 +23,11 @@ class ListMyPlaylists
             ->limit(100)
             ->get();
 
-        $mapped = $playlists
-            ->map(static fn(Playlist $playlist): PlaylistData => PlaylistData::from($playlist))
-            ->all();
+        $mapped = $playlists->map(
+            static fn(Playlist $playlist): PlaylistData => PlaylistData::from(
+                $playlist,
+            ),
+        )->all();
 
         return response()->json(MyPlaylistsResponseData::from([
             'playlists' => $mapped,

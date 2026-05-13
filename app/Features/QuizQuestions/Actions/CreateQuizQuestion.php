@@ -19,24 +19,23 @@ class CreateQuizQuestion
         Gate::authorize('create', QuizQuestion::class);
 
         $user = assertedUser();
-        $validated = $request->validated();
 
-        if (array_key_exists('track_id', $validated) && $validated['track_id'] !== null) {
-            $track = MusicTrack::query()->findOrFail($validated['track_id']);
+        if ($request->track_id !== null) {
+            $track = MusicTrack::query()->findOrFail($request->track_id);
             Gate::authorize('view', $track);
         }
 
         $question = QuizQuestion::query()->create([
             'user_id' => $user->id,
-            'track_id' => $validated['track_id'] ?? null,
-            'question_type' => $validated['question_type'],
-            'prompt_text' => $validated['prompt_text'] ?? null,
-            'correct_answer' => $validated['correct_answer'],
-            'base_points' => $validated['base_points'],
-            'media_start_seconds' => $validated['media_start_seconds'] ?? null,
-            'media_end_seconds' => $validated['media_end_seconds'] ?? null,
-            'difficulty_level' => $validated['difficulty_level'],
-            'visibility' => $validated['visibility'] ?? Visibility::Private,
+            'track_id' => $request->track_id,
+            'question_type' => $request->question_type,
+            'prompt_text' => $request->prompt_text,
+            'correct_answer' => $request->correct_answer,
+            'base_points' => $request->base_points,
+            'media_start_seconds' => $request->media_start_seconds,
+            'media_end_seconds' => $request->media_end_seconds,
+            'difficulty_level' => $request->difficulty_level,
+            'visibility' => $request->visibility ?? Visibility::Private,
         ]);
 
         $question->load('track');

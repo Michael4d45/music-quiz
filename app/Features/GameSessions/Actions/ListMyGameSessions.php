@@ -6,9 +6,7 @@ namespace App\Features\GameSessions\Actions;
 
 use App\Data\Models\GameSessionData;
 use App\Data\Responses\MyGameSessionsResponseData;
-use App\Enums\SessionStatus;
 use App\Models\GameSession;
-use App\Models\Playlist;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -31,9 +29,11 @@ class ListMyGameSessions
             ->limit(50)
             ->get();
 
-        $payload = $sessions
-            ->map(static fn(GameSession $session): GameSessionData => GameSessionData::from($session))
-            ->all();
+        $payload = $sessions->map(
+            static fn(GameSession $session): GameSessionData => GameSessionData::from(
+                $session,
+            ),
+        )->all();
 
         return response()->json(MyGameSessionsResponseData::from([
             'sessions' => $payload,

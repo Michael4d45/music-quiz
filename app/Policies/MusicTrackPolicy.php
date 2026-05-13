@@ -34,16 +34,20 @@ class MusicTrackPolicy
 
     public function update(User $user, MusicTrack $musicTrack): bool
     {
-        return !$user->is_guest
+        return (
+            !$user->is_guest
             && $musicTrack->user_id !== null
-            && $musicTrack->user_id === $user->id;
+            && $musicTrack->user_id === $user->id
+        );
     }
 
     public function delete(User $user, MusicTrack $musicTrack): bool
     {
-        return !$user->is_guest
+        return (
+            !$user->is_guest
             && $musicTrack->user_id !== null
-            && $musicTrack->user_id === $user->id;
+            && $musicTrack->user_id === $user->id
+        );
     }
 
     public function restore(User $user, MusicTrack $musicTrack): bool

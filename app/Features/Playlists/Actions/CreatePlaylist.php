@@ -20,14 +20,13 @@ class CreatePlaylist
         Gate::authorize('create', Playlist::class);
 
         $user = assertedUser();
-        $validated = $request->validated();
 
         $playlist = Playlist::query()->create([
             'user_id' => $user->id,
-            'name' => $validated['name'],
-            'description' => $validated['description'] ?? null,
-            'status' => $validated['status'] ?? PlaylistStatus::Draft,
-            'visibility' => $validated['visibility'] ?? Visibility::Private,
+            'name' => $request->name,
+            'description' => $request->description,
+            'status' => $request->status ?? PlaylistStatus::Draft,
+            'visibility' => $request->visibility ?? Visibility::Private,
             'tags' => null,
             'estimated_duration_minutes' => null,
             'target_audience' => null,

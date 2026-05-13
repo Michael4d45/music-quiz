@@ -10,7 +10,10 @@ test('guest can join a lobby session by room code', function (): void {
     $guest = User::factory()->guest()->create();
     $session = GameSession::factory()->publicLobby()->create();
 
-    $response = $this->actingAs($guest, 'web')->postJson('/api/game-sessions/join', [
+    $response = $this->actingAs(
+        $guest,
+        'web',
+    )->postJson('/api/game-sessions/join', [
         'room_code' => $session->room_code,
     ]);
 
@@ -21,34 +24,44 @@ test('guest can join a lobby session by room code', function (): void {
             ->where('session_id', $session->id)
             ->where('user_id', $guest->id)
             ->count(),
-    )->toBe(1);
+    )
+        ->toBe(1);
 });
 
 test('join is idempotent for the same user', function (): void {
     $guest = User::factory()->guest()->create();
     $session = GameSession::factory()->publicLobby()->create();
 
-    $this->actingAs($guest, 'web')->postJson('/api/game-sessions/join', [
-        'room_code' => $session->room_code,
-    ])->assertSuccessful();
+    $this
+        ->actingAs($guest, 'web')
+        ->postJson('/api/game-sessions/join', [
+            'room_code' => $session->room_code,
+        ])
+        ->assertSuccessful();
 
-    $this->actingAs($guest, 'web')->postJson('/api/game-sessions/join', [
-        'room_code' => $session->room_code,
-    ])->assertSuccessful();
+    $this
+        ->actingAs($guest, 'web')
+        ->postJson('/api/game-sessions/join', [
+            'room_code' => $session->room_code,
+        ])
+        ->assertSuccessful();
 
     expect(
         SessionParticipant::query()
             ->where('session_id', $session->id)
             ->where('user_id', $guest->id)
             ->count(),
-    )->toBe(1);
+    )
+        ->toBe(1);
 });
 
 test('join rejects when room is full', function (): void {
     $guest = User::factory()->guest()->create();
-    $session = GameSession::factory()->publicLobby()->create([
-        'max_players' => 1,
-    ]);
+    $session = GameSession::factory()
+        ->publicLobby()
+        ->create([
+            'max_players' => 1,
+        ]);
 
     $other = User::factory()->guest()->create();
     SessionParticipant::factory()->create([
@@ -56,7 +69,10 @@ test('join rejects when room is full', function (): void {
         'user_id' => $other->id,
     ]);
 
-    $response = $this->actingAs($guest, 'web')->postJson('/api/game-sessions/join', [
+    $response = $this->actingAs(
+        $guest,
+        'web',
+    )->postJson('/api/game-sessions/join', [
         'room_code' => $session->room_code,
     ]);
 
@@ -67,9 +83,10 @@ test('guest can load a lobby session by room code', function (): void {
     $guest = User::factory()->guest()->create();
     $session = GameSession::factory()->publicLobby()->create();
 
-    $response = $this->actingAs($guest, 'web')->getJson(
-        '/api/game-sessions/room/' . $session->room_code,
-    );
+    $response = $this->actingAs(
+        $guest,
+        'web',
+    )->getJson('/api/game-sessions/room/' . $session->room_code);
 
     $response->assertSuccessful();
     $response->assertJsonPath('id', $session->id);
@@ -79,9 +96,12 @@ test('guest can leave a session they joined', function (): void {
     $guest = User::factory()->guest()->create();
     $session = GameSession::factory()->publicLobby()->create();
 
-    $this->actingAs($guest, 'web')->postJson('/api/game-sessions/join', [
-        'room_code' => $session->room_code,
-    ])->assertSuccessful();
+    $this
+        ->actingAs($guest, 'web')
+        ->postJson('/api/game-sessions/join', [
+            'room_code' => $session->room_code,
+        ])
+        ->assertSuccessful();
 
     $response = $this->actingAs($guest, 'web')->deleteJson(
         '/api/game-sessions/' . $session->id . '/leave',
@@ -93,5 +113,6 @@ test('guest can leave a session they joined', function (): void {
             ->where('session_id', $session->id)
             ->where('user_id', $guest->id)
             ->count(),
-    )->toBe(0);
+    )
+        ->toBe(0);
 });

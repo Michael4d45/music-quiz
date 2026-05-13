@@ -20,14 +20,13 @@ class AddPlaylistItem
     ): Response {
         Gate::authorize('update', $playlist);
 
-        /** @var array{question_id: string} $validated */
-        $validated = $request->validated();
-        $question = QuizQuestion::query()->findOrFail($validated['question_id']);
+        $question = QuizQuestion::query()->findOrFail($request->question_id);
         Gate::authorize('view', $question);
 
-        $maxSort = PlaylistItem::query()
-            ->where('playlist_id', $playlist->id)
-            ->max('sort_order');
+        $maxSort = PlaylistItem::query()->where(
+            'playlist_id',
+            $playlist->id,
+        )->max('sort_order');
         $nextOrder = is_numeric($maxSort) ? (int) $maxSort : 0;
 
         $item = PlaylistItem::query()->create([

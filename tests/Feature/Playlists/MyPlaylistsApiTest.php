@@ -25,5 +25,8 @@ test('registered user can list and create playlists', function (): void {
 test('guest cannot access my playlists', function (): void {
     $guest = User::factory()->guest()->create();
 
-    $this->actingAs($guest, 'web')->getJson('/api/my/playlists')->assertForbidden();
+    $this
+        ->actingAs($guest, 'web')
+        ->getJson('/api/my/playlists')
+        ->assertForbidden();
 });

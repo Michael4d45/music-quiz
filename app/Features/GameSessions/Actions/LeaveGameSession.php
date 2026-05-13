@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Features\GameSessions\Actions;
 
+use App\Features\Auth\Responses\MessageResponse;
 use App\Models\GameSession;
 use App\Models\SessionParticipant;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,11 +21,15 @@ class LeaveGameSession
             ->first();
 
         if (!$participant instanceof SessionParticipant) {
-            return response()->json(['message' => 'Not a participant in this session'], 404);
+            return response()->json(MessageResponse::from([
+                'message' => 'Not a participant in this session',
+            ]), 404);
         }
 
         $participant->delete();
 
-        return response()->json(['message' => 'Left the session']);
+        return response()->json(MessageResponse::from([
+            'message' => 'Left the session',
+        ]));
     }
 }

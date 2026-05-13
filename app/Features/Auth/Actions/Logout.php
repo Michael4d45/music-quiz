@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Features\Auth\Actions;
 
+use App\Features\Auth\Responses\MessageResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,6 +21,8 @@ class Logout
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return response()->json(['message' => 'Logged out successfully']);
+        return response()->json(MessageResponse::from([
+            'message' => 'Logged out successfully',
+        ]));
     }
 }

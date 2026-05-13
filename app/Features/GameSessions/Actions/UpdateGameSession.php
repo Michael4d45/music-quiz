@@ -9,13 +9,14 @@ use App\Enums\SessionStatus;
 use App\Features\GameSessions\Requests\UpdateGameSessionRequest;
 use App\Models\GameSession;
 use App\Models\Playlist;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 
 class UpdateGameSession
 {
     public function __invoke(
-        UpdateGameSessionRequest $request,
+        Request $request,
         GameSession $gameSession,
     ): Response {
         Gate::authorize('update', $gameSession);
@@ -24,11 +25,21 @@ class UpdateGameSession
             abort(422, 'Only sessions in the lobby can be updated.');
         }
 
-        $data = $request->validated();
+        $validatedResult = UpdateGameSessionRequest::validate($request->only([
+            'is_public',
+            'max_players',
+            'playlist_id',
+        ]));
+        $data = is_array($validatedResult)
+            ? $validatedResult
+            : $validatedResult->toArray();
 
         if (array_key_exists('playlist_id', $data)) {
             if ($data['playlist_id'] !== null) {
-                Gate::authorize('view', Playlist::query()->findOrFail($data['playlist_id']));
+                Gate::authorize(
+                    'view',
+                    Playlist::query()->findOrFail($data['playlist_id']),
+                );
             }
         }
 

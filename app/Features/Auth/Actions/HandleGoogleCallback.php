@@ -78,7 +78,9 @@ class HandleGoogleCallback
         null|User $currentUser,
         bool $wasAuthenticated,
     ): User|RedirectResponse {
-        $googleAccountUser = User::query()->where('google_id', $googleId)->first();
+        $googleAccountUser = User::query()
+            ->where('google_id', $googleId)
+            ->first();
 
         if ($googleAccountUser instanceof User) {
             if (
@@ -143,7 +145,7 @@ class HandleGoogleCallback
         if ($wasAuthenticated && $currentUser instanceof User) {
             $emailToUse = $currentUser->is_guest
                 ? $email
-                : ($currentUser->email ?? $email);
+                : $currentUser->email ?? $email;
 
             $name = $googleUser->getName() ?? $currentUser->name ?? 'User';
             $currentUser->update([
@@ -151,8 +153,9 @@ class HandleGoogleCallback
                 'email' => $emailToUse,
                 'google_id' => $googleId,
                 'verified_google_email' => $email,
-                'email_verified_at' => $currentUser->email_verified_at
-                    ?? ($emailToUse === $email ? now() : null),
+                'email_verified_at' =>
+                    $currentUser->email_verified_at
+                        ?? ($emailToUse === $email ? now() : null),
                 'is_guest' => false,
             ]);
 

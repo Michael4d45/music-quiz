@@ -24,9 +24,11 @@ class ListMyQuizQuestions
             ->limit(200)
             ->get();
 
-        $mapped = $questions
-            ->map(static fn(QuizQuestion $q): QuizQuestionData => QuizQuestionData::from($q))
-            ->all();
+        $mapped = $questions->map(
+            static fn(QuizQuestion $q): QuizQuestionData => QuizQuestionData::from(
+                $q,
+            ),
+        )->all();
 
         return response()->json(MyQuizQuestionsResponseData::from([
             'questions' => $mapped,

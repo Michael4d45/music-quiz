@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\MusicTracks\Schemas;
 
+use App\Enums\MusicTrackOriginKind;
 use App\Filament\Resources\MusicSources\MusicSourceResource;
 use App\Filament\Resources\SubCategories\SubCategoryResource;
 use App\Filament\Resources\Users\UserResource;
@@ -51,6 +52,25 @@ class MusicTrackForm
                 ->label('Duration (ms)')
                 ->numeric()
                 ->minValue(1000),
+
+            Select::make('origin_kind')
+                ->label('Origin / grouping kind')
+                ->options(MusicTrackOriginKind::class)
+                ->native(false),
+
+            TextInput::make('origin_title')
+                ->label('Game, film, TV show, or soundtrack title')
+                ->maxLength(255),
+
+            TextInput::make('user_upload_original_name')
+                ->label('Uploaded file name')
+                ->disabled()
+                ->dehydrated(false),
+
+            TextInput::make('user_upload_path')
+                ->label('Uploaded file storage path')
+                ->disabled()
+                ->dehydrated(false),
 
             TextEntry::make('subCategory.name')
                 ->label('Sub Category')

@@ -6,8 +6,8 @@ namespace App\Features\GameSessions\Actions;
 
 use App\Data\Models\GameSessionData;
 use App\Enums\SessionStatus;
+use App\Features\Auth\Responses\MessageResponse;
 use App\Models\GameSession;
-use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class ShowGameSessionByRoomCode
@@ -33,25 +33,31 @@ class ShowGameSessionByRoomCode
             ->first();
 
         if (!$session instanceof GameSession) {
-            return response()->json(['message' => 'Room not found'], 404);
+            return response()->json(MessageResponse::from([
+                'message' => 'Room not found',
+            ]), 404);
         }
 
         if (!$this->userMayViewSession($user->id, $session)) {
-            return response()->json(['message' => 'Forbidden'], 403);
+            return response()->json(MessageResponse::from([
+                'message' => 'Forbidden',
+            ]), 403);
         }
 
         return response()->json(GameSessionData::from($session));
     }
 
-    private function userMayViewSession(string $userId, GameSession $session): bool
-    {
+    private function userMayViewSession(
+        string $userId,
+        GameSession $session,
+    ): bool {
         if ($session->host_id === $userId) {
             return true;
         }
 
-        if (
-            $session->participants->contains(static fn($p) => (string) $p->user_id === $userId)
-        ) {
+        if ($session->participants->contains(
+            static fn($p) => (string) $p->user_id === $userId,
+        )) {
             return true;
         }
 

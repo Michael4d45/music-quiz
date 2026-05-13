@@ -5,20 +5,21 @@ declare(strict_types=1);
 namespace App\Features\MusicTracks\Requests;
 
 use App\Enums\MusicTrackOriginKind;
-use App\Models\MusicSource;
-use Illuminate\Validation\Validator;
+use Illuminate\Http\UploadedFile;
 use Spatie\LaravelData\Attributes\Validation\Enum as EnumRule;
 use Spatie\LaravelData\Attributes\Validation\Exists;
+use Spatie\LaravelData\Attributes\Validation\File;
 use Spatie\LaravelData\Attributes\Validation\IntegerType;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\Required;
+use Spatie\LaravelData\Attributes\Validation\Rule;
 use Spatie\LaravelData\Attributes\Validation\StringType;
 use Spatie\LaravelData\Attributes\Validation\Uuid;
 use Spatie\LaravelData\Data;
 
-class StoreMusicTrackRequest extends Data
+class StoreMusicTrackUploadRequest extends Data
 {
     public function __construct(
         #[Required, StringType, Max(255)]
@@ -27,8 +28,11 @@ class StoreMusicTrackRequest extends Data
         public string $artist_name,
         #[Required, Uuid, Exists('sub_categories', 'id')]
         public string $sub_category_id,
-        #[Required, Uuid, Exists('music_sources', 'id')]
-        public string $primary_source_id,
+        #[Required, File, Max(51_200)]
+        #[Rule(
+            'mimetypes:audio/mpeg,audio/mp3,audio/wav,audio/x-wav,audio/mp4,audio/x-m4a,audio/flac,audio/ogg,audio/x-flac',
+        )]
+        public UploadedFile $audio,
         #[Nullable, StringType, Max(255)]
         public null|string $album_name = null,
         #[Nullable, IntegerType, Min(1800), Max(2100)]
@@ -42,31 +46,4 @@ class StoreMusicTrackRequest extends Data
         #[Nullable, StringType, Max(255)]
         public null|string $origin_title = null,
     ) {}
-
-    public static function withValidator(Validator $validator): void
-    {
-        $validator->after(function (Validator $validator): void {
-            $uploadId = MusicSource::query()
-                ->where('name', 'user_upload')
-                ->value('id');
-
-            if (!is_string($uploadId)) {
-                return;
-            }
-
-            $incoming = $validator->getData()['primary_source_id'] ?? null;
-            if (!is_string($incoming)) {
-                return;
-            }
-
-            if ($incoming !== $uploadId) {
-                return;
-            }
-
-            $validator->errors()->add(
-                'primary_source_id',
-                'Use “Add from file” for uploads instead of choosing the upload catalog entry.',
-            );
-        });
-    }
 }

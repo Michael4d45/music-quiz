@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Features\QuizQuestions\Actions;
 
+use App\Features\Auth\Responses\MessageResponse;
 use App\Models\QuizQuestion;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,8 @@ class DestroyQuizQuestion
 
         $quizQuestion->delete();
 
-        return response()->json(['message' => 'Question deleted']);
+        return response()->json(MessageResponse::from([
+            'message' => 'Question deleted',
+        ]));
     }
 }

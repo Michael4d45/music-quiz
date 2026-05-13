@@ -94,9 +94,10 @@ it('allows stateful API user fetch after login from guest session', function ():
     $this->actingAs($guest, 'web');
 
     $csrfToken = csrf_token();
-    $this->withSession([
-        '_token' => $csrfToken,
-    ])
+    $this
+        ->withSession([
+            '_token' => $csrfToken,
+        ])
         ->postJson('/login', [
             'email' => 'member@example.com',
             'password' => 'password123',

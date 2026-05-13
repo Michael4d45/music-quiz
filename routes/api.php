@@ -10,6 +10,7 @@ use App\Features\GameSessions\Actions\ListPublicLobbyGameSessions;
 use App\Features\GameSessions\Actions\ShowGameSessionByRoomCode;
 use App\Features\GameSessions\Actions\UpdateGameSession;
 use App\Features\MusicTracks\Actions\CreateMusicTrack;
+use App\Features\MusicTracks\Actions\CreateMusicTrackUpload;
 use App\Features\MusicTracks\Actions\DestroyMusicTrack;
 use App\Features\MusicTracks\Actions\ListMyMusicTracks;
 use App\Features\MusicTracks\Actions\UpdateMusicTrack;
@@ -94,6 +95,7 @@ Route::middleware(['web', 'registered'])->group(function (): void {
 
     Route::get('my/music-tracks', ListMyMusicTracks::class);
     Route::post('my/music-tracks', CreateMusicTrack::class);
+    Route::post('my/music-tracks/upload', CreateMusicTrackUpload::class);
     Route::patch(
         'my/music-tracks/{musicTrack}',
         UpdateMusicTrack::class,

@@ -16,9 +16,11 @@ class QuizQuestionPolicy
 
     public function view(User $user, QuizQuestion $quizQuestion): bool
     {
-        return !$user->is_guest
+        return (
+            !$user->is_guest
             && $quizQuestion->user_id !== null
-            && $quizQuestion->user_id === $user->id;
+            && $quizQuestion->user_id === $user->id
+        );
     }
 
     public function create(User $user): bool
@@ -28,16 +30,20 @@ class QuizQuestionPolicy
 
     public function update(User $user, QuizQuestion $quizQuestion): bool
     {
-        return !$user->is_guest
+        return (
+            !$user->is_guest
             && $quizQuestion->user_id !== null
-            && $quizQuestion->user_id === $user->id;
+            && $quizQuestion->user_id === $user->id
+        );
     }
 
     public function delete(User $user, QuizQuestion $quizQuestion): bool
     {
-        return !$user->is_guest
+        return (
+            !$user->is_guest
             && $quizQuestion->user_id !== null
-            && $quizQuestion->user_id === $user->id;
+            && $quizQuestion->user_id === $user->id
+        );
     }
 
     public function restore(User $user, QuizQuestion $quizQuestion): bool

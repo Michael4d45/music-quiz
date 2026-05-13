@@ -26,7 +26,9 @@ final class GuestUserMergeService
         }
 
         if ($target->is_guest) {
-            throw new InvalidArgumentException('Target user must not be a guest.');
+            throw new InvalidArgumentException(
+                'Target user must not be a guest.',
+            );
         }
 
         if ($guest->id === $target->id) {
@@ -34,25 +36,34 @@ final class GuestUserMergeService
         }
 
         DB::transaction(function () use ($guest, $target): void {
-            Playlist::query()->where('user_id', $guest->id)->update([
-                'user_id' => $target->id,
-            ]);
-
-            GameSession::query()->where('host_id', $guest->id)->update([
-                'host_id' => $target->id,
-            ]);
-
-            QuizQuestion::query()->where('user_id', $guest->id)->update([
-                'user_id' => $target->id,
-            ]);
-
-            MusicTrack::query()->where('user_id', $guest->id)->update([
-                'user_id' => $target->id,
-            ]);
-
-            $guestParticipants = SessionParticipant::query()
+            Playlist::query()
                 ->where('user_id', $guest->id)
-                ->get();
+                ->update([
+                    'user_id' => $target->id,
+                ]);
+
+            GameSession::query()
+                ->where('host_id', $guest->id)
+                ->update([
+                    'host_id' => $target->id,
+                ]);
+
+            QuizQuestion::query()
+                ->where('user_id', $guest->id)
+                ->update([
+                    'user_id' => $target->id,
+                ]);
+
+            MusicTrack::query()
+                ->where('user_id', $guest->id)
+                ->update([
+                    'user_id' => $target->id,
+                ]);
+
+            $guestParticipants = SessionParticipant::query()->where(
+                'user_id',
+                $guest->id,
+            )->get();
 
             foreach ($guestParticipants as $participant) {
                 $duplicateExists = SessionParticipant::query()

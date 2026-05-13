@@ -4,25 +4,24 @@ declare(strict_types=1);
 
 namespace App\Features\GameSessions\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+use Spatie\LaravelData\Attributes\Validation\BooleanType;
+use Spatie\LaravelData\Attributes\Validation\Exists;
+use Spatie\LaravelData\Attributes\Validation\IntegerType;
+use Spatie\LaravelData\Attributes\Validation\Max;
+use Spatie\LaravelData\Attributes\Validation\Min;
+use Spatie\LaravelData\Attributes\Validation\Nullable;
+use Spatie\LaravelData\Attributes\Validation\Sometimes;
+use Spatie\LaravelData\Attributes\Validation\Uuid;
+use Spatie\LaravelData\Data;
 
-class UpdateGameSessionRequest extends FormRequest
+class UpdateGameSessionRequest extends Data
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
-    /**
-     * @return array<string, list<string|\Illuminate\Validation\Rules\Exists>>
-     */
-    public function rules(): array
-    {
-        return [
-            'is_public' => ['sometimes', 'boolean'],
-            'max_players' => ['sometimes', 'integer', 'min:2', 'max:50'],
-            'playlist_id' => ['sometimes', 'nullable', 'uuid', Rule::exists('playlists', 'id')],
-        ];
-    }
+    public function __construct(
+        #[Sometimes, BooleanType]
+        public null|bool $is_public = null,
+        #[Sometimes, IntegerType, Min(2), Max(50)]
+        public null|int $max_players = null,
+        #[Sometimes, Nullable, Uuid, Exists('playlists', 'id')]
+        public null|string $playlist_id = null,
+    ) {}
 }

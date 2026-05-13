@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Features\Broadcasting\Actions;
 
+use App\Data\Responses\ErrorResponseData;
 use App\Features\Broadcasting\Requests\AuthenticateBroadcastingRequest;
 use App\Features\Broadcasting\Responses\AuthenticateBroadcastingResponse;
 use Illuminate\Http\JsonResponse;
@@ -16,22 +17,26 @@ class AuthenticateBroadcasting
     /**
      * Authenticate a broadcasting channel
      */
-    public function __invoke(
-        Request $request,
-        AuthenticateBroadcastingRequest $data,
-    ): JsonResponse {
+    public function __invoke(Request $request): JsonResponse
+    {
+        AuthenticateBroadcastingRequest::validate($request->only([
+            'socket_id',
+            'channel_name',
+        ]));
+
         $user = Auth::user();
         if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(ErrorResponseData::from([
+                'error' => 'Unauthorized',
+            ]), 401);
         }
 
-        // Authenticate the channel
         try {
             $authData = Broadcast::auth($request);
-        } catch (\Exception $e) {
-            return response()->json([
+        } catch (\Exception) {
+            return response()->json(ErrorResponseData::from([
                 'error' => 'Channel authentication failed',
-            ], 403);
+            ]), 403);
         }
 
         $auth = '';

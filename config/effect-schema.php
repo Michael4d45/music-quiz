@@ -16,6 +16,7 @@ return [
     'paths' => [
         app_path('Data'),
         app_path('Enums'),
+        app_path('Features'),
     ],
 
     /*

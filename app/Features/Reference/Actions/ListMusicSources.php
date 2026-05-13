@@ -15,6 +15,7 @@ class ListMusicSources
     {
         $sources = MusicSource::query()
             ->where('is_active', true)
+            ->where('name', '!=', 'user_upload')
             ->orderBy('priority')
             ->orderBy('display_name')
             ->get();

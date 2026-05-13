@@ -37,7 +37,8 @@ test('registered user can load reference pickers for tracks and questions', func
 test('guest cannot load reference sub-categories', function (): void {
     $guest = User::factory()->guest()->create();
 
-    $this->actingAs($guest, 'web')
+    $this
+        ->actingAs($guest, 'web')
         ->getJson('/api/reference/sub-categories')
         ->assertForbidden();
 });

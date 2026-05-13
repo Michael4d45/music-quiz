@@ -48,16 +48,13 @@ it('upgrades an existing guest user instead of creating a duplicate', function (
     $csrfToken = csrf_token();
     $response = $this->withSession([
         '_token' => $csrfToken,
-    ])->postJson(
-        '/register',
-        [
-            'name' => 'Upgraded Guest',
-            'email' => 'upgraded@example.com',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
-            '_token' => $csrfToken,
-        ],
-    );
+    ])->postJson('/register', [
+        'name' => 'Upgraded Guest',
+        'email' => 'upgraded@example.com',
+        'password' => 'password123',
+        'password_confirmation' => 'password123',
+        '_token' => $csrfToken,
+    ]);
 
     $response->assertSuccessful();
 
@@ -73,9 +70,10 @@ it('allows stateful API user fetch after guest upgrade registration', function (
     $this->actingAs($guest, 'web');
 
     $csrfToken = csrf_token();
-    $this->withSession([
-        '_token' => $csrfToken,
-    ])
+    $this
+        ->withSession([
+            '_token' => $csrfToken,
+        ])
         ->postJson('/register', [
             'name' => 'Stateful Guest',
             'email' => 'stateful-guest@example.com',

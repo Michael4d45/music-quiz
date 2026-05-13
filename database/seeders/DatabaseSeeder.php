@@ -432,6 +432,14 @@ class DatabaseSeeder extends Seeder
             }
         }
 
+        MusicSource::query()->firstOrCreate(['name' => 'user_upload'], [
+            'display_name' => 'My audio file (upload)',
+            'api_base_url' => null,
+            'requires_authentication' => false,
+            'is_active' => true,
+            'priority' => 99,
+        ]);
+
         return $sources;
     }
 

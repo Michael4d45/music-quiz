@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Features\Playlists\Actions;
 
+use App\Features\Auth\Responses\MessageResponse;
 use App\Models\Playlist;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,8 @@ class DestroyPlaylist
 
         $playlist->delete();
 
-        return response()->json(['message' => 'Playlist deleted']);
+        return response()->json(MessageResponse::from([
+            'message' => 'Playlist deleted',
+        ]));
     }
 }

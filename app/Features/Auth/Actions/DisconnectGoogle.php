@@ -6,6 +6,7 @@ namespace App\Features\Auth\Actions;
 
 use App\Data\Models\UserData;
 use App\Features\Auth\Responses\DisconnectGoogleResponse;
+use App\Features\Auth\Responses\MessageResponse;
 use Illuminate\Http\JsonResponse;
 
 class DisconnectGoogle
@@ -18,12 +19,11 @@ class DisconnectGoogle
         $user = assertedUser();
 
         if (!$user->google_id) {
-            return response()->json([
+            return response()->json(MessageResponse::from([
                 'message' => 'No Google account connected',
-            ], 400);
+            ]), 400);
         }
 
-        // Remove Google account connection
         $user->update([
             'google_id' => null,
             'verified_google_email' => null,

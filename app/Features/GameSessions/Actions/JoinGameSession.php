@@ -8,6 +8,7 @@ use App\Data\Models\SessionParticipantData;
 use App\Enums\Role;
 use App\Enums\SessionStatus;
 use App\Events\GameSessionParticipantJoined;
+use App\Features\Auth\Responses\MessageResponse;
 use App\Features\GameSessions\Requests\JoinGameSessionRequest;
 use App\Models\GameSession;
 use App\Models\SessionParticipant;
@@ -78,7 +79,9 @@ class JoinGameSession
         });
 
         if ($result === null) {
-            return response()->json(['message' => 'Room not found'], 404);
+            return response()->json(MessageResponse::from([
+                'message' => 'Room not found',
+            ]), 404);
         }
 
         $participant = $result['participant'];
