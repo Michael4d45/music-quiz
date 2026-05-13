@@ -80,6 +80,12 @@ export function MyGameSessionsPage() {
                 </ButtonLink>
             </div>
 
+            <p className="text-muted mb-6 max-w-2xl text-sm">
+                Host a room for your friends: pick how the game is scored, set how
+                many players can join, and optionally tie the session to one of your
+                playlists so each round uses your question library.
+            </p>
+
             <div className="bg-card mb-10 flex flex-col gap-4 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10">
                 <h2 className="text-lg font-semibold">Host a new session</h2>
                 <div className="grid gap-3 sm:grid-cols-2">

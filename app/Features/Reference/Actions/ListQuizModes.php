@@ -13,13 +13,13 @@ class ListQuizModes
 {
     public function __invoke(): Response
     {
-        $modes = QuizMode::query()
-            ->orderBy('name')
-            ->get();
+        $modes = QuizMode::query()->orderBy('name')->get();
 
-        $mapped = $modes
-            ->map(static fn(QuizMode $mode): QuizModeData => QuizModeData::from($mode))
-            ->all();
+        $mapped = $modes->map(
+            static fn(QuizMode $mode): QuizModeData => QuizModeData::from(
+                $mode,
+            ),
+        )->all();
 
         return response()->json(QuizModesListResponseData::from([
             'quiz_modes' => $mapped,

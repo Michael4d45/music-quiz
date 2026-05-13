@@ -7,7 +7,6 @@ import { RegisterRequest } from '@/schemas/App/Features/Auth/Requests/RegisterRe
 import {
     createContext,
     ReactNode,
-    useCallback,
     useContext,
     useEffect,
     useRef,
@@ -86,6 +85,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const hasMounted = useRef(false);
     const isOnline = useOnlineStatus();
     const isFetchingUser = useRef(false);
+    const userFetchChainRef = useRef<Promise<void>>(Promise.resolve());
 
     // Provide the current user directly for easier consumption and reactivity
     const user = authState.user;
@@ -103,33 +103,36 @@ export function AuthProvider({ children }: AuthProviderProps) {
         });
     };
 
-    const getUser = () => {
-        if (isFetchingUser.current) return;
-        isFetchingUser.current = true;
-
-        return showUser()
-            .then((result) => {
-                if (result._tag === 'Success') {
-                    setOfflineAuthTrust(true);
-                    authManager.setUser(result.data);
-                    console.log('[AuthContext] Fetched user data');
-                } else if (result._tag === 'AuthenticationError') {
-                    setOfflineAuthTrust(false);
-                    authManager.clearAuthData();
-                }
-
-                return result;
+    const getUser = (): Promise<void> => {
+        userFetchChainRef.current = userFetchChainRef.current
+            .catch((error: unknown) => {
+                console.error('[AuthContext] User fetch chain error:', error);
             })
-            .finally(() => {
-                isFetchingUser.current = false;
-                setAuthState((previousState) => {
-                    if (previousState.hasFetchedUser) {
-                        return previousState;
+            .then(async () => {
+                isFetchingUser.current = true;
+                try {
+                    const result = await showUser();
+                    if (result._tag === 'Success') {
+                        setOfflineAuthTrust(true);
+                        authManager.setUser(result.data);
+                        console.log('[AuthContext] Fetched user data');
+                    } else if (result._tag === 'AuthenticationError') {
+                        setOfflineAuthTrust(false);
+                        authManager.clearAuthData();
                     }
+                } finally {
+                    isFetchingUser.current = false;
+                    setAuthState((previousState) => {
+                        if (previousState.hasFetchedUser) {
+                            return previousState;
+                        }
 
-                    return { ...previousState, hasFetchedUser: true };
-                });
+                        return { ...previousState, hasFetchedUser: true };
+                    });
+                }
             });
+
+        return userFetchChainRef.current;
     };
 
     const refreshUser = () => {
@@ -225,9 +228,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
     };
 
-    const googleLogin = async (reconnect?: boolean) => {
-        // Redirect to Google OAuth
-        window.location.href = `/auth/google${reconnect ? '?reconnect=1' : ''}`;
+    const googleLogin = async (
+        reconnect?: boolean,
+        remember?: boolean,
+    ): Promise<void> => {
+        const params = new URLSearchParams();
+        if (reconnect) {
+            params.set('reconnect', '1');
+        }
+        if (remember) {
+            params.set('remember', '1');
+        }
+        const query = params.toString();
+        window.location.href = `/auth/google${query ? `?${query}` : ''}`;
     };
 
     const disconnectGoogle = async () => {

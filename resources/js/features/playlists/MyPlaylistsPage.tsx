@@ -44,6 +44,12 @@ export function MyPlaylistsPage() {
                 </ButtonLink>
             </div>
 
+            <p className="text-muted mb-6 max-w-2xl text-sm">
+                A playlist is an ordered set of quiz questions. Open a playlist to
+                add or remove questions, then attach it when you host a session so
+                rounds draw from that set.
+            </p>
+
             <div className="bg-card mb-8 flex flex-col gap-3 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10 sm:flex-row sm:items-end">
                 <div className="grow">
                     <label
