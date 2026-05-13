@@ -1,9 +1,7 @@
 import { Button } from '@/components/ui/Button';
-import { useAuth } from '@/features/auth/AuthContext';
 import { useOfflineBlock } from '@/hooks/useOfflineBlock';
 import type { GameSessionsLobbyResponseData } from '@/schemas/App/Data/Models/GameSessionsLobbyResponseData';
 import toast from 'react-hot-toast';
-import { useEffect, useRef } from 'react';
 import { Link, useLoaderData } from 'react-router-dom';
 import { fetchGameSessionsLobby } from './api';
 
@@ -22,19 +20,7 @@ export async function gameSessionsLobbyLoader(): Promise<GameSessionsLobbyRespon
 
 export function GameSessionsLobbyPage() {
     const { sessions } = useLoaderData<GameSessionsLobbyResponseData>();
-    const { user, refreshUser, authState } = useAuth();
-    const lobbyHydrateUserRef = useRef(false);
     const { isBlocked, blockReason } = useOfflineBlock();
-
-    useEffect(() => {
-        if (lobbyHydrateUserRef.current) {
-            return;
-        }
-        if (!user && authState.hasFetchedUser) {
-            lobbyHydrateUserRef.current = true;
-            void refreshUser();
-        }
-    }, [user, authState.hasFetchedUser, refreshUser]);
 
     const copyRoomCode = async (code: string) => {
         if (isBlocked) {

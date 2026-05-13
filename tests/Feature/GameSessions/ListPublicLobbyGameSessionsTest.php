@@ -6,11 +6,8 @@ use App\Enums\SessionStatus;
 use App\Models\GameSession;
 use App\Models\User;
 
-test('lobby is available for guest session without prior login', function (): void {
-    $response = $this->withHeader('Origin', rtrim(
-        (string) config('app.url'),
-        '/',
-    ))->getJson('/api/game-sessions/lobby');
+test('lobby is available without authentication, session, or spa origin headers', function (): void {
+    $response = $this->getJson('/api/game-sessions/lobby');
 
     $response->assertSuccessful();
     $response->assertJsonStructure(['sessions']);

@@ -14,8 +14,8 @@ class EnsureGuestUser
 {
     /**
      * When the request is not already authenticated, create a guest user if needed,
-     * persist their id in the session, and log them in so routes using auth:sanctum
-     * resolve to a user (guest or registered).
+     * persist their id in the session, and log them in on the web guard so session
+     * API routes can resolve request()->user() (guest or registered).
      */
     public function handle(Request $request, Closure $next): Response
     {

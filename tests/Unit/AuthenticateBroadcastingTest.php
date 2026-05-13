@@ -48,13 +48,20 @@ test('supports string auth responses', function () {
         ]);
 });
 
-test('returns 401 when user is not authenticated', function () {
+test('guest session can authenticate broadcasting when channel resolves', function () {
+    Broadcast::shouldReceive('auth')->andReturn('guest-auth-token');
+
     $response = $this->postJson('/api/broadcasting/auth', [
         'socket_id' => 'socket-123',
         'channel_name' => 'test-channel',
     ]);
 
-    $response->assertUnauthorized();
+    $response
+        ->assertSuccessful()
+        ->assertJson([
+            'auth' => 'guest-auth-token',
+            'channel_data' => null,
+        ]);
 });
 
 test('returns 403 when channel authentication fails', function () {
