@@ -49,11 +49,25 @@ Patterns in this repo:
 
 ## Types and schemas
 
-- **Generated schemas** live under `@/schemas/...` (produced from the Laravel side; mirrored TypeScript under `resources/js/schemas`). Prefer these for API payloads and domain models (e.g. `@/schemas/App/Data/Models/UserData`).
-- **Do not edit generated schema files by hand.** Fix or extend generation on the backend / codegen pipeline.
+### Generated Effect schemas (single source of truth)
+
+- The Laravel API models request and response JSON using **Spatie Laravel Data** (`Data` classes): shared types under `app/Data`, feature requests/responses under `app/Features/**`, and PHP enums under `app/Enums`. Prefer **named `Data` DTOs** for bodies (including simple `{ message }` / `{ error }` responses) so the wire format stays explicit and versionable.
+- **`php artisan effect-schema:transform`** (`michael4d45/effect-schema-generator`) scans those PHP classes and writes **Effect `Schema` modules and TypeScript** into **`resources/js/schemas`** (see root `config/effect-schema.php` for scan paths). The SPA imports them as **`@/schemas/...`** (e.g. `@/schemas/App/Data/Models/UserData`).
+- The Vite plugin **`laravelDataTypes`** (see root `laravelDataTypes.ts`) runs the same Artisan command on **`buildStart`** and on HMR when files change under `app/Data/**/*.php`, `app/Features/**/*.php`, or `app/Enums/**/*.php`. After changing PHP `Data` types, rely on dev/build for regeneration, or run the Artisan command manually if needed.
+- **Do not hand-edit anything under `resources/js/schemas`.** To add or change API shapes, add or update the PHP `Data` (or enum) class, then regenerate so `decodeJson` / feature APIs stay aligned.
+
+### Using schemas in the SPA
+
+- Prefer **`decodeJson`** (and generated schemas from `@/schemas/...`) for JSON response and request bodies in **`@/lib/apiCore`** and feature **`api.ts`** modules so decoding matches the backend contract.
 - Use **type-only imports** when only types are needed: `import type { … } from '@/schemas/...'`.
 - Define **props interfaces** for component props (e.g. `ButtonProps`). Extend DOM props when wrapping native elements (e.g. `React.ButtonHTMLAttributes<HTMLButtonElement>`).
 - Rely on **TypeScript strict**; avoid `any`; handle null/undefined explicitly.
+
+### Typical API response DTOs (for decoding)
+
+- **`MessageResponse`** — `{ message: string }` (e.g. deletes, logout, simple notices).
+- **`ErrorResponseData`** — `{ error: string }` (e.g. broadcasting auth failures).
+- **`PasswordResetFailedResponseData`** — `{ message, errors }` on structured 422-style failures. Prefer decoding with the generated schema rather than ad hoc object shapes.
 
 === react patterns ===
 
@@ -71,6 +85,7 @@ Patterns in this repo:
 ## API and data
 
 - **Core:** `@/lib/apiCore` — `httpRequest`, `buildQueryString`, `decodeJson` with `Schema`, `runEffect`, `withRetry`, cache helpers as needed.
+- **Contract with Laravel:** Treat **`@/schemas/...`** as the typed mirror of PHP `Data` DTOs. When adding an endpoint or changing a payload, extend the PHP `Data` class first, regenerate schemas, then update the feature API layer to use the new schema in **`decodeJson`** (or equivalent). Avoid inline “best guess” TypeScript types that are not backed by generated schemas.
 - **Errors:** Check `result._tag`; branch on `Success` vs validation / auth / network error tags; surface messages with toasts or inline UI.
 - **Auth:** `authManager` + `AuthContext` / `useAuth()`; do not duplicate token storage logic ad hoc.
 - **Offline:** Respect `useOfflineBlock`, `OfflineBanner`, and related patterns when adding mutations or gated UI.
@@ -97,7 +112,7 @@ Patterns in this repo:
 
 ## Quality and tooling
 
-- From the project root: **`npm run lint`**, **`npm run types`**, and **`npm run format`** / **`npm run format:check`** before finalizing SPA changes.
+- From the project root: **`npm run lint`**, **`npm run types`**, and **`npm run format`** / **`npm run format:check`** before finalizing SPA changes. Run **`npm run types`** after PHP `Data` / enum changes if Vite was not running (schemas may be stale until `effect-schema:transform` runs).
 
 ## Documentation
 
