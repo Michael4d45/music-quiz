@@ -11,6 +11,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Flex;
 use Filament\Schemas\Schema;
 
 class SessionRoundForm
@@ -75,6 +76,12 @@ class SessionRoundForm
                 ->relationship('firstBuzzer', 'guest_name')
                 ->searchable()
                 ->preload(),
+
+            Flex::make([
+                TextInput::make('id')->copyable()->disabled(),
+            ])
+                ->columnSpanFull()
+                ->hiddenOn('create'),
         ]);
     }
 }
