@@ -1,0 +1,106 @@
+---
+alwaysApply: true
+---
+<react-spa-guidelines>
+=== foundation ===
+
+# React SPA Guidelines
+
+This application’s React SPA lives under **`resources/js`**. Follow these guidelines when working on the SPA to match existing structure and conventions.
+
+## Foundational Context
+
+- **React** — v19
+- **TypeScript** — strict mode; path alias **`@/*`** → **`./resources/js/*`** (see root `tsconfig.json`)
+- **Vite** — v7 (root `package.json` scripts: `npm run dev`, `npm run build`)
+- **react-router-dom** — v7 (`createBrowserRouter`, loaders, data APIs)
+- **Effect** — `effect` + `Schema` from `effect` for HTTP and JSON decoding in `@/lib/apiCore` (e.g. `httpRequest`, `decodeJson`, `runEffect`, `withRetry`)
+- **Tailwind CSS** — v4 (see project Tailwind rules)
+- **ESLint** — v9; **Prettier** — v3
+
+## Conventions
+
+- Follow existing code conventions. When adding or editing SPA code, check sibling files and the same feature folder for structure, naming, and patterns.
+- Use descriptive names (e.g. `hasFetchedUser`). Prefer full words over abbreviations unless widely used (e.g. `id`, `url`).
+- Reuse existing components from `@/components` and feature-level components before introducing new ones.
+- Use the **`@/`** path alias for all imports under `resources/js` (e.g. `@/components/ui/Button`, `@/lib/utils`).
+- Use **`@/schemas/...`** for generated API/domain types and schemas (see **Types and schemas**). Do not hand-edit generated files.
+
+=== structure ===
+
+## Application structure
+
+- **Entry:** [`resources/js/main.tsx`](resources/js/main.tsx) — `AuthProvider`, `RouterProvider` with [`router.tsx`](resources/js/router.tsx); theme init via `useAppearance`.
+- **Shell:** [`resources/js/app.tsx`](resources/js/app.tsx) — `Sidebar` (md+), `Header` (mobile), `OfflineBanner`, `GlobalRealtimeListener`, `AuthGuard` wrapping `Outlet`, `ModalRenderer`, `Toaster`.
+- **Router:** [`resources/js/router.tsx`](resources/js/router.tsx) — root layout route `/` with `App`, `errorElement: ErrorPage`; wildcard `*` → `NotFoundPage`.
+- **Features:** Folders under [`resources/js/features/`](resources/js/features/) — e.g. `auth`, `content`, `home`, `profile`, plus shared [`ErrorPage`](resources/js/features/ErrorPage.tsx) / [`NotFoundPage`](resources/js/features/NotFoundPage.tsx).
+- **Shared:** [`resources/js/components/`](resources/js/components/), [`resources/js/lib/`](resources/js/lib/), [`resources/js/hooks/`](resources/js/hooks/), [`resources/js/config/`](resources/js/config/) (e.g. navigation).
+
+## Feature structure
+
+Patterns in this repo:
+
+- **`features/auth/routes.tsx`** — Exports `authRoutes` (`RouteObject[]`) for login, register, password flows; each auth screen sets `handle: { isAuthPage: true }`.
+- **Other routes** — Declared inline in `router.tsx` (e.g. `/`, `/content`, `/profile`) or added there as the app grows.
+- **Page + loader** — Co-located in the same module when used (e.g. `ContentPage` + `contentLoader`, `ProfilePage` + `profileLoader`).
+- **`api.ts`** per feature where needed — call through `@/lib/apiCore`; return tagged results (`_tag: 'Success'` vs error tags) from `runEffect(...)`.
+
+=== types and schemas ===
+
+## Types and schemas
+
+- **Generated schemas** live under `@/schemas/...` (produced from the Laravel side; mirrored TypeScript under `resources/js/schemas`). Prefer these for API payloads and domain models (e.g. `@/schemas/App/Data/Models/UserData`).
+- **Do not edit generated schema files by hand.** Fix or extend generation on the backend / codegen pipeline.
+- Use **type-only imports** when only types are needed: `import type { … } from '@/schemas/...'`.
+- Define **props interfaces** for component props (e.g. `ButtonProps`). Extend DOM props when wrapping native elements (e.g. `React.ButtonHTMLAttributes<HTMLButtonElement>`).
+- Rely on **TypeScript strict**; avoid `any`; handle null/undefined explicitly.
+
+=== react patterns ===
+
+## React patterns
+
+- **Ref-forwarding:** When wrapping native elements, use `React.forwardRef` and set `displayName` where the codebase already does (e.g. `Button`).
+- **Loaders:** Export async loader functions from the page module (or a dedicated module). Use `LoaderFunctionArgs` from `react-router` / `react-router-dom` when you need `params` or `request`. In the component, `useLoaderData<YourType>()`. Handle API errors in the loader (fallback data or rethrow as appropriate).
+- **Data flow:** Loaders for initial route data; local `useState` for UI-only state. Use **`useAuth()`** from `@/features/auth/AuthContext` for session user and auth actions.
+- **Modals:** `@/lib/modal` + `ModalRenderer`; avoid duplicating global modal chrome.
+- **Toasts:** `react-hot-toast`; toaster options live in `app.tsx`.
+- **URL state:** `useSearchParams` when the route should be shareable/bookmarkable for list/filter state; keep loaders aligned with the same query keys if they read the URL.
+
+=== api and data ===
+
+## API and data
+
+- **Core:** `@/lib/apiCore` — `httpRequest`, `buildQueryString`, `decodeJson` with `Schema`, `runEffect`, `withRetry`, cache helpers as needed.
+- **Errors:** Check `result._tag`; branch on `Success` vs validation / auth / network error tags; surface messages with toasts or inline UI.
+- **Auth:** `authManager` + `AuthContext` / `useAuth()`; do not duplicate token storage logic ad hoc.
+- **Offline:** Respect `useOfflineBlock`, `OfflineBanner`, and related patterns when adding mutations or gated UI.
+
+=== styling ===
+
+## Styling (Tailwind)
+
+- Use **Tailwind v4** utilities only (no deprecated v3-only classes). Follow project rules for spacing and theme tokens.
+- Use **`cn()`** from `@/lib/utils` to merge class names.
+- **Spacing:** Prefer `gap-*` in flex/grid layouts.
+- **Dark mode:** Follow existing `dark:` and CSS variable patterns used in shared components.
+- Reuse **`@/components/ui/*`** (`Button`, `ButtonLink`, `Form`, `FormField`, etc.).
+
+=== routing and auth ===
+
+## Routing and auth
+
+- **Router:** Add or extend routes in `router.tsx` and/or feature `routes.tsx`; use `RouteObject` from `react-router-dom`.
+- **Loaders:** Attach to the route that owns the data; keep them free of unrelated side effects beyond fetch/decode.
+- **`AuthGuard`:** Routes are **public by default**. Mark **protected** routes with **`handle: { isProtected: true }`** (see `/profile`). Mark **auth-only pages** (login, register, etc.) with **`handle: { isAuthPage: true }`** so logged-in users are redirected home. There is no `isGuestPage` handle in this app.
+
+=== quality and tooling ===
+
+## Quality and tooling
+
+- From the project root: **`npm run lint`**, **`npm run types`**, and **`npm run format`** / **`npm run format:check`** before finalizing SPA changes.
+
+## Documentation
+
+- Do not add new SPA README or doc files unless the user explicitly asks for them.
+
+</react-spa-guidelines>
