@@ -56,7 +56,17 @@ export const initEcho = (): ReverbEcho => {
         String(import.meta.env['VITE_REVERB_PORT'] ?? ''),
         10,
     );
+    // Port must match `.env` (`REVERB_PORT` → `VITE_REVERB_PORT`), i.e. where the
+    // browser opens the WebSocket — usually `REVERB_SERVER_PORT`, not `APP_PORT`.
     const port = Number.isFinite(configuredPort) ? configuredPort : undefined;
+
+    const viteScheme = import.meta.env['VITE_REVERB_SCHEME'];
+    const scheme =
+        viteScheme === 'http' || viteScheme === 'https'
+            ? viteScheme
+            : window.location.protocol === 'https:'
+              ? 'https'
+              : 'http';
 
     echoInstance = new Echo({
         broadcaster: 'reverb',
@@ -64,8 +74,7 @@ export const initEcho = (): ReverbEcho => {
         wsHost,
         wsPort: port ?? 80,
         wssPort: port ?? 443,
-        forceTLS:
-            (import.meta.env['VITE_REVERB_SCHEME'] ?? 'https') === 'https',
+        forceTLS: scheme === 'https',
         enabledTransports: ['ws', 'wss'],
         authorizer: (channel, options) => {
             return {

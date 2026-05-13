@@ -44,11 +44,14 @@ use Illuminate\Support\Str;
  * @property-read Collection<array-key,Playlist> $playlists
  * @property-read Collection<array-key,QuizQuestion> $quizQuestions
  * @property-read Collection<array-key,MusicTrack> $musicTracks
+ *
+ * This is from Notifiable trait
+ * @property-read \Illuminate\Notifications\DatabaseNotification $notifications
  */
 class User extends Authenticatable implements MustVerifyEmail, FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory;
 
     use HasUuids;
     use Notifiable;

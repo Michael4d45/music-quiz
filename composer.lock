@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2a2611df53766b4fa35021ebe2b2d94b",
+    "content-hash": "4ba95ee15899f7eeecff7d573fb303ee",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -2310,16 +2310,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v13.8.0",
+            "version": "v13.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "e7db333a025a1e93ebca7744953069d7719f4bcf"
+                "reference": "a0c6ad03b380287015287d8d5a0fa2459e2332fd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/e7db333a025a1e93ebca7744953069d7719f4bcf",
-                "reference": "e7db333a025a1e93ebca7744953069d7719f4bcf",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/a0c6ad03b380287015287d8d5a0fa2459e2332fd",
+                "reference": "a0c6ad03b380287015287d8d5a0fa2459e2332fd",
                 "shasum": ""
             },
             "require": {
@@ -2423,7 +2423,7 @@
                 "aws/aws-sdk-php": "^3.322.9",
                 "ext-gmp": "*",
                 "fakerphp/faker": "^1.24",
-                "guzzlehttp/psr7": "^2.4",
+                "guzzlehttp/psr7": "^2.9",
                 "laravel/pint": "^1.18",
                 "league/flysystem-aws-s3-v3": "^3.25.1",
                 "league/flysystem-ftp": "^3.25.1",
@@ -2530,7 +2530,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2026-05-05T21:01:14+00:00"
+            "time": "2026-05-13T15:38:40+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -2593,16 +2593,16 @@
         },
         {
             "name": "laravel/reverb",
-            "version": "v1.10.1",
+            "version": "v1.10.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/reverb.git",
-                "reference": "a96310ae8b844d4862b2188a3cd6e79434893a6b"
+                "reference": "43a5c0a99b1aaba33dc32f97fcf51f182dd8c8ac"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/reverb/zipball/a96310ae8b844d4862b2188a3cd6e79434893a6b",
-                "reference": "a96310ae8b844d4862b2188a3cd6e79434893a6b",
+                "url": "https://api.github.com/repos/laravel/reverb/zipball/43a5c0a99b1aaba33dc32f97fcf51f182dd8c8ac",
+                "reference": "43a5c0a99b1aaba33dc32f97fcf51f182dd8c8ac",
                 "shasum": ""
             },
             "require": {
@@ -2666,9 +2666,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/reverb/issues",
-                "source": "https://github.com/laravel/reverb/tree/v1.10.1"
+                "source": "https://github.com/laravel/reverb/tree/v1.10.2"
             },
-            "time": "2026-04-30T12:07:26+00:00"
+            "time": "2026-05-10T15:47:52+00:00"
         },
         {
             "name": "laravel/sanctum",
@@ -11386,16 +11386,16 @@
         },
         {
             "name": "carthage-software/mago",
-            "version": "1.27.0",
+            "version": "1.27.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/carthage-software/mago.git",
-                "reference": "ac8e26273627ecd7f19afc4666490ab1c712247d"
+                "reference": "f4c31bbcb871e6bcbb96323ce791e06288b39b2a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/carthage-software/mago/zipball/ac8e26273627ecd7f19afc4666490ab1c712247d",
-                "reference": "ac8e26273627ecd7f19afc4666490ab1c712247d",
+                "url": "https://api.github.com/repos/carthage-software/mago/zipball/f4c31bbcb871e6bcbb96323ce791e06288b39b2a",
+                "reference": "f4c31bbcb871e6bcbb96323ce791e06288b39b2a",
                 "shasum": ""
             },
             "require": {
@@ -11433,7 +11433,7 @@
             ],
             "support": {
                 "issues": "https://github.com/carthage-software/mago/issues",
-                "source": "https://github.com/carthage-software/mago/tree/1.27.0"
+                "source": "https://github.com/carthage-software/mago/tree/1.27.1"
             },
             "funding": [
                 {
@@ -11441,7 +11441,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-05-13T00:06:08+00:00"
+            "time": "2026-05-13T15:32:36+00:00"
         },
         {
             "name": "composer/pcre",

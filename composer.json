@@ -19,7 +19,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.24",
         "michael4d45/context-logging": "^6.0",
-        "michael4d45/effect-schema-generator": "^0.6",
+        "michael4d45/effect-schema-generator": "^0.6.0",
         "michael4d45/filament-system-info-widget": "^2.0",
         "spatie/laravel-data": "^4.18"
     },
@@ -31,7 +31,7 @@
         "laravel/boost": "^2.0",
         "laravel/tinker": "^3.0",
         "michael4d45/coverage-treemap": "^1.0",
-        "michael4d45/laravel-resource-checker": "^1.0",
+        "michael4d45/laravel-resource-checker": "^1.2",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
         "pestphp/pest": "^4.3",
