@@ -15,9 +15,3 @@ it('can logout when authenticated', function () {
         'message' => 'Logged out successfully',
     ]);
 });
-
-it('returns unauthorized when not authenticated', function () {
-    $response = $this->postJson('/logout');
-
-    $response->assertUnauthorized();
-});

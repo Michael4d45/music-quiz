@@ -2,53 +2,42 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Playlists;
-
 use App\Enums\Visibility;
 use App\Models\Playlist;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class MyPlaylistsCrudApiTest extends TestCase
-{
-    use RefreshDatabase;
+test('owner can update playlist', function (): void {
+    $user = User::factory()->create();
+    $playlist = Playlist::factory()->for($user)->create([
+        'name' => 'Old name',
+        'visibility' => Visibility::Private,
+    ]);
 
-    public function test_owner_can_update_playlist(): void
-    {
-        $user = User::factory()->create();
-        $playlist = Playlist::factory()->for($user)->create([
-            'name' => 'Old name',
-            'visibility' => Visibility::Private,
-        ]);
-
-        $this
-            ->actingAs($user, 'web')
-            ->patchJson("/api/my/playlists/{$playlist->id}", [
-                'name' => 'New name',
-                'description' => 'Updated description',
-                'visibility' => Visibility::Public->value,
-            ])
-            ->assertOk()
-            ->assertJsonPath('name', 'New name')
-            ->assertJsonPath('description', 'Updated description');
-
-        $this->assertDatabaseHas('playlists', [
-            'id' => $playlist->id,
+    $this
+        ->actingAs($user, 'web')
+        ->patchJson("/api/my/playlists/{$playlist->id}", [
             'name' => 'New name',
-        ]);
-    }
+            'description' => 'Updated description',
+            'visibility' => Visibility::Public->value,
+        ])
+        ->assertOk()
+        ->assertJsonPath('name', 'New name')
+        ->assertJsonPath('description', 'Updated description');
 
-    public function test_owner_can_delete_playlist(): void
-    {
-        $user = User::factory()->create();
-        $playlist = Playlist::factory()->for($user)->create();
+    $this->assertDatabaseHas('playlists', [
+        'id' => $playlist->id,
+        'name' => 'New name',
+    ]);
+});
 
-        $this
-            ->actingAs($user, 'web')
-            ->deleteJson("/api/my/playlists/{$playlist->id}")
-            ->assertOk();
+test('owner can delete playlist', function (): void {
+    $user = User::factory()->create();
+    $playlist = Playlist::factory()->for($user)->create();
 
-        $this->assertDatabaseMissing('playlists', ['id' => $playlist->id]);
-    }
-}
+    $this
+        ->actingAs($user, 'web')
+        ->deleteJson("/api/my/playlists/{$playlist->id}")
+        ->assertOk();
+
+    $this->assertDatabaseMissing('playlists', ['id' => $playlist->id]);
+});
