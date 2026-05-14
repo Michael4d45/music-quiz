@@ -28,9 +28,7 @@ class AddPlaylistItem
             $playlist->id,
         )->max('sort_order');
 
-        $sortOrder = is_numeric($maxSort)
-            ? (int) $maxSort + 100
-            : 100;
+        $sortOrder = is_numeric($maxSort) ? (int) $maxSort + 100 : 100;
 
         $item = PlaylistItem::query()->create([
             'playlist_id' => $playlist->id,

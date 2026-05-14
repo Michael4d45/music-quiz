@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data\Models;
 
-use App\Enums\PlaylistStatus;
+use App\Data\Models\UserData;
 use App\Enums\QuestionOrder;
 use App\Enums\Visibility;
 use Illuminate\Support\Carbon;
@@ -19,7 +19,6 @@ class PlaylistData extends Data
         public string $user_id,
         public string $name,
         public null|string $description,
-        public PlaylistStatus $status,
         public Visibility $visibility,
         /** @var list<string>|null */
         public null|array $tags,

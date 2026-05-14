@@ -1279,7 +1279,6 @@ class DatabaseSeeder extends Seeder
                     'user_id' => $user->id,
                     'name' => 'My Quiz Playlist ' . ($i + 1),
                     'description' => 'A collection of great quiz questions',
-                    'status' => rand(0, 1) ? 'published' : 'draft',
                     'visibility' => rand(0, 1) ? 'public' : 'private',
                     'tags' => ['rock', 'pop', 'quiz'],
                     'estimated_duration_minutes' => rand(20, 60),

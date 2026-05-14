@@ -9,13 +9,12 @@ import {
 } from '@/features/quiz-questions/api';
 import { fetchMyMusicTracks } from '@/features/music-tracks/api';
 import {
-    groupHeading,
     questionGroupHeading,
-    sortGroupEntries,
     sortQuestionGroupEntries,
 } from '@/features/music-tracks/trackGrouping';
 import { QuizQuestionTrackAudioPlayer } from '@/features/quiz-questions/QuizQuestionTrackAudioPlayer';
-import { fetchQuestionTypes } from '@/features/reference/api';
+import { TrackPickerWithUpload } from '@/features/quiz-questions/TrackPickerWithUpload';
+import { fetchQuestionTypes, fetchSubCategories } from '@/features/reference/api';
 import { cn } from '@/lib/utils';
 import type { IdLabelOptionData } from '@/schemas/App/Data/Models/IdLabelOptionData';
 import type { MusicTrackData } from '@/schemas/App/Data/Models/MusicTrackData';
@@ -30,6 +29,7 @@ import { useLoaderData, useRevalidator } from 'react-router-dom';
 export interface MyQuizQuestionsLoaderData extends MyQuizQuestionsResponseData {
     readonly question_types: readonly IdLabelOptionData[];
     readonly tracks: readonly MusicTrackData[];
+    readonly sub_categories: readonly IdLabelOptionData[];
 }
 
 const VISIBILITY_OPTIONS: { value: (typeof Visibility)[keyof typeof Visibility]; label: string }[] = [
@@ -39,10 +39,11 @@ const VISIBILITY_OPTIONS: { value: (typeof Visibility)[keyof typeof Visibility];
 ];
 
 export async function myQuizQuestionsLoader(): Promise<MyQuizQuestionsLoaderData> {
-    const [questionsRes, typesRes, tracksRes] = await Promise.all([
+    const [questionsRes, typesRes, tracksRes, subRes] = await Promise.all([
         fetchMyQuizQuestions(),
         fetchQuestionTypes(),
         fetchMyMusicTracks(),
+        fetchSubCategories(),
     ]);
 
     return {
@@ -51,6 +52,8 @@ export async function myQuizQuestionsLoader(): Promise<MyQuizQuestionsLoaderData
         question_types:
             typesRes._tag === 'Success' ? typesRes.data.question_types : [],
         tracks: tracksRes._tag === 'Success' ? tracksRes.data.tracks : [],
+        sub_categories:
+            subRes._tag === 'Success' ? subRes.data.sub_categories : [],
     };
 }
 
@@ -74,28 +77,11 @@ function parseNullableNonNegativeInt(raw: string): number | null {
     return n;
 }
 
-function trackSelectOptgroups(tracks: readonly MusicTrackData[]) {
-    const map = new Map<string, MusicTrackData[]>();
-    for (const t of tracks) {
-        const heading = groupHeading(t);
-        const list = map.get(heading) ?? [];
-        list.push(t);
-        map.set(heading, list);
-    }
-    for (const list of map.values()) {
-        list.sort((a, b) =>
-            `${a.artist_name} ${a.title}`.localeCompare(
-                `${b.artist_name} ${b.title}`,
-            ),
-        );
-    }
-    return sortGroupEntries([...map.entries()]);
-}
-
 export function MyQuizQuestionsPage() {
-    const { questions, question_types, tracks } =
+    const { questions, question_types, tracks, sub_categories } =
         useLoaderData<MyQuizQuestionsLoaderData>();
     const revalidator = useRevalidator();
+    const [uploadedTracks, setUploadedTracks] = useState<MusicTrackData[]>([]);
     const [questionType, setQuestionType] = useState<QuestionType>('artist');
     const [trackId, setTrackId] = useState('');
     const [correctAnswer, setCorrectAnswer] = useState('');
@@ -110,7 +96,7 @@ export function MyQuizQuestionsPage() {
     const [search, setSearch] = useState('');
     const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
-    const trackOptgroups = trackSelectOptgroups(tracks);
+    const allTracks = [...tracks, ...uploadedTracks];
 
     const filteredQuestions = (() => {
         const q = search.trim().toLowerCase();
@@ -209,11 +195,10 @@ export function MyQuizQuestionsPage() {
                 moreLabel="More about quiz questions"
             >
                 <p>
-                    Build prompts and the canonical correct answer. Link a track
-                    when the round should reference a specific recording; groups
-                    below follow the same library headings as on My tracks.
-                    Uploaded tracks can be previewed while you tune wording or
-                    media trim.
+                    Build prompts and the canonical correct answer. Pick an
+                    existing track or upload a short clip below; groups in the
+                    track list mirror My tracks. Uploaded clips can be previewed
+                    while you tune wording or media trim.
                 </p>
             </PageIntroExpandable>
 
@@ -268,8 +253,14 @@ export function MyQuizQuestionsPage() {
                                                 key={`${q.id}-${q.updated_at?.toString() ?? ''}`}
                                                 question={q}
                                                 question_types={question_types}
-                                                tracks={tracks}
-                                                trackOptgroups={trackOptgroups}
+                                                tracks={allTracks}
+                                                sub_categories={sub_categories}
+                                                onTrackCreated={(t) =>
+                                                    setUploadedTracks((prev) => [
+                                                        ...prev,
+                                                        t,
+                                                    ])
+                                                }
                                                 onSaved={() =>
                                                     revalidator.revalidate()
                                                 }
@@ -310,32 +301,16 @@ export function MyQuizQuestionsPage() {
                                 ))}
                             </select>
                         </div>
-                        <div>
-                            <label className="text-muted mb-1 block text-sm font-medium">
-                                Linked track (optional)
-                            </label>
-                            <select
-                                className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
-                                value={trackId}
-                                onChange={(e) => setTrackId(e.target.value)}
-                            >
-                                <option value="">None — standalone question</option>
-                                {trackOptgroups.map(([groupLabel, trackList]) => (
-                                    <optgroup key={groupLabel} label={groupLabel}>
-                                        {trackList.map((t) => (
-                                            <option key={t.id} value={t.id}>
-                                                {t.title} — {t.artist_name}
-                                            </option>
-                                        ))}
-                                    </optgroup>
-                                ))}
-                            </select>
-                            {tracks.length === 0 && (
-                                <p className="text-muted mt-1 text-xs">
-                                    Add tracks under My tracks in the sidebar to
-                                    enable linking.
-                                </p>
-                            )}
+                        <div className="sm:col-span-2">
+                            <TrackPickerWithUpload
+                                tracks={allTracks}
+                                subCategories={sub_categories}
+                                selectedTrackId={trackId}
+                                onSelectedTrackIdChange={setTrackId}
+                                onTrackCreated={(t) =>
+                                    setUploadedTracks((prev) => [...prev, t])
+                                }
+                            />
                         </div>
                         <div className="sm:col-span-2">
                             <label className="text-muted mb-1 block text-sm font-medium">
@@ -478,7 +453,8 @@ interface QuizQuestionRowProps {
     readonly question: QuizQuestionData;
     readonly question_types: readonly IdLabelOptionData[];
     readonly tracks: readonly MusicTrackData[];
-    readonly trackOptgroups: [string, MusicTrackData[]][];
+    readonly sub_categories: readonly IdLabelOptionData[];
+    readonly onTrackCreated: (track: MusicTrackData) => void;
     readonly onSaved: () => void;
     readonly onRequestDelete: () => void;
 }
@@ -487,7 +463,8 @@ function QuizQuestionRow({
     question: q,
     question_types,
     tracks,
-    trackOptgroups,
+    sub_categories,
+    onTrackCreated,
     onSaved,
     onRequestDelete,
 }: QuizQuestionRowProps) {
@@ -628,30 +605,19 @@ function QuizQuestionRow({
                     </div>
                     <div>
                         <label className="text-muted mb-1 block text-xs font-medium">
-                            Linked track
+                            Audio
                         </label>
-                        <select
-                            className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
-                            value={trackId}
-                            onChange={(e) => setTrackId(e.target.value)}
-                        >
-                            <option value="">None — standalone</option>
-                            {trackOptgroups.map(([groupLabel, trackList]) => (
-                                <optgroup key={groupLabel} label={groupLabel}>
-                                    {trackList.map((t) => (
-                                        <option key={t.id} value={t.id}>
-                                            {t.title} — {t.artist_name}
-                                        </option>
-                                    ))}
-                                </optgroup>
-                            ))}
-                        </select>
-                        {tracks.length === 0 && (
-                            <p className="text-muted mt-1 text-xs">
-                                Add tracks under My tracks in the sidebar to link
-                                recordings.
-                            </p>
-                        )}
+                        <TrackPickerWithUpload
+                            tracks={tracks}
+                            subCategories={sub_categories}
+                            selectedTrackId={trackId}
+                            onSelectedTrackIdChange={setTrackId}
+                            onTrackCreated={onTrackCreated}
+                            disabled={saving}
+                            selectLabel="Linked track"
+                            noneOptionLabel="None — standalone"
+                            emptyTracksHint={null}
+                        />
                     </div>
                     <div className="sm:col-span-2">
                         <label className="text-muted mb-1 block text-xs font-medium">

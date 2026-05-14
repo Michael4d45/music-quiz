@@ -27,9 +27,9 @@ class UpdatePlaylistItemPosition
             abort(404);
         }
 
-        $validatedResult = UpdatePlaylistItemPositionRequest::validate(
-            $request->only(['before_item_id']),
-        );
+        $validatedResult = UpdatePlaylistItemPositionRequest::validate($request->only([
+            'before_item_id',
+        ]));
         $validated = is_array($validatedResult)
             ? $validatedResult
             : $validatedResult->toArray();
@@ -50,14 +50,18 @@ class UpdatePlaylistItemPosition
             ->get();
 
         $without = $all->filter(
-            static fn(PlaylistItem $item): bool => $item->id !== $playlistItem->id,
+            static fn(PlaylistItem $item): bool => (
+                $item->id !== $playlistItem->id
+            ),
         )->values();
 
         if ($beforeItemId !== null) {
             $exists = $without->contains(
-                static fn(PlaylistItem $item): bool => $item->id === $beforeItemId,
+                static fn(PlaylistItem $item): bool => (
+                    $item->id === $beforeItemId
+                ),
             );
-            if (! $exists) {
+            if (!$exists) {
                 throw ValidationException::withMessages([
                     'before_item_id' => 'Must reference another item in this playlist.',
                 ]);
@@ -67,7 +71,9 @@ class UpdatePlaylistItemPosition
         $insertIndex = $beforeItemId === null
             ? $without->count()
             : (int) $without->search(
-                static fn(PlaylistItem $item): bool => $item->id === $beforeItemId,
+                static fn(PlaylistItem $item): bool => (
+                    $item->id === $beforeItemId
+                ),
             );
 
         /** @var list<PlaylistItem> $orderedModels */
@@ -77,7 +83,9 @@ class UpdatePlaylistItemPosition
 
         DB::transaction(function () use ($ordered, $playlistItem): void {
             $newIndex = $ordered->search(
-                static fn(PlaylistItem $item): bool => $item->id === $playlistItem->id,
+                static fn(PlaylistItem $item): bool => (
+                    $item->id === $playlistItem->id
+                ),
             );
             if ($newIndex === false) {
                 return;
@@ -86,7 +94,7 @@ class UpdatePlaylistItemPosition
             $left = $newIndex > 0
                 ? (int) $ordered->get($newIndex - 1)->sort_order
                 : null;
-            $right = $newIndex < $ordered->count() - 1
+            $right = $newIndex < ($ordered->count() - 1)
                 ? (int) $ordered->get($newIndex + 1)->sort_order
                 : null;
 
@@ -98,7 +106,7 @@ class UpdatePlaylistItemPosition
                     ->whereKeyNot($playlistItem->id)
                     ->where('sort_order', $newSort)
                     ->exists();
-                if (! $hasConflict) {
+                if (!$hasConflict) {
                     PlaylistItem::query()
                         ->whereKey($playlistItem->id)
                         ->update(['sort_order' => $newSort]);
@@ -113,8 +121,10 @@ class UpdatePlaylistItemPosition
         return app(ListPlaylistItems::class)($playlist);
     }
 
-    private function midpointSortOrder(?int $left, ?int $right): ?int
-    {
+    private function midpointSortOrder(
+        null|int $left,
+        null|int $right,
+    ): null|int {
         if ($left === null && $right === null) {
             return 100;
         }
@@ -132,11 +142,11 @@ class UpdatePlaylistItemPosition
 
             $half = (int) floor($right / 2);
 
-            return ($half >= 1 && $half < $right) ? $half : null;
+            return $half >= 1 && $half < $right ? $half : null;
         }
 
         if ($right === null) {
-            if ($left >= PHP_INT_MAX - 1) {
+            if ($left >= (PHP_INT_MAX - 1)) {
                 return null;
             }
 
@@ -145,17 +155,17 @@ class UpdatePlaylistItemPosition
             return $candidate > $left ? $candidate : null;
         }
 
-        if ($left >= $right - 1) {
+        if ($left >= ($right - 1)) {
             return null;
         }
 
-        if ($left + 100 < $right) {
+        if (($left + 100) < $right) {
             return $left + 100;
         }
 
         $mid = (int) floor(($left + $right) / 2);
 
-        return ($mid > $left && $mid < $right) ? $mid : null;
+        return $mid > $left && $mid < $right ? $mid : null;
     }
 
     /**

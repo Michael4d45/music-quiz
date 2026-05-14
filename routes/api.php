@@ -23,6 +23,7 @@ use App\Features\MusicTracks\Actions\StreamMyMusicTrackUpload;
 use App\Features\MusicTracks\Actions\UpdateMusicTrack;
 use App\Features\Playlists\Actions\AddPlaylistItem;
 use App\Features\Playlists\Actions\CreatePlaylist;
+use App\Features\Playlists\Actions\CreatePlaylistQuestion;
 use App\Features\Playlists\Actions\DestroyPlaylist;
 use App\Features\Playlists\Actions\ListMyPlaylists;
 use App\Features\Playlists\Actions\ListPlaylistItems;
@@ -108,6 +109,10 @@ Route::middleware(['web', 'registered'])->group(function (): void {
     Route::get(
         'my/playlists/{playlist}/items',
         ListPlaylistItems::class,
+    )->whereUuid('playlist');
+    Route::post(
+        'my/playlists/{playlist}/questions',
+        CreatePlaylistQuestion::class,
     )->whereUuid('playlist');
     Route::post(
         'my/playlists/{playlist}/items',

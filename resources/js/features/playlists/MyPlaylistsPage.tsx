@@ -10,10 +10,6 @@ import {
 import { cn } from '@/lib/utils';
 import type { PlaylistData } from '@/schemas/App/Data/Models/PlaylistData';
 import type { MyPlaylistsResponseData } from '@/schemas/App/Data/Responses/MyPlaylistsResponseData';
-import {
-    PlaylistStatus,
-    type PlaylistStatus as PlaylistStatusValue,
-} from '@/schemas/App/Enums/PlaylistStatus';
 import { Visibility } from '@/schemas/App/Enums/Visibility';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -31,39 +27,10 @@ const VISIBILITY_OPTIONS: {
     { value: Visibility.Public, label: 'Public' },
 ];
 
-const STATUS_OPTIONS: {
-    value: (typeof PlaylistStatus)[keyof typeof PlaylistStatus];
-    label: string;
-}[] = [
-    { value: PlaylistStatus.Draft, label: 'Draft' },
-    { value: PlaylistStatus.Published, label: 'Published' },
-    { value: PlaylistStatus.Archived, label: 'Archived' },
-];
-
-const STATUS_GROUP_ORDER: readonly PlaylistStatusValue[] = [
-    PlaylistStatus.Published,
-    PlaylistStatus.Draft,
-    PlaylistStatus.Archived,
-];
-
-const STATUS_GROUP_HEADING: Record<PlaylistStatusValue, string> = {
-    [PlaylistStatus.Published]: 'Published playlists',
-    [PlaylistStatus.Draft]: 'Draft playlists',
-    [PlaylistStatus.Archived]: 'Archived playlists',
-};
-
-function playlistGroupHeading(status: PlaylistStatusValue): string {
-    return STATUS_GROUP_HEADING[status];
-}
-
-function sortPlaylistGroupsByStatus(
-    entries: [PlaylistStatusValue, PlaylistData[]][],
-): [PlaylistStatusValue, PlaylistData[]][] {
-    return [...entries].sort(([a], [b]) => {
-        return (
-            STATUS_GROUP_ORDER.indexOf(a) - STATUS_GROUP_ORDER.indexOf(b)
-        );
-    });
+function visibilityLabel(
+    value: (typeof Visibility)[keyof typeof Visibility],
+): string {
+    return VISIBILITY_OPTIONS.find((o) => o.value === value)?.label ?? value;
 }
 
 export function MyPlaylistsPage() {
@@ -83,7 +50,6 @@ export function MyPlaylistsPage() {
             const blob = [
                 p.name,
                 p.description ?? '',
-                p.status,
                 p.visibility,
                 String(p.play_count),
             ]
@@ -93,28 +59,10 @@ export function MyPlaylistsPage() {
         });
     })();
 
-    const groupedPlaylists = (() => {
-        const map = new Map<PlaylistStatusValue, PlaylistData[]>();
-        for (const p of filteredPlaylists) {
-            const list = map.get(p.status) ?? [];
-            list.push(p);
-            map.set(p.status, list);
-        }
-        for (const list of map.values()) {
-            list.sort(
-                (a, b) =>
-                    (b.updated_at?.getTime() ?? 0) -
-                    (a.updated_at?.getTime() ?? 0),
-            );
-        }
-        return sortPlaylistGroupsByStatus([...map.entries()]).map(
-            ([status, list]) => ({
-                key: status,
-                heading: playlistGroupHeading(status),
-                list,
-            }),
-        );
-    })();
+    const sortedPlaylists = [...filteredPlaylists].sort(
+        (a, b) =>
+            (b.updated_at?.getTime() ?? 0) - (a.updated_at?.getTime() ?? 0),
+    );
 
     const handleCreate = async () => {
         if (!name.trim()) {
@@ -150,14 +98,15 @@ export function MyPlaylistsPage() {
             <h1 className="mb-6 text-2xl font-bold">My playlists</h1>
 
             <PageIntroExpandable
-                summary="Ordered lists of quiz questions you can attach when hosting. Open a playlist to reorder items; edit name, visibility, and status here."
+                summary="Ordered lists of quiz questions you attach when hosting. Open a playlist to add or reorder questions; set who can see the list here."
                 moreLabel="How playlists work in hosting"
             >
                 <p>
                     A playlist is an ordered set of quiz questions. Open one to
-                    add or reorder items, then pick it when you host so rounds
-                    draw from that set. Edit name, visibility, or status here;
-                    fine-tune question order on the playlist detail page.
+                    build the round list, then pick it when you host so the game
+                    draws from that set. Visibility controls who can discover or
+                    open the list; fine-tune question order on the playlist detail
+                    page.
                 </p>
             </PageIntroExpandable>
 
@@ -168,62 +117,35 @@ export function MyPlaylistsPage() {
                         className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Name, description, status, or visibility…"
+                        placeholder="Name, description, visibility…"
                         autoComplete="off"
                     />
                 </label>
             </div>
 
             <div className="mb-8 flex flex-col gap-4">
-                <h2 className="text-lg font-semibold">Playlist library</h2>
-                {groupedPlaylists.length === 0 ? (
+                <h2 className="text-lg font-semibold">Your playlists</h2>
+                {sortedPlaylists.length === 0 ? (
                     <p className="text-muted">
                         {playlists.length === 0
                             ? 'No playlists yet. Create your first one below.'
                             : 'No playlists match your search.'}
                     </p>
                 ) : (
-                    <div className="flex flex-col gap-3">
-                        {groupedPlaylists.map((group) => (
-                            <details
-                                key={group.key}
-                                className="bg-card rounded-lg border border-transparent shadow-md open:border-transparent dark:border-white/10"
-                            >
-                                <summary className="cursor-pointer list-none rounded-lg px-4 py-3 marker:hidden [&::-webkit-details-marker]:hidden">
-                                    <div className="flex flex-wrap items-baseline justify-between gap-2">
-                                        <span className="font-semibold">
-                                            {group.heading}
-                                        </span>
-                                        <span className="text-muted text-sm">
-                                            {group.list.length}{' '}
-                                            {group.list.length === 1
-                                                ? 'playlist'
-                                                : 'playlists'}
-                                        </span>
-                                    </div>
-                                </summary>
-                                <ul
-                                    className="flex flex-col gap-2 border-t border-transparent px-2 pb-3 pt-1 dark:border-white/10"
-                                    role="list"
-                                >
-                                    {group.list.map((p) => (
-                                        <li key={p.id}>
-                                            <PlaylistRow
-                                                key={`${p.id}-${p.updated_at?.toString() ?? ''}`}
-                                                playlist={p}
-                                                onSaved={() =>
-                                                    revalidator.revalidate()
-                                                }
-                                                onRequestDelete={() =>
-                                                    setPendingDeleteId(p.id)
-                                                }
-                                            />
-                                        </li>
-                                    ))}
-                                </ul>
-                            </details>
+                    <ul className="flex flex-col gap-2" role="list">
+                        {sortedPlaylists.map((p) => (
+                            <li key={p.id}>
+                                <PlaylistRow
+                                    key={`${p.id}-${p.updated_at?.toString() ?? ''}`}
+                                    playlist={p}
+                                    onSaved={() => revalidator.revalidate()}
+                                    onRequestDelete={() =>
+                                        setPendingDeleteId(p.id)
+                                    }
+                                />
+                            </li>
                         ))}
-                    </div>
+                    </ul>
                 )}
             </div>
 
@@ -297,7 +219,6 @@ interface PlaylistRowProps {
 function PlaylistRow({ playlist: p, onSaved, onRequestDelete }: PlaylistRowProps) {
     const [name, setName] = useState(p.name);
     const [description, setDescription] = useState(p.description ?? '');
-    const [status, setStatus] = useState(p.status);
     const [visibility, setVisibility] = useState(p.visibility);
     const [saving, setSaving] = useState(false);
 
@@ -310,7 +231,6 @@ function PlaylistRow({ playlist: p, onSaved, onRequestDelete }: PlaylistRowProps
         const result = await updatePlaylist(p.id, {
             name: name.trim(),
             description: description.trim() || null,
-            status,
             visibility,
         });
         setSaving(false);
@@ -323,7 +243,7 @@ function PlaylistRow({ playlist: p, onSaved, onRequestDelete }: PlaylistRowProps
     };
 
     return (
-        <details className="bg-background/60 rounded-lg border border-transparent dark:border-white/10">
+        <details className="bg-card rounded-lg border border-transparent shadow-md dark:border-white/10">
             <summary
                 className={cn(
                     'cursor-pointer list-none px-3 py-2 marker:hidden [&::-webkit-details-marker]:hidden',
@@ -333,10 +253,8 @@ function PlaylistRow({ playlist: p, onSaved, onRequestDelete }: PlaylistRowProps
                     <div className="min-w-0 flex-1 space-y-1">
                         <div className="font-semibold">{name}</div>
                         <div className="text-muted flex flex-wrap gap-x-2 gap-y-1 text-xs">
-                            <span className="rounded bg-secondary/80 px-1.5 py-0.5">
-                                {status}
-                            </span>
-                            <span>{visibility}</span>
+                            <span>{visibilityLabel(visibility)}</span>
+                            <span>·</span>
                             <span>Played {p.play_count}×</span>
                         </div>
                         {description.trim() ? (
@@ -356,7 +274,7 @@ function PlaylistRow({ playlist: p, onSaved, onRequestDelete }: PlaylistRowProps
                             className="text-center text-sm"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            Open items
+                            Open playlist
                         </ButtonLink>
                         <span className="text-muted text-center text-xs sm:text-right">
                             Tap to edit
@@ -387,25 +305,7 @@ function PlaylistRow({ playlist: p, onSaved, onRequestDelete }: PlaylistRowProps
                             onChange={(e) => setDescription(e.target.value)}
                         />
                     </div>
-                    <div>
-                        <label className="text-muted mb-1 block text-xs font-medium">
-                            Status
-                        </label>
-                        <select
-                            className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
-                            value={status}
-                            onChange={(e) =>
-                                setStatus(e.target.value as PlaylistStatusValue)
-                            }
-                        >
-                            {STATUS_OPTIONS.map((o) => (
-                                <option key={o.value} value={o.value}>
-                                    {o.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
+                    <div className="sm:col-span-2">
                         <label className="text-muted mb-1 block text-xs font-medium">
                             Visibility
                         </label>

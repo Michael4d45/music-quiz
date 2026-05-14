@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Playlists\Schemas;
 
-use App\Enums\PlaylistStatus;
 use App\Enums\QuestionOrder;
 use App\Enums\Visibility;
 use App\Filament\Resources\ScoringRules\ScoringRuleResource;
 use App\Filament\Resources\Users\UserResource;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
@@ -41,11 +40,6 @@ class PlaylistForm
             TextInput::make('name')->required()->maxLength(255),
 
             Textarea::make('description')->rows(3)->columnSpanFull(),
-
-            Select::make('status')
-                ->options(PlaylistStatus::class)
-                ->required()
-                ->default(PlaylistStatus::Draft),
 
             Select::make('visibility')
                 ->options(Visibility::class)

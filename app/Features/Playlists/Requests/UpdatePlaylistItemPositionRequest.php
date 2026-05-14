@@ -12,6 +12,6 @@ class UpdatePlaylistItemPositionRequest extends Data
 {
     public function __construct(
         #[Nullable, Uuid]
-        public ?string $before_item_id = null,
+        public null|string $before_item_id = null,
     ) {}
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Enums\PlaylistStatus;
 use App\Enums\QuestionOrder;
 use App\Enums\Visibility;
 use Illuminate\Database\Eloquent\Collection;
@@ -22,7 +21,6 @@ use Illuminate\Support\Carbon;
  * @property string $user_id
  * @property string $name
  * @property string|null $description
- * @property PlaylistStatus $status
  * @property Visibility $visibility
  * @property list<string>|null $tags
  * @property int|null $estimated_duration_minutes
@@ -53,7 +51,6 @@ class Playlist extends Model
         'user_id',
         'name',
         'description',
-        'status',
         'visibility',
         'tags',
         'estimated_duration_minutes',
@@ -103,7 +100,6 @@ class Playlist extends Model
     protected function casts(): array
     {
         return [
-            'status' => PlaylistStatus::class,
             'visibility' => Visibility::class,
             'question_order' => QuestionOrder::class,
             'tags' => 'array',

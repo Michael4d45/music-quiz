@@ -17,12 +17,13 @@ class UpdatePlaylist
     {
         Gate::authorize('update', $playlist);
 
-        $validatedResult = UpdatePlaylistRequest::validate($request->only([
-            'name',
-            'description',
-            'status',
-            'visibility',
-        ]));
+        $keys = collect(['name', 'description', 'visibility'])
+            ->filter(fn(string $key): bool => $request->has($key))
+            ->values()
+            ->all();
+        $validatedResult = UpdatePlaylistRequest::validate($request->only(
+            $keys,
+        ));
         $validated = is_array($validatedResult)
             ? $validatedResult
             : $validatedResult->toArray();

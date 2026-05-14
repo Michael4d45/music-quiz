@@ -6,6 +6,36 @@ import { MyPlaylistItemsResponseDataSchema } from '@/schemas/App/Data/Responses/
 import { MyPlaylistsResponseDataSchema } from '@/schemas/App/Data/Responses/MyPlaylistsResponseData';
 import { Effect, pipe } from 'effect';
 
+export async function createPlaylistQuestion(
+    playlistId: string,
+    payload: {
+        track_id?: string | null;
+        question_type: string;
+        prompt_text?: string | null;
+        correct_answer: string;
+        base_points: number;
+        media_start_seconds?: number | null;
+        media_end_seconds?: number | null;
+        difficulty_level: number;
+        visibility?: string;
+    },
+) {
+    return runEffect(
+        pipe(
+            Effect.succeed(payload),
+            Effect.flatMap((body) =>
+                httpRequest(`/api/my/playlists/${playlistId}/questions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                }),
+            ),
+            withRetry('createPlaylistQuestion'),
+            decodeJson(MyPlaylistItemsResponseDataSchema),
+        ),
+    );
+}
+
 export async function fetchMyPlaylists() {
     return runEffect(
         pipe(
@@ -41,7 +71,6 @@ export async function updatePlaylist(
     payload: Partial<{
         name: string;
         description: string | null;
-        status: string;
         visibility: string;
     }>,
 ) {

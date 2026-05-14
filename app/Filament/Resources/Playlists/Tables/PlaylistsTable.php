@@ -46,8 +46,6 @@ class PlaylistsTable
                     ->sortable()
                     ->toggleable(),
 
-                TextColumn::make('status')->badge()->sortable()->toggleable(),
-
                 TextColumn::make('visibility')
                     ->badge()
                     ->sortable()
@@ -92,9 +90,6 @@ class PlaylistsTable
                     ->relationship('user', 'name')
                     ->searchable()
                     ->preload(),
-                SelectFilter::make('status')
-                    ->label('Status')
-                    ->options(\App\Enums\PlaylistStatus::class),
                 SelectFilter::make('visibility')
                     ->label('Visibility')
                     ->options(\App\Enums\Visibility::class),

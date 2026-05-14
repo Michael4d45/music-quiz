@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Features\Playlists\Requests;
 
-use App\Enums\PlaylistStatus;
 use App\Enums\Visibility;
 use Spatie\LaravelData\Attributes\Validation\Enum as EnumRule;
 use Spatie\LaravelData\Attributes\Validation\Max;
@@ -21,8 +20,6 @@ class CreatePlaylistRequest extends Data
         public string $name,
         #[Nullable, StringType]
         public null|string $description = null,
-        #[Sometimes, EnumRule(PlaylistStatus::class)]
-        public null|PlaylistStatus $status = null,
         #[Sometimes, EnumRule(Visibility::class)]
         public null|Visibility $visibility = null,
     ) {}
