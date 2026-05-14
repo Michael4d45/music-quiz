@@ -20,7 +20,7 @@ class ListPlaylistItems
 
         $items = PlaylistItem::query()
             ->where('playlist_id', $playlist->id)
-            ->with(['question'])
+            ->with(['question.track'])
             ->orderBy('sort_order')
             ->orderBy('id')
             ->get();

@@ -10,7 +10,8 @@ use App\Models\SessionParticipant;
 use App\Models\User;
 
 /**
- * Session rules: registered users may be in several active games at once.
+ * Session rules: registered users may be in several active games at once and may host
+ * multiple non-completed sessions concurrently.
  * Guests may only be a participant in one non-completed game at a time; guests cannot host
  * (see GameSessionPolicy::create and JoinGameSession).
  */
@@ -29,17 +30,6 @@ final class ActiveGameSessionGuards
         }
 
         return self::guestHasParticipantCommitmentExcluding($user, $session->id);
-    }
-
-    /**
-     * Whether this user already hosts a game that has not completed.
-     */
-    public static function userAlreadyHostsActiveSession(User $user): bool
-    {
-        return GameSession::query()
-            ->where('host_id', $user->id)
-            ->where('status', '!=', SessionStatus::Completed)
-            ->exists();
     }
 
     private static function guestHasParticipantCommitmentExcluding(

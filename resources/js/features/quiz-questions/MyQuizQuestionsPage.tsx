@@ -14,7 +14,7 @@ import {
     sortGroupEntries,
     sortQuestionGroupEntries,
 } from '@/features/music-tracks/trackGrouping';
-import { TrackUploadAudioPlayer } from '@/features/music-tracks/TrackUploadAudioPlayer';
+import { QuizQuestionTrackAudioPlayer } from '@/features/quiz-questions/QuizQuestionTrackAudioPlayer';
 import { fetchQuestionTypes } from '@/features/reference/api';
 import { cn } from '@/lib/utils';
 import type { IdLabelOptionData } from '@/schemas/App/Data/Models/IdLabelOptionData';
@@ -513,8 +513,6 @@ function QuizQuestionRow({
         return tracks.find((t) => t.id === trackId) ?? q.track ?? null;
     })();
 
-    const hasUpload = Boolean(displayTrack?.user_upload_path);
-
     const handleSave = async () => {
         if (!correctAnswer.trim()) {
             toast.error('Correct answer is required');
@@ -594,17 +592,16 @@ function QuizQuestionRow({
                         Tap to edit
                     </span>
                 </div>
-                {displayTrack ? (
+                {trackId.trim() !== '' ? (
                     <div
                         className="border-t border-transparent pt-2 dark:border-white/10"
                         onClick={(e) => e.stopPropagation()}
                         onKeyDown={(e) => e.stopPropagation()}
                         role="presentation"
                     >
-                        <TrackUploadAudioPlayer
-                            trackId={displayTrack.id}
-                            trackTitle={`${displayTrack.title} — ${displayTrack.artist_name}`}
-                            hasUpload={hasUpload}
+                        <QuizQuestionTrackAudioPlayer
+                            trackId={trackId}
+                            track={displayTrack ?? undefined}
                         />
                     </div>
                 ) : null}

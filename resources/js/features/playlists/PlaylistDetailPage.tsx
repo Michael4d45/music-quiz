@@ -7,6 +7,7 @@ import {
     removePlaylistItem,
     updatePlaylistItemPosition,
 } from '@/features/playlists/api';
+import { QuizQuestionTrackAudioPlayerFromQuestion } from '@/features/quiz-questions/QuizQuestionTrackAudioPlayer';
 import { fetchMyQuizQuestions } from '@/features/quiz-questions/api';
 import { fetchQuestionTypes } from '@/features/reference/api';
 import { cn } from '@/lib/utils';
@@ -108,6 +109,13 @@ export function PlaylistDetailPage() {
             return items;
         }
         return items.filter((item) => itemSearchBlob(item).includes(q));
+    })();
+
+    const selectedQuestionForAdd = (() => {
+        if (selectedQuestionId.trim() === '') {
+            return undefined;
+        }
+        return questions.find((qu) => qu.id === selectedQuestionId);
     })();
 
     const handleAdd = async () => {
@@ -241,6 +249,10 @@ export function PlaylistDetailPage() {
                                                     Answer: {q.correct_answer}
                                                 </p>
                                             ) : null}
+                                            <QuizQuestionTrackAudioPlayerFromQuestion
+                                                question={q ?? undefined}
+                                                className="max-w-md"
+                                            />
                                         </div>
                                         <div className="flex shrink-0 flex-col gap-2 sm:w-40">
                                             <div className="flex gap-2">
@@ -354,6 +366,12 @@ export function PlaylistDetailPage() {
                                     ))}
                                 </select>
                             </label>
+                            {selectedQuestionForAdd ? (
+                                <QuizQuestionTrackAudioPlayerFromQuestion
+                                    question={selectedQuestionForAdd}
+                                    className="max-w-md"
+                                />
+                            ) : null}
                             <Button
                                 type="button"
                                 onClick={() => void handleAdd()}

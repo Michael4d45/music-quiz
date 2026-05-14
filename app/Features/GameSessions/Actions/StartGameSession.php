@@ -148,6 +148,7 @@ class StartGameSession
             'rounds.question.multipleChoiceOptions' => static function ($query): void {
                 $query->orderBy('sort_order');
             },
+            'rounds.question.track',
             'rounds.question.answerVariants',
             'rounds.answers' => static function ($query): void {
                 $query->orderBy('created_at');

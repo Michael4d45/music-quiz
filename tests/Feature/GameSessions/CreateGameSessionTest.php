@@ -24,7 +24,7 @@ test('guest cannot create a hosted game session', function (): void {
     $response->assertForbidden();
 });
 
-test('registered user cannot create a second hosted game while the first is still active', function (): void {
+test('registered user can create a second hosted game while the first is still active', function (): void {
     $user = User::factory()->create();
     $mode = QuizMode::factory()->create();
     $rule = ScoringRule::factory()->create();
@@ -43,7 +43,7 @@ test('registered user cannot create a second hosted game while the first is stil
         'is_public' => true,
     ]);
 
-    $response->assertStatus(422);
+    $response->assertCreated();
 });
 
 test('registered user can create a hosted game after their previous hosted game completed', function (): void {

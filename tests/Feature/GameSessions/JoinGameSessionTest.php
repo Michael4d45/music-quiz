@@ -149,7 +149,7 @@ test('guest can load a lobby session by room code', function (): void {
     )->getJson('/api/game-sessions/room/' . $session->room_code);
 
     $response->assertSuccessful();
-    $response->assertJsonPath('id', $session->id);
+    $response->assertJsonPath('session.id', $session->id);
 });
 
 test('guest can leave a session they joined', function (): void {
@@ -175,4 +175,34 @@ test('guest can leave a session they joined', function (): void {
             ->count(),
     )
         ->toBe(0);
+});
+
+test('join stores optional display_name on participant guest_name column', function (): void {
+    $guest = User::factory()->guest()->create();
+    $session = GameSession::factory()->publicLobby()->create();
+
+    $this->actingAs($guest, 'web')->postJson('/api/game-sessions/join', [
+        'room_code' => $session->room_code,
+        'display_name' => '  Luna  ',
+    ])->assertSuccessful();
+
+    $participant = SessionParticipant::query()
+        ->where('session_id', $session->id)
+        ->where('user_id', $guest->id)
+        ->first();
+
+    expect($participant)->not->toBeNull();
+    expect($participant->guest_name)->toBe('Luna');
+});
+
+test('join rejects display_name longer than 64 characters', function (): void {
+    $user = User::factory()->create();
+    $session = GameSession::factory()->publicLobby()->create();
+
+    $this->actingAs($user, 'web')
+        ->postJson('/api/game-sessions/join', [
+            'room_code' => $session->room_code,
+            'display_name' => str_repeat('a', 65),
+        ])
+        ->assertUnprocessable();
 });

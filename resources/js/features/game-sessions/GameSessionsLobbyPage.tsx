@@ -9,6 +9,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import { fetchGameSessionsLobby, joinGameSession } from './api';
+import { gameSessionStatusLabel } from './gameSessionStatusLabel';
 
 export async function gameSessionsLobbyLoader(): Promise<GameSessionsLobbyResponseData> {
     const result = await fetchGameSessionsLobby();
@@ -23,17 +24,6 @@ export async function gameSessionsLobbyLoader(): Promise<GameSessionsLobbyRespon
     return { sessions: [], current_session: null };
 }
 
-function lobbySessionStatusLabel(status: string): string {
-    const labels: Record<string, string> = {
-        lobby: 'Waiting in lobby',
-        in_progress: 'In progress',
-        round_transition: 'Between rounds',
-        paused: 'Paused',
-        completed: 'Completed',
-    };
-    return labels[status] ?? status;
-}
-
 export function GameSessionsLobbyPage() {
     const { sessions, current_session } =
         useLoaderData<GameSessionsLobbyResponseData>();
@@ -41,6 +31,7 @@ export function GameSessionsLobbyPage() {
     const { isBlocked, blockReason } = useOfflineBlock();
     const navigate = useNavigate();
     const [joinCode, setJoinCode] = useState('');
+    const [joinDisplayName, setJoinDisplayName] = useState('');
 
     const returnToRoom = (roomCode: string) => {
         navigate(`/game-sessions/room/${roomCode.trim().toUpperCase()}`);
@@ -88,7 +79,9 @@ export function GameSessionsLobbyPage() {
             }
         }
 
-        const result = await joinGameSession(normalized);
+        const result = await joinGameSession(normalized, {
+            display_name: joinDisplayName,
+        });
         if (result._tag === 'Success') {
             toast.success('Joined');
             navigate(`/game-sessions/room/${normalized}`);
@@ -124,32 +117,52 @@ export function GameSessionsLobbyPage() {
                 </p>
             </PageIntroExpandable>
 
-            <div className="bg-card mb-6 flex flex-col gap-3 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10 sm:flex-row sm:items-end">
-                <div className="grow">
+            <div className="bg-card mb-6 flex flex-col gap-4 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+                    <div className="grow">
+                        <label
+                            htmlFor="join-code"
+                            className="text-muted mb-1 block text-sm font-medium"
+                        >
+                            Join by room code
+                        </label>
+                        <input
+                            id="join-code"
+                            maxLength={6}
+                            className="border-input bg-background w-full rounded-md border px-3 py-2 font-mono text-lg tracking-widest uppercase"
+                            value={joinCode}
+                            onChange={(e) =>
+                                setJoinCode(e.target.value.toUpperCase())
+                            }
+                            placeholder="ABC123"
+                        />
+                    </div>
+                    <Button
+                        type="button"
+                        disabled={isBlocked}
+                        onClick={() => void goToRoomAfterJoin(joinCode)}
+                    >
+                        Join
+                    </Button>
+                </div>
+                <div>
                     <label
-                        htmlFor="join-code"
+                        htmlFor="join-display-name"
                         className="text-muted mb-1 block text-sm font-medium"
                     >
-                        Join by room code
+                        Name in this room (optional)
                     </label>
                     <input
-                        id="join-code"
-                        maxLength={6}
-                        className="border-input bg-background w-full rounded-md border px-3 py-2 font-mono text-lg tracking-widest uppercase"
-                        value={joinCode}
-                        onChange={(e) =>
-                            setJoinCode(e.target.value.toUpperCase())
-                        }
-                        placeholder="ABC123"
+                        id="join-display-name"
+                        type="text"
+                        maxLength={64}
+                        autoComplete="nickname"
+                        className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
+                        value={joinDisplayName}
+                        onChange={(e) => setJoinDisplayName(e.target.value)}
+                        placeholder="Shown to other players in this session only"
                     />
                 </div>
-                <Button
-                    type="button"
-                    disabled={isBlocked}
-                    onClick={() => void goToRoomAfterJoin(joinCode)}
-                >
-                    Join
-                </Button>
             </div>
 
             <div className="mb-6">
@@ -318,7 +331,7 @@ function ActiveSessionBanner({
                 <span className="text-foreground font-mono font-semibold tracking-wide">
                     {session.room_code}
                 </span>{' '}
-                · {lobbySessionStatusLabel(session.status)} · Host{' '}
+                · {gameSessionStatusLabel(session.status)} · Host{' '}
                 {session.host_display_name}
             </p>
             <p className="text-foreground mt-2 text-sm font-medium">{roleLine}</p>

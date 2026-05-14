@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Playlists;
 
+use App\Models\MusicTrack;
 use App\Models\Playlist;
 use App\Models\PlaylistItem;
 use App\Models\QuizQuestion;
@@ -31,6 +32,28 @@ class PlaylistItemsApiTest extends TestCase
             ->assertOk()
             ->assertJsonPath('playlist.name', 'Evening set')
             ->assertJsonCount(1, 'items');
+    }
+
+    public function test_list_playlist_items_includes_nested_question_track(): void
+    {
+        $user = User::factory()->create();
+        $track = MusicTrack::factory()->create([
+            'user_id' => $user->id,
+        ]);
+        $question = QuizQuestion::factory()->for($user)->create([
+            'track_id' => $track->id,
+        ]);
+        $playlist = Playlist::factory()->for($user)->create(['name' => 'With track']);
+        PlaylistItem::factory()->create([
+            'playlist_id' => $playlist->id,
+            'question_id' => $question->id,
+            'sort_order' => 100,
+        ]);
+
+        $this->actingAs($user, 'web')
+            ->getJson("/api/my/playlists/{$playlist->id}/items")
+            ->assertOk()
+            ->assertJsonPath('items.0.question.track.id', $track->id);
     }
 
     public function test_add_first_playlist_item_sort_order_is_hundred(): void

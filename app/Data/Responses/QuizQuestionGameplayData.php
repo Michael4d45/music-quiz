@@ -23,5 +23,9 @@ class QuizQuestionGameplayData extends Data
         public null|int $media_end_seconds,
         public array $multiple_choice_options,
         public array $answer_variants,
+        public null|string $track_id,
+        public null|string $track_title,
+        public null|string $track_artist_name,
+        public bool $audio_upload_available,
     ) {}
 }

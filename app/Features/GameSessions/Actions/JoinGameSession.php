@@ -28,7 +28,7 @@ class JoinGameSession
         $normalized = strtoupper($request->room_code);
 
         /** @var array{participant: SessionParticipant, is_new: bool}|null $result */
-        $result = DB::transaction(function () use ($normalized, $user) {
+        $result = DB::transaction(function () use ($normalized, $request, $user) {
             /** @var GameSession|null $session */
             $session = GameSession::query()
                 ->whereRaw('upper(room_code) = ?', [$normalized])
@@ -72,7 +72,9 @@ class JoinGameSession
             $created = SessionParticipant::query()->create([
                 'session_id' => $session->id,
                 'user_id' => $user->id,
-                'guest_name' => null,
+                'guest_name' => self::normalizedParticipantDisplayName(
+                    $request->display_name,
+                ),
                 'role' => Role::Player,
                 'current_total_score' => 0,
                 'is_connected' => true,
@@ -111,5 +113,16 @@ class JoinGameSession
         $participant->load('user');
 
         return response()->json(SessionParticipantData::from($participant));
+    }
+
+    private static function normalizedParticipantDisplayName(
+        null|string $displayName,
+    ): null|string {
+        if ($displayName === null) {
+            return null;
+        }
+        $trimmed = trim($displayName);
+
+        return $trimmed === '' ? null : $trimmed;
     }
 }

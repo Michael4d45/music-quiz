@@ -11,7 +11,9 @@ use App\Features\GameSessions\Actions\ListPublicLobbyGameSessions;
 use App\Features\GameSessions\Actions\ShowGameSessionByRoomCode;
 use App\Features\GameSessions\Actions\ShowGameSessionRecap;
 use App\Features\GameSessions\Actions\StartGameSession;
+use App\Features\GameSessions\Actions\StreamGameSessionRoundQuestionAudio;
 use App\Features\GameSessions\Actions\SubmitSessionRoundAnswer;
+use App\Features\GameSessions\Actions\SyncGameSessionRoundMediaPlayback;
 use App\Features\GameSessions\Actions\UpdateGameSession;
 use App\Features\MusicTracks\Actions\CreateMusicTrack;
 use App\Features\MusicTracks\Actions\CreateMusicTrackUpload;
@@ -71,6 +73,18 @@ Route::middleware(['web', 'auth'])->group(function (): void {
     Route::post(
         'game-sessions/{gameSession}/rounds/{sessionRound}/answer',
         SubmitSessionRoundAnswer::class,
+    )
+        ->whereUuid('gameSession')
+        ->whereUuid('sessionRound');
+    Route::get(
+        'game-sessions/{gameSession}/rounds/{sessionRound}/audio',
+        StreamGameSessionRoundQuestionAudio::class,
+    )
+        ->whereUuid('gameSession')
+        ->whereUuid('sessionRound');
+    Route::post(
+        'game-sessions/{gameSession}/rounds/{sessionRound}/media-playback',
+        SyncGameSessionRoundMediaPlayback::class,
     )
         ->whereUuid('gameSession')
         ->whereUuid('sessionRound');

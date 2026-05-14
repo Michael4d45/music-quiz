@@ -88,15 +88,25 @@ export async function submitSessionRoundAnswer(
     );
 }
 
-export async function joinGameSession(roomCode: string) {
+export async function joinGameSession(
+    roomCode: string,
+    options?: { readonly display_name?: string | null },
+) {
+    const body: { room_code: string; display_name?: string } = {
+        room_code: roomCode,
+    };
+    const trimmed = options?.display_name?.trim();
+    if (trimmed !== undefined && trimmed !== '') {
+        body.display_name = trimmed;
+    }
     return runEffect(
         pipe(
-            Effect.succeed({ room_code: roomCode }),
-            Effect.flatMap((body) =>
+            Effect.succeed(body),
+            Effect.flatMap((payload) =>
                 httpRequest('/api/game-sessions/join', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body),
+                    body: JSON.stringify(payload),
                 }),
             ),
             withRetry('joinGameSession'),
@@ -190,6 +200,38 @@ export async function updateGameSession(
             ),
             withRetry('updateGameSession'),
             decodeJson(GameSessionDataSchema),
+        ),
+    );
+}
+
+export async function syncGameSessionRoundMediaPlayback(
+    sessionId: string,
+    roundId: string,
+    body: { playing: boolean; current_time_seconds: number },
+) {
+    return runEffect(
+        pipe(
+            Effect.succeed(body),
+            Effect.flatMap((payload) =>
+                httpRequest(
+                    `/api/game-sessions/${encodeURIComponent(sessionId)}/rounds/${encodeURIComponent(roundId)}/media-playback`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                    },
+                ),
+            ),
+            withRetry('syncGameSessionRoundMediaPlayback'),
+            Effect.flatMap((response) => {
+                if (response.status === 204) {
+                    return Effect.succeed({ _tag: 'Success' as const });
+                }
+                return Effect.fail({
+                    _tag: 'FatalError' as const,
+                    message: `Unexpected response status ${response.status}`,
+                });
+            }),
         ),
     );
 }

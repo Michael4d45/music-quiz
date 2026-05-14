@@ -2,15 +2,22 @@ import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
 import {
     advanceGameSessionRound,
+    joinGameSession,
     leaveGameSession,
     startGameSession,
     submitSessionRoundAnswer,
 } from '@/features/game-sessions/api';
+import {
+    SessionRoundMediaPlayer,
+    type SessionRoundRemotePlayback,
+} from '@/features/game-sessions/SessionRoundMediaPlayer';
 import { useGameSessionChannel } from '@/hooks/useGameSessionChannel';
+import { useOfflineBlock } from '@/hooks/useOfflineBlock';
 import { apiFailureMessage } from '@/lib/apiCore';
 import { cn } from '@/lib/utils';
 import { QuestionType } from '@/schemas/App/Enums/QuestionType';
 import type { GameSessionRoomViewData } from '@/schemas/App/Data/Responses/GameSessionRoomViewData';
+import type { SessionParticipantData } from '@/schemas/App/Data/Models/SessionParticipantData';
 import type { SessionRoundGameplayData } from '@/schemas/App/Data/Responses/SessionRoundGameplayData';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -55,6 +62,24 @@ function multipleChoiceAnswerLabel(
     return opt?.option_text ?? null;
 }
 
+function roundAudioLabel(round: SessionRoundGameplayData): string {
+    const q = round.question;
+    const title = q.track_title?.trim() ?? 'Track';
+    const artist = q.track_artist_name?.trim() ?? '';
+    if (artist === '') {
+        return `Round ${round.round_number} audio: ${title}`;
+    }
+    return `Round ${round.round_number} audio: ${title} — ${artist}`;
+}
+
+function participantSeatLabel(participant: SessionParticipantData): string {
+    const alias = participant.guest_name?.trim();
+    if (alias) {
+        return alias;
+    }
+    return participant.user?.name?.trim() || 'Player';
+}
+
 export function GameSessionRoomPage() {
     const room = useLoaderData<GameSessionRoomViewData>();
     const core = room.session;
@@ -64,18 +89,39 @@ export function GameSessionRoomPage() {
     }>();
     const navigate = useNavigate();
     const revalidator = useRevalidator();
+    const { isBlocked, blockReason } = useOfflineBlock();
     const roomCode = params.roomCode ?? core.room_code;
     const isRecapRoute = Boolean(params.sessionId);
     const isCompleted = core.status === 'completed';
+
+    const [remotePlayback, setRemotePlayback] =
+        useState<SessionRoundRemotePlayback | null>(null);
 
     const revalidateRoom = () => {
         revalidator.revalidate();
     };
 
+    const maySubscribeToSessionChannel =
+        !isCompleted &&
+        (room.viewer_is_host || room.viewer_participant_id !== null);
+
     const { participantCount } = useGameSessionChannel(
-        isCompleted ? undefined : core.id,
+        maySubscribeToSessionChannel ? core.id : undefined,
         {
             onSessionUpdated: revalidateRoom,
+            onRoundMediaPlayback: (data) => {
+                if (data.session_id !== core.id) {
+                    return;
+                }
+                setRemotePlayback({
+                    round_id: data.round_id,
+                    playing: data.playing,
+                    current_time_seconds: data.current_time_seconds,
+                    server_seq: data.server_seq,
+                });
+            },
+            subscribeRoundMediaPlayback:
+                !isCompleted && !room.viewer_is_host,
         },
     );
 
@@ -96,7 +142,16 @@ export function GameSessionRoomPage() {
 
     const activeRound = findActiveRound(room.rounds);
 
+    const effectiveRemotePlayback =
+        activeRound !== null &&
+        remotePlayback !== null &&
+        remotePlayback.round_id === activeRound.id
+            ? remotePlayback
+            : null;
+
     const [leaving, setLeaving] = useState(false);
+    const [joining, setJoining] = useState(false);
+    const [joinDisplayName, setJoinDisplayName] = useState('');
     const [starting, setStarting] = useState(false);
     const [advancing, setAdvancing] = useState(false);
     const [submitting, setSubmitting] = useState(false);
@@ -104,6 +159,53 @@ export function GameSessionRoomPage() {
         null,
     );
     const [textAnswer, setTextAnswer] = useState('');
+
+    const shareRoomUrl =
+        typeof window !== 'undefined' && roomCode.trim() !== ''
+            ? `${window.location.origin}/game-sessions/room/${roomCode.trim().toUpperCase()}`
+            : '';
+
+    const copyInviteLink = async () => {
+        if (isBlocked) {
+            toast.error(blockReason || 'Cannot copy while offline');
+            return;
+        }
+        if (shareRoomUrl === '') {
+            toast.error('No room link');
+            return;
+        }
+        try {
+            await navigator.clipboard.writeText(shareRoomUrl);
+            toast.success('Invite link copied');
+        } catch {
+            toast.error('Could not copy link');
+        }
+    };
+
+    const handleJoinRoom = async () => {
+        if (isBlocked) {
+            toast.error(blockReason || 'Cannot join while offline');
+            return;
+        }
+        const normalized = roomCode.trim().toUpperCase();
+        if (normalized.length !== 6) {
+            toast.error('Invalid room code');
+            return;
+        }
+        setJoining(true);
+        const result = await joinGameSession(normalized, {
+            display_name: joinDisplayName,
+        });
+        setJoining(false);
+        if (result._tag === 'Success') {
+            toast.success('You have a seat in this room');
+            revalidateRoom();
+        } else {
+            toast.error(
+                apiFailureMessage(result, 'Could not join this room'),
+            );
+        }
+    };
 
     const handleLeave = async () => {
         if (core.status === 'completed') {
@@ -210,20 +312,88 @@ export function GameSessionRoomPage() {
                 ) : null}
             </p>
 
+            {!isRecapRoute && shareRoomUrl !== '' ? (
+                <div className="bg-card mb-6 flex flex-col gap-3 rounded-lg border border-transparent p-4 shadow-md sm:flex-row sm:items-center sm:justify-between dark:border-white/10">
+                    <div className="min-w-0 flex-1">
+                        <p className="text-muted mb-1 text-xs font-medium tracking-wide uppercase">
+                            Invite link
+                        </p>
+                        <input
+                            type="text"
+                            readOnly
+                            value={shareRoomUrl}
+                            aria-label="Room invite link"
+                            className="border-input bg-background text-foreground w-full rounded-md border px-3 py-2 font-mono text-sm"
+                            onFocus={(e) => e.currentTarget.select()}
+                            onClick={(e) => e.currentTarget.select()}
+                        />
+                    </div>
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        className="shrink-0"
+                        onClick={() => void copyInviteLink()}
+                    >
+                        Copy link
+                    </Button>
+                </div>
+            ) : null}
+
             {!isCompleted ? (
                 <PageIntroExpandable
                     summary="Live session room: host can start the quiz and advance rounds; players submit answers when a round is open."
                     moreLabel="How play works"
                 >
                     <p className="text-muted text-sm">
-                        Join while the session is in the lobby. When the host starts, the
-                        host also gets a player seat so you can rehearse solo. Have guests
-                        join from the lobby before start if they need a seat. Questions follow
-                        the playlist order (up to ten rounds). After you submit, other players
-                        will not see your answer until the round closes. The host advances when
+                        Join while the session is in the lobby — use the join card
+                        below, or enter the code on the game lobby page. When the
+                        host starts, the host also gets a player seat so you can
+                        rehearse solo. Questions follow the playlist order (up to
+                        ten rounds). After you submit, other players will not see
+                        your answer until the round closes. The host advances when
                         you are ready for the next question.
                     </p>
                 </PageIntroExpandable>
+            ) : null}
+
+            {core.status === 'lobby' &&
+            !room.viewer_is_host &&
+            !room.viewer_participant_id ? (
+                <div className="bg-card mb-6 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10">
+                    <h2 className="mb-2 font-semibold">Join this room</h2>
+                    <p className="text-muted mb-3 text-sm">
+                        Opening the invite link only shows the room. Take a seat
+                        to appear in the player list and play when the host
+                        starts. Optionally choose how your name appears in this
+                        room only (your account name stays private if you fill
+                        this in).
+                    </p>
+                    <div className="mb-3">
+                        <label
+                            htmlFor="room-join-display-name"
+                            className="text-muted mb-1 block text-sm"
+                        >
+                            Name in this room (optional)
+                        </label>
+                        <input
+                            id="room-join-display-name"
+                            type="text"
+                            maxLength={64}
+                            autoComplete="nickname"
+                            className="border-input bg-background w-full max-w-md rounded-md border px-3 py-2 text-sm"
+                            value={joinDisplayName}
+                            onChange={(e) => setJoinDisplayName(e.target.value)}
+                            placeholder="e.g. Team Blue"
+                        />
+                    </div>
+                    <Button
+                        type="button"
+                        disabled={joining}
+                        onClick={() => void handleJoinRoom()}
+                    >
+                        {joining ? 'Joining…' : 'Join this room'}
+                    </Button>
+                </div>
             ) : null}
 
             {core.status === 'lobby' && room.viewer_is_host ? (
@@ -268,6 +438,26 @@ export function GameSessionRoomPage() {
                         {activeRound.question.prompt_text?.trim() ||
                             'Question'}
                     </p>
+
+                    {activeRound.question.audio_upload_available ? (
+                        <SessionRoundMediaPlayer
+                            key={activeRound.id}
+                            sessionId={core.id}
+                            roundId={activeRound.id}
+                            variant={
+                                room.viewer_is_host ? 'host' : 'follower'
+                            }
+                            mediaStartSeconds={
+                                activeRound.question.media_start_seconds
+                            }
+                            mediaEndSeconds={
+                                activeRound.question.media_end_seconds
+                            }
+                            ariaLabel={roundAudioLabel(activeRound)}
+                            hasAudio
+                            remotePlayback={effectiveRemotePlayback}
+                        />
+                    ) : null}
 
                     {room.viewer_participant_id && !myAnswerForActiveRound ? (
                         activeRound.question.question_type ===
@@ -350,8 +540,9 @@ export function GameSessionRoomPage() {
 
                     {!room.viewer_participant_id && !room.viewer_is_host ? (
                         <p className="text-muted text-sm">
-                            You are viewing as a guest without a seat in this game.
-                            Join from the lobby while the session is open.
+                            You are watching without a seat (the game has already
+                            started, so joining from here is closed). Ask the
+                            host to open a new lobby game if you want to play.
                         </p>
                     ) : null}
 
@@ -441,7 +632,7 @@ export function GameSessionRoomPage() {
                                             <span className="text-muted mr-2 font-mono">
                                                 #{index + 1}
                                             </span>
-                                            {p.user?.name ?? 'Player'}
+                                            {participantSeatLabel(p)}
                                             {p.user_id === core.host_id ? (
                                                 <span className="text-muted">
                                                     {' '}
@@ -485,6 +676,22 @@ export function GameSessionRoomPage() {
                                             {round.question.correct_answer}
                                         </span>
                                     </p>
+                                ) : null}
+                                {round.question.audio_upload_available ? (
+                                    <SessionRoundMediaPlayer
+                                        sessionId={core.id}
+                                        roundId={round.id}
+                                        variant="recap"
+                                        mediaStartSeconds={
+                                            round.question.media_start_seconds
+                                        }
+                                        mediaEndSeconds={
+                                            round.question.media_end_seconds
+                                        }
+                                        ariaLabel={roundAudioLabel(round)}
+                                        hasAudio
+                                        remotePlayback={null}
+                                    />
                                 ) : null}
                                 {round.answers.length > 0 ? (
                                     <ul className="flex flex-col gap-1.5">
@@ -573,7 +780,7 @@ export function GameSessionRoomPage() {
                                     className="flex items-center justify-between text-sm"
                                 >
                                     <span>
-                                        {p.user?.name ?? 'Player'}
+                                        {participantSeatLabel(p)}
                                         {p.user_id === core.host_id ? (
                                             <span className="text-muted"> (host)</span>
                                         ) : null}

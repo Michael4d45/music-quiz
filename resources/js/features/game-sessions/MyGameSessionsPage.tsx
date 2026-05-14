@@ -8,6 +8,7 @@ import {
     fetchQuizModes,
     fetchScoringRules,
 } from '@/features/game-sessions/api';
+import { gameSessionStatusLabel } from '@/features/game-sessions/gameSessionStatusLabel';
 import { apiFailureMessage } from '@/lib/apiCore';
 import { fetchMyPlaylists } from '@/features/playlists/api';
 import type { GameSessionData } from '@/schemas/App/Data/Models/GameSessionData';
@@ -16,7 +17,7 @@ import type { ScoringRuleData } from '@/schemas/App/Data/Models/ScoringRuleData'
 import type { PlaylistData } from '@/schemas/App/Data/Models/PlaylistData';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { useLoaderData, useRevalidator } from 'react-router-dom';
+import { useLoaderData, useNavigate } from 'react-router-dom';
 
 export interface MyGameSessionsLoaderData {
     sessions: readonly GameSessionData[];
@@ -48,7 +49,7 @@ export function MyGameSessionsPage() {
     const { user } = useAuth();
     const { sessions, quiz_modes, scoring_rules, playlists } =
         useLoaderData<MyGameSessionsLoaderData>();
-    const revalidator = useRevalidator();
+    const navigate = useNavigate();
     const [quizModeId, setQuizModeId] = useState('');
     const [scoringRuleId, setScoringRuleId] = useState('');
     const [playlistId, setPlaylistId] = useState('');
@@ -68,8 +69,9 @@ export function MyGameSessionsPage() {
             is_public: isPublic,
         });
         if (result._tag === 'Success') {
-            toast.success(`Room ${result.data.room_code} created`);
-            revalidator.revalidate();
+            const code = result.data.room_code.trim().toUpperCase();
+            toast.success(`Room ${code} created`);
+            navigate(`/game-sessions/room/${code}`);
         } else {
             toast.error(
                 apiFailureMessage(result, 'Could not create session'),
@@ -102,7 +104,8 @@ export function MyGameSessionsPage() {
                     Host a room for your friends: pick how the game is scored, set
                     how many players can join, and optionally tie the session to
                     one of your playlists so each round uses your question
-                    library.
+                    library. When you are signed in you can host several active
+                    rooms at once if you need to.
                 </p>
             </PageIntroExpandable>
 
@@ -235,7 +238,7 @@ export function MyGameSessionsPage() {
                                             {s.room_code}
                                         </span>
                                         <p className="text-muted text-sm">
-                                            {s.status}
+                                            {gameSessionStatusLabel(s.status)}
                                             {s.is_public ? ' · public' : ' · private'}
                                             {' · '}
                                             {roleLabel}

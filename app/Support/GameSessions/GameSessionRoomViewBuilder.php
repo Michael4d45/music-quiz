@@ -12,6 +12,7 @@ use App\Data\Responses\PlayerAnswerGameplayData;
 use App\Data\Responses\QuizQuestionGameplayData;
 use App\Data\Responses\SessionRoundGameplayData;
 use App\Models\GameSession;
+use App\Models\MusicTrack;
 use App\Models\PlayerAnswer;
 use App\Models\QuizQuestion;
 use App\Models\SessionRound;
@@ -110,6 +111,14 @@ final class GameSessionRoomViewBuilder
             )->all()
             : [];
 
+        $track = $question->relationLoaded('track') && $question->track instanceof MusicTrack
+            ? $question->track
+            : null;
+
+        $audioUploadAvailable =
+            $track !== null
+            && $track->user_upload_path !== null;
+
         return new QuizQuestionGameplayData(
             id: $question->id,
             question_type: $question->question_type,
@@ -120,6 +129,10 @@ final class GameSessionRoomViewBuilder
             media_end_seconds: $question->media_end_seconds,
             multiple_choice_options: $options,
             answer_variants: $variants,
+            track_id: $question->track_id,
+            track_title: $track?->title,
+            track_artist_name: $track?->artist_name,
+            audio_upload_available: $audioUploadAvailable,
         );
     }
 
@@ -157,7 +170,11 @@ final class GameSessionRoomViewBuilder
         null|string $viewerParticipantId,
     ): PlayerAnswerGameplayData {
         $participant = $answer->participant;
-        $displayName = $participant?->user?->name ?? 'Player';
+        $alias = $participant?->guest_name;
+        $displayName =
+            is_string($alias) && trim($alias) !== ''
+                ? trim($alias)
+                : ($participant?->user?->name ?? 'Player');
         $isOwn =
             $viewerParticipantId !== null
             && (string) $answer->participant_id === (string) $viewerParticipantId;
