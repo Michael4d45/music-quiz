@@ -516,12 +516,12 @@ function QuizQuestionRow({
     );
     const [saving, setSaving] = useState(false);
 
-    const displayTrack = useMemo(() => {
+    const displayTrack = (() => {
         if (trackId.trim() === '') {
             return null;
         }
         return tracks.find((t) => t.id === trackId) ?? q.track ?? null;
-    }, [trackId, tracks, q.track]);
+    })();
 
     const hasUpload = Boolean(displayTrack?.user_upload_path);
 

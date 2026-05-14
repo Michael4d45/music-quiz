@@ -20,10 +20,8 @@ import {
     myMusicTracksLoader,
 } from './features/music-tracks/MyMusicTracksPage';
 import { NotFoundPage } from './features/NotFoundPage';
-import {
-    MyPlaylistsPage,
-    myPlaylistsLoader,
-} from './features/playlists/MyPlaylistsPage';
+import { MyPlaylistsPage } from './features/playlists/MyPlaylistsPage';
+import { myPlaylistsLoader } from './features/playlists/myPlaylistsLoader';
 import {
     PlaylistDetailPage,
     playlistDetailLoader,
