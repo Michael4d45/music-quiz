@@ -8,13 +8,13 @@ alwaysApply: false
 
 ## Primary chrome
 
-- **Desktop:** left sidebar ([`resources/js/components/Sidebar.tsx`](resources/js/components/Sidebar.tsx)) driven by [`config/navigation.ts`](resources/js/config/navigation.ts) (e.g. Home, Game lobby).
+- **Desktop:** left sidebar ([`resources/js/components/Sidebar.tsx`](resources/js/components/Sidebar.tsx)) driven by [`config/navigation.ts`](resources/js/config/navigation.ts) (e.g. Game lobby, My sessions). The app root `/` redirects to **`/game-sessions/lobby`**.
 - **Mobile:** [`Header.tsx`](resources/js/components/Header.tsx) + slide-out drawer with the same nav items.
 - **Profile / admin:** [`UserActions.tsx`](resources/js/components/UserActions.tsx) at the bottom of the sidebar (and mobile drawer): Profile link, Sign out, appearance toggle, compact sidebar control; **Admin Panel** (`/admin`) for admins only. These are not entries in `navigationSections`.
 
 ## Page layout
 
-- There is no shared `PageContainer` / `PageHeader` component yet. Match existing pages: e.g. [`ProfilePage.tsx`](resources/js/features/profile/ProfilePage.tsx) (`container mx-auto max-w-md …`, single `<h1>`), [`GameSessionsLobbyPage.tsx`](resources/js/features/game-sessions/GameSessionsLobbyPage.tsx) (`mx-auto max-w-4xl`, title row + actions).
+- Prefer [`PageShell`](resources/js/components/layout/PageShell.tsx) + [`PageHeader`](resources/js/components/layout/PageHeader.tsx) for new or refactored screens (max width, padding, single `<h1>` in the header). Use [`Surface`](resources/js/components/layout/Surface.tsx) for optional grouping (`tint` / `elevated`) instead of ad hoc `bg-card` + `shadow-md` stacks. Auth and global error states use [`AuthPageFrame`](resources/js/components/layout/AuthPageFrame.tsx) + `Surface` elevated. Legacy pages may still use `container mx-auto …` until migrated.
 - Use **one top-level `<h1>`** per screen; keep hierarchy consistent with surrounding pages.
 - Prefer **`Link`** (or `Button` / `ButtonLink` to a known route) for “back” and parent navigation. **Do not use `navigate(-1)`** for primary navigation so deep links and bookmarks stay predictable.
 - If you later introduce route `location.state` for return paths, pass it through links explicitly rather than relying on history.

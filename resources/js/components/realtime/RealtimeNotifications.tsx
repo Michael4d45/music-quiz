@@ -1,3 +1,4 @@
+import { Surface } from '@/components/layout/Surface';
 import { useAuth } from '@/features/auth/AuthContext';
 import { useNotificationsChannel } from '@/hooks/useNotificationsChannel';
 import { usePresenceChannel } from '@/hooks/usePresenceChannel';
@@ -23,8 +24,9 @@ export function RealtimeNotifications() {
     }
 
     return (
-        <div
-            className="bg-card rounded-lg p-4 shadow-md"
+        <Surface
+            variant="tint"
+            className="p-4 sm:p-5"
             data-test="realtime-notifications"
         >
             <div className="mb-3 flex items-center justify-between">
@@ -86,6 +88,6 @@ export function RealtimeNotifications() {
                     No real-time messages yet.
                 </p>
             )}
-        </div>
+        </Surface>
     );
 }

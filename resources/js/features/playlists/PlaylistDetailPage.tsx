@@ -1,5 +1,8 @@
 import ConfirmModal from '@/components/ConfirmModal';
 import { PageIntroExpandable } from '@/components/PageIntroExpandable';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { PageShell } from '@/components/layout/PageShell';
+import { Surface } from '@/components/layout/Surface';
 import { Button } from '@/components/ui/Button';
 import { fetchMyMusicTracks } from '@/features/music-tracks/api';
 import {
@@ -16,7 +19,6 @@ import {
     fetchQuestionTypes,
     fetchSubCategories,
 } from '@/features/reference/api';
-import { cn } from '@/lib/utils';
 import type { IdLabelOptionData } from '@/schemas/App/Data/Models/IdLabelOptionData';
 import type { MusicTrackData } from '@/schemas/App/Data/Models/MusicTrackData';
 import type { PlaylistItemData } from '@/schemas/App/Data/Models/PlaylistItemData';
@@ -271,21 +273,24 @@ export function PlaylistDetailPage() {
     };
 
     return (
-        <div className="mx-auto max-w-4xl px-4 py-6">
-            <h1 className="mb-2 text-2xl font-bold">{playlist.name}</h1>
-            {playlist.description?.trim() ? (
-                <p className="text-muted mb-4 max-w-2xl text-sm">
-                    {playlist.description}
-                </p>
-            ) : null}
-
-            <div className="text-muted mb-6 flex flex-wrap gap-x-4 gap-y-1 text-xs">
-                <span>{playlist.visibility}</span>
-                <span>·</span>
-                <span>Order: {playlist.question_order}</span>
-                <span>·</span>
-                <span>Played {playlist.play_count}×</span>
-            </div>
+        <PageShell>
+            <PageHeader
+                title={playlist.name}
+                description={
+                    <>
+                        {playlist.description?.trim() ? (
+                            <p className="mb-2 max-w-2xl">
+                                {playlist.description}
+                            </p>
+                        ) : null}
+                        <p className="text-xs">
+                            {playlist.visibility} · Order:{' '}
+                            {playlist.question_order} · Played{' '}
+                            {playlist.play_count}×
+                        </p>
+                    </>
+                }
+            />
 
             <PageIntroExpandable
                 summary="Add a new question (with optional audio) or pick from your library. Use Up and Down to change play order."
@@ -299,7 +304,7 @@ export function PlaylistDetailPage() {
                 </p>
             </PageIntroExpandable>
 
-            <div className="bg-card mb-8 flex flex-col gap-4 rounded-lg border border-transparent px-4 py-4 shadow-md dark:border-white/10">
+            <Surface variant="tint" className="mb-8 flex flex-col gap-4">
                 <h2 className="text-lg font-semibold">
                     New question for this playlist
                 </h2>
@@ -469,7 +474,7 @@ export function PlaylistDetailPage() {
                 >
                     {creating ? 'Saving…' : 'Create and add to playlist'}
                 </Button>
-            </div>
+            </Surface>
 
             <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <label className="flex min-w-0 flex-1 flex-col gap-1 text-sm">
@@ -510,10 +515,9 @@ export function PlaylistDetailPage() {
                                 : null;
                             return (
                                 <li key={item.id} role="listitem">
-                                    <div
-                                        className={cn(
-                                            'bg-card flex flex-col gap-3 rounded-lg border border-transparent px-4 py-3 shadow-md sm:flex-row sm:items-stretch sm:justify-between dark:border-white/10',
-                                        )}
+                                    <Surface
+                                        variant="tint"
+                                        className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-stretch sm:justify-between"
                                     >
                                         <div className="min-w-0 flex-1 space-y-1">
                                             <div className="font-medium">
@@ -605,7 +609,7 @@ export function PlaylistDetailPage() {
                                                 Remove
                                             </Button>
                                         </div>
-                                    </div>
+                                    </Surface>
                                 </li>
                             );
                         })}
@@ -613,7 +617,7 @@ export function PlaylistDetailPage() {
                 )}
             </div>
 
-            <details className="bg-card mb-8 rounded-lg border border-transparent shadow-md dark:border-white/10">
+            <details className="mb-8 overflow-hidden rounded-2xl bg-black/[0.025] dark:bg-white/[0.04]">
                 <summary className="cursor-pointer list-none px-4 py-3 text-lg font-semibold marker:hidden [&::-webkit-details-marker]:hidden">
                     Add from library
                 </summary>
@@ -679,6 +683,6 @@ export function PlaylistDetailPage() {
                 confirmText="Remove"
                 cancelText="Cancel"
             />
-        </div>
+        </PageShell>
     );
 }

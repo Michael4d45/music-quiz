@@ -63,7 +63,7 @@ export function Pagination({
     }
 
     return (
-        <div className="bg-card border-secondary flex items-center justify-between border-t px-4 py-3 sm:px-6">
+        <div className="bg-primary border-secondary mt-6 flex items-center justify-between border-t px-0 py-4 sm:px-1 sm:py-5">
             <div className="flex flex-1 justify-between sm:hidden">
                 {currentPage > 1 && (
                     <Link

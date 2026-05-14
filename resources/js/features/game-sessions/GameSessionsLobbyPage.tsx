@@ -1,4 +1,8 @@
+import { PageHeader } from '@/components/layout/PageHeader';
+import { PageShell } from '@/components/layout/PageShell';
+import { Surface } from '@/components/layout/Surface';
 import { PageIntroExpandable } from '@/components/PageIntroExpandable';
+import { RealtimeNotifications } from '@/components/realtime/RealtimeNotifications';
 import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/features/auth/AuthContext';
 import { useOfflineBlock } from '@/hooks/useOfflineBlock';
@@ -100,8 +104,8 @@ export function GameSessionsLobbyPage() {
     };
 
     return (
-        <div className="mx-auto max-w-4xl px-4 py-6">
-            <h1 className="mb-6 text-2xl font-bold">Game lobby</h1>
+        <PageShell>
+            <PageHeader title="Game lobby" />
 
             {current_session ? (
                 <ActiveSessionBanner
@@ -126,7 +130,7 @@ export function GameSessionsLobbyPage() {
                 </p>
             </PageIntroExpandable>
 
-            <div className="bg-card mb-6 flex flex-col gap-4 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10">
+            <Surface variant="tint" className="mb-8 flex flex-col gap-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
                     <div className="grow">
                         <label
@@ -172,7 +176,7 @@ export function GameSessionsLobbyPage() {
                         placeholder="Shown to other players in this session only"
                     />
                 </div>
-            </div>
+            </Surface>
 
             <div className="mb-6">
                 <Button
@@ -209,7 +213,10 @@ export function GameSessionsLobbyPage() {
 
                         return (
                             <li key={session.id}>
-                                <div className="bg-card flex flex-col gap-3 rounded-lg border border-transparent p-5 shadow-md dark:border-white/10">
+                                <Surface
+                                    variant="tint"
+                                    className="flex h-full flex-col gap-4"
+                                >
                                     <div className="flex items-start justify-between gap-2">
                                         <div>
                                             <p className="text-muted text-sm">
@@ -291,13 +298,13 @@ export function GameSessionsLobbyPage() {
                                     >
                                         {primaryLabel}
                                     </Button>
-                                </div>
+                                </Surface>
                             </li>
                         );
                     })}
                 </ul>
             ) : (
-                <div className="bg-card rounded-lg p-8 text-center shadow-md">
+                <Surface variant="tint" className="py-14 text-center">
                     <p className="text-secondary mb-2">
                         No joinable public games right now.
                     </p>
@@ -306,9 +313,12 @@ export function GameSessionsLobbyPage() {
                             ? 'Go online to refresh the list.'
                             : 'Ask a host to mark their session as public in the lobby, or check back soon.'}
                     </p>
-                </div>
+                </Surface>
             )}
-        </div>
+            <div className="mt-10">
+                <RealtimeNotifications />
+            </div>
+        </PageShell>
     );
 }
 
@@ -335,7 +345,7 @@ function ActiveSessionBanner({
             : 'You are a player in this room.';
 
     return (
-        <div className="border-primary/30 bg-card dark:border-primary/40 mb-6 rounded-lg border-2 border-dashed p-4 shadow-md">
+        <Surface variant="emphasis" className="mb-8">
             <h2 className="text-lg font-semibold">Your active game</h2>
             <p className="text-muted mt-1 text-sm">
                 Room{' '}
@@ -365,6 +375,6 @@ function ActiveSessionBanner({
                     Return to room
                 </Button>
             </div>
-        </div>
+        </Surface>
     );
 }

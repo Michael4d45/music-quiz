@@ -1,4 +1,6 @@
 import ConfirmModal from '@/components/ConfirmModal';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { PageShell } from '@/components/layout/PageShell';
 import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
 import {
@@ -273,8 +275,8 @@ export function MyMusicTracksPage() {
     };
 
     return (
-        <div className="mx-auto max-w-4xl px-4 py-6">
-            <h1 className="mb-6 text-2xl font-bold">My music tracks</h1>
+        <PageShell>
+            <PageHeader title="My music tracks" />
 
             <PageIntroExpandable
                 summary="Add streaming catalog metadata or upload audio for in-browser playback. Library groups mirror albums and soundtracks."
@@ -317,7 +319,7 @@ export function MyMusicTracksPage() {
                         {grouped.map(([heading, list]) => (
                             <details
                                 key={heading}
-                                className="bg-card rounded-lg border border-transparent shadow-md open:border-transparent dark:border-white/10"
+                                className="overflow-hidden rounded-2xl bg-black/[0.025] dark:bg-white/[0.04]"
                                 open={heading !== SINGLES_GROUP}
                             >
                                 <summary className="cursor-pointer list-none rounded-lg px-4 py-3 marker:hidden [&::-webkit-details-marker]:hidden">
@@ -360,7 +362,7 @@ export function MyMusicTracksPage() {
                 )}
             </div>
 
-            <details className="bg-card mb-8 rounded-lg border border-transparent shadow-md dark:border-white/10">
+            <details className="mb-8 overflow-hidden rounded-2xl bg-black/[0.025] dark:bg-white/[0.04]">
                 <summary className="cursor-pointer list-none px-4 py-3 text-lg font-semibold marker:hidden [&::-webkit-details-marker]:hidden">
                     Add a track
                 </summary>
@@ -646,7 +648,7 @@ export function MyMusicTracksPage() {
                 confirmText="Delete"
                 cancelText="Cancel"
             />
-        </div>
+        </PageShell>
     );
 }
 

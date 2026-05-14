@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { Navigate, createBrowserRouter } from 'react-router-dom';
 import { App } from './app';
 import { authRoutes } from './features/auth/routes';
 import { ErrorPage } from './features/ErrorPage';
@@ -15,7 +15,6 @@ import {
     MyGameSessionsPage,
     myGameSessionsLoader,
 } from './features/game-sessions/MyGameSessionsPage';
-import { HomePage } from './features/home/HomePage';
 import {
     MyMusicTracksPage,
     myMusicTracksLoader,
@@ -50,7 +49,7 @@ export const router = createBrowserRouter([
         children: [
             {
                 index: true,
-                element: <HomePage />,
+                element: <Navigate to="/game-sessions/lobby" replace />,
             },
             {
                 path: 'game-sessions/lobby',

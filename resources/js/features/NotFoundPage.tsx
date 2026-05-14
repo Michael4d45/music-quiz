@@ -1,4 +1,7 @@
+import { AuthPageFrame } from '@/components/layout/AuthPageFrame';
+import { Surface } from '@/components/layout/Surface';
 import { Button } from '@/components/ui/Button';
+import { ButtonLink } from '@/components/ui/ButtonLink';
 import { Link, useNavigate } from 'react-router-dom';
 
 export function NotFoundPage() {
@@ -13,36 +16,50 @@ export function NotFoundPage() {
     };
 
     return (
-        <div className="bg-primary flex min-h-full items-center justify-center">
-            <div className="w-full max-w-md text-center">
-                <div className="mb-8">
-                    <h1 className="text-secondary mb-4 text-6xl font-bold">
+        <AuthPageFrame>
+            <Surface variant="elevated" className="p-8 sm:p-10">
+                <div className="text-center">
+                    <p className="text-primary mb-2 text-sm font-semibold tracking-wide uppercase">
+                        Lost in the playlist
+                    </p>
+                    <h1 className="text-secondary mb-3 text-5xl font-bold tracking-tight sm:text-6xl">
                         404
                     </h1>
-                    <h2 className="text-secondary mb-4 text-2xl font-semibold">
+                    <h2 className="text-secondary mb-4 text-xl font-semibold sm:text-2xl">
                         Page Not Found
                     </h2>
-                    <p className="text-secondary">
+                    <p className="text-muted mb-10 text-sm leading-relaxed">
                         Sorry, the page you are looking for could not be found.
+                        That URL does not match any route—double-check the link
+                        or head back to a known screen.
                     </p>
-                </div>
 
-                <div className="space-y-4">
-                    <Link to="/" className="block">
-                        <Button className="w-full" data-test="go-home">
-                            Go Home
+                    <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+                        <Link to="/" className="block sm:inline-block">
+                            <Button
+                                className="w-full sm:w-auto"
+                                data-test="go-home"
+                            >
+                                Go Home
+                            </Button>
+                        </Link>
+                        <ButtonLink
+                            to="/game-sessions/lobby"
+                            variant="secondary"
+                            className="w-full sm:w-auto"
+                        >
+                            Game lobby
+                        </ButtonLink>
+                        <Button
+                            variant="outline"
+                            className="w-full sm:w-auto"
+                            onClick={handleGoBack}
+                        >
+                            Go Back
                         </Button>
-                    </Link>
-
-                    <Button
-                        variant="secondary"
-                        className="w-full"
-                        onClick={handleGoBack}
-                    >
-                        Go Back
-                    </Button>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </Surface>
+        </AuthPageFrame>
     );
 }

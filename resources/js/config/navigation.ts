@@ -1,6 +1,5 @@
 import {
     Gamepad2,
-    Home,
     ListMusic,
     ListVideo,
     Mic2,
@@ -24,11 +23,6 @@ export const navigationSections: NavigationSection[] = [
     {
         title: 'Main',
         items: [
-            {
-                href: '/',
-                label: 'Home',
-                icon: Home,
-            },
             {
                 href: '/game-sessions/lobby',
                 label: 'Game lobby',

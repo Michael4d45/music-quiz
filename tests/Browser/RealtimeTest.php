@@ -61,7 +61,7 @@ it('shows real-time notifications component for authenticated users', function (
 
     visit('/')
         ->assertNoJavaScriptErrors()
-        ->waitForText('Welcome back', 10)
+        ->waitForText('Game lobby', 10)
         ->waitForText('Sign out', 10)
         ->waitForText('Real-time Updates', 10)
         ->assertSee('No real-time messages yet');
@@ -70,6 +70,6 @@ it('shows real-time notifications component for authenticated users', function (
 it('hides real-time notifications for unauthenticated users', function (): void {
     visit('/')
         ->assertNoJavaScriptErrors()
-        ->waitForText('Welcome', 10)
+        ->waitForText('Game lobby', 10)
         ->assertDontSee('Real-time Updates');
 });

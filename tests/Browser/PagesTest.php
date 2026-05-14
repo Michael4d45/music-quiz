@@ -12,7 +12,7 @@ afterEach(function () {
     assert_no_log_errors(storage_path('logs/pages.log'));
 });
 
-it('home page loads without JS errors', function (): void {
+it('app root loads without JS errors (redirects to game lobby)', function (): void {
     visit('/')->assertNoJavaScriptErrors();
 });
 
@@ -47,7 +47,7 @@ it('can navigate home from 404 page', function (): void {
         ->assertSee('Page Not Found')
         ->click('Go Home')
         ->wait(1)
-        ->assertPathIs('/')
+        ->assertPathIs('/game-sessions/lobby')
         ->assertNoJavaScriptErrors();
 });
 

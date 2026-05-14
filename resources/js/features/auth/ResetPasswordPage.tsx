@@ -1,3 +1,5 @@
+import { AuthPageFrame } from '@/components/layout/AuthPageFrame';
+import { Surface } from '@/components/layout/Surface';
 import { Button } from '@/components/ui/Button';
 import { Form, FormField } from '@/components/ui/Form';
 import { resetPassword } from '@/features/auth/api';
@@ -50,12 +52,12 @@ export function ResetPasswordPage() {
 
     if (isSubmitted) {
         return (
-            <div className="mx-auto flex h-full max-w-md items-center justify-center">
-                <div className="bg-card w-full rounded-lg p-8 shadow-md">
-                    <h1 className="mb-6 text-center text-2xl font-bold">
+            <AuthPageFrame>
+                <Surface variant="elevated" className="p-8 sm:p-10">
+                    <h1 className="mb-4 text-center text-2xl font-bold tracking-tight">
                         Password Reset Successful
                     </h1>
-                    <p className="text-secondary mb-6 text-center">
+                    <p className="text-secondary mb-8 text-center text-sm leading-relaxed">
                         Your password has been reset successfully. You can now
                         log in with your new password.
                     </p>
@@ -67,19 +69,19 @@ export function ResetPasswordPage() {
                             Go to Login
                         </Link>
                     </div>
-                </div>
-            </div>
+                </Surface>
+            </AuthPageFrame>
         );
     }
 
     if (!email || !token) {
         return (
-            <div className="mx-auto flex h-full max-w-md items-center justify-center">
-                <div className="bg-card w-full rounded-lg p-8 shadow-md">
-                    <h1 className="mb-6 text-center text-2xl font-bold">
+            <AuthPageFrame>
+                <Surface variant="elevated" className="p-8 sm:p-10">
+                    <h1 className="mb-4 text-center text-2xl font-bold tracking-tight">
                         Invalid Reset Link
                     </h1>
-                    <p className="text-secondary mb-6 text-center">
+                    <p className="text-secondary mb-8 text-center text-sm leading-relaxed">
                         The reset link is invalid or expired. Please request a
                         new password reset.
                     </p>
@@ -91,17 +93,20 @@ export function ResetPasswordPage() {
                             Request New Reset Link
                         </Link>
                     </div>
-                </div>
-            </div>
+                </Surface>
+            </AuthPageFrame>
         );
     }
 
     return (
-        <div className="mx-auto max-w-md">
-            <div className="bg-card rounded-lg p-8 shadow-md">
-                <h1 className="mb-6 text-center text-2xl font-bold">
+        <AuthPageFrame>
+            <Surface variant="elevated" className="p-8 sm:p-10">
+                <h1 className="mb-2 text-center text-2xl font-bold tracking-tight">
                     Reset Password
                 </h1>
+                <p className="text-muted mb-8 text-center text-sm">
+                    Choose a new password and you are back in the game.
+                </p>
 
                 {isBlocked && (
                     <div className="border-danger bg-danger-light mb-6 rounded-lg border p-4">
@@ -152,7 +157,7 @@ export function ResetPasswordPage() {
                         </Link>
                     </p>
                 </div>
-            </div>
-        </div>
+            </Surface>
+        </AuthPageFrame>
     );
 }

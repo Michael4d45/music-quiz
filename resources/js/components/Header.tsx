@@ -14,7 +14,7 @@ export default function Header({ children }: HeaderProps) {
 
     return (
         <>
-            <div className="border-secondary bg-card sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
+            <div className="border-secondary bg-primary sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b px-4 sm:gap-x-6 sm:px-6 lg:px-8">
                 <button
                     type="button"
                     className="text-secondary -m-2.5 p-2.5 lg:hidden"
@@ -60,10 +60,10 @@ export default function Header({ children }: HeaderProps) {
                                 </button>
                             </div>
 
-                            <div className="bg-card flex grow flex-col gap-y-5 overflow-y-auto px-6 pb-4">
+                            <div className="bg-primary flex grow flex-col gap-y-5 overflow-y-auto px-6 pb-4">
                                 <div className="flex h-16 shrink-0 items-center">
                                     <Link
-                                        to="/"
+                                        to="/game-sessions/lobby"
                                         className="flex items-center"
                                         onClick={() => setSidebarOpen(false)}
                                     >

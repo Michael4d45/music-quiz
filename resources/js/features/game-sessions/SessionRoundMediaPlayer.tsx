@@ -439,6 +439,7 @@ export function SessionRoundMediaPlayer({
                         min={0}
                         max={followerSliderMax}
                         step={0.05}
+                        readOnly
                         value={followerSliderValue}
                         tabIndex={-1}
                         className="accent-primary pointer-events-none h-2 w-full"

@@ -1,3 +1,5 @@
+import { AuthPageFrame } from '@/components/layout/AuthPageFrame';
+import { Surface } from '@/components/layout/Surface';
 import { Button } from '@/components/ui/Button';
 import { Form, FormField } from '@/components/ui/Form';
 import { sendPasswordResetLink } from '@/features/auth/api';
@@ -22,12 +24,12 @@ export function ForgotPasswordPage() {
 
     if (isSubmitted) {
         return (
-            <div className="mx-auto flex h-full max-w-md items-center justify-center">
-                <div className="bg-card w-full rounded-lg p-8 shadow-md">
-                    <h1 className="mb-6 text-center text-2xl font-bold">
+            <AuthPageFrame>
+                <Surface variant="elevated" className="p-8 sm:p-10">
+                    <h1 className="mb-4 text-center text-2xl font-bold tracking-tight">
                         Check Your Email
                     </h1>
-                    <p className="text-secondary mb-6 text-center">
+                    <p className="text-secondary mb-8 text-center text-sm leading-relaxed">
                         If an account exists with that email, a password reset
                         link has been sent.
                     </p>
@@ -39,17 +41,20 @@ export function ForgotPasswordPage() {
                             Back to Login
                         </Link>
                     </div>
-                </div>
-            </div>
+                </Surface>
+            </AuthPageFrame>
         );
     }
 
     return (
-        <div className="mx-auto flex h-full max-w-md items-center justify-center">
-            <div className="bg-card w-full rounded-lg p-8 shadow-md">
-                <h1 className="mb-6 text-center text-2xl font-bold">
+        <AuthPageFrame>
+            <Surface variant="elevated" className="p-8 sm:p-10">
+                <h1 className="mb-2 text-center text-2xl font-bold tracking-tight">
                     Forgot Password
                 </h1>
+                <p className="text-muted mb-8 text-center text-sm">
+                    We will email you a reset link—quick and painless.
+                </p>
 
                 {isBlocked && (
                     <div className="border-danger bg-danger-light mb-6 rounded-lg border p-4">
@@ -92,7 +97,7 @@ export function ForgotPasswordPage() {
                         </Link>
                     </p>
                 </div>
-            </div>
-        </div>
+            </Surface>
+        </AuthPageFrame>
     );
 }

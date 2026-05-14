@@ -1,3 +1,5 @@
+import { AuthPageFrame } from '@/components/layout/AuthPageFrame';
+import { Surface } from '@/components/layout/Surface';
 import { Button } from '@/components/ui/Button';
 import { Form, FormField } from '@/components/ui/Form';
 import { GoogleIcon } from '@/components/ui/GoogleIcon';
@@ -47,11 +49,14 @@ export function RegisterPage() {
     };
 
     return (
-        <div className="mx-auto flex h-full max-w-md items-center justify-center">
-            <div className="bg-card w-full rounded-lg p-8 shadow-md">
-                <h1 className="mb-6 text-center text-2xl font-bold">
+        <AuthPageFrame>
+            <Surface variant="elevated" className="p-8 sm:p-10">
+                <h1 className="mb-2 text-center text-2xl font-bold tracking-tight">
                     Create Account
                 </h1>
+                <p className="text-muted mb-8 text-center text-sm">
+                    Build playlists and host your own rounds.
+                </p>
 
                 {isBlocked && (
                     <div className="border-danger bg-danger-light mb-6 rounded-lg border p-4">
@@ -108,13 +113,13 @@ export function RegisterPage() {
                     </Button>
                 </Form>
 
-                <div className="mt-6">
+                <div className="mt-8">
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center">
                             <div className="border-secondary w-full border-t" />
                         </div>
                         <div className="relative flex justify-center text-sm">
-                            <span className="bg-card text-secondary px-2">
+                            <span className="bg-card text-secondary px-3">
                                 Or
                             </span>
                         </div>
@@ -134,7 +139,7 @@ export function RegisterPage() {
                     </div>
                 </div>
 
-                <div className="mt-6 text-center">
+                <div className="mt-8 text-center">
                     <p className="text-secondary text-sm">
                         Already have an account?{' '}
                         <Link
@@ -145,7 +150,7 @@ export function RegisterPage() {
                         </Link>
                     </p>
                 </div>
-            </div>
-        </div>
+            </Surface>
+        </AuthPageFrame>
     );
 }

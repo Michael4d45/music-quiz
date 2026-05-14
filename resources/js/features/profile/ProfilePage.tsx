@@ -1,3 +1,5 @@
+import { PageShell } from '@/components/layout/PageShell';
+import { Surface } from '@/components/layout/Surface';
 import { Button } from '@/components/ui/Button';
 import { GoogleIcon } from '@/components/ui/GoogleIcon';
 import { useAuth } from '@/features/auth/AuthContext';
@@ -43,9 +45,9 @@ export function ProfilePage() {
     const [isResendingVerification, setIsResendingVerification] =
         useState(false);
 
-    const handleLogout = () => {
-        logout();
-        navigate('/');
+    const handleLogout = async () => {
+        navigate('/game-sessions/lobby', { replace: true });
+        await logout();
     };
 
     const handleResendVerification = async () => {
@@ -60,8 +62,8 @@ export function ProfilePage() {
     };
 
     return (
-        <div className="container mx-auto max-w-md px-4 py-8">
-            <div className="bg-card rounded-lg p-8 shadow-md">
+        <PageShell maxWidth="md">
+            <Surface variant="elevated" className="p-6 sm:p-8">
                 <h1 className="mb-6 text-2xl font-bold">Profile</h1>
 
                 <div className="space-y-4">
@@ -152,13 +154,13 @@ export function ProfilePage() {
                     <Button
                         data-test="profile-logout"
                         variant="danger"
-                        onClick={handleLogout}
+                        onClick={() => void handleLogout()}
                         className="w-full"
                     >
                         Sign Out
                     </Button>
                 </div>
-            </div>
-        </div>
+            </Surface>
+        </PageShell>
     );
 }

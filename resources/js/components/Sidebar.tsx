@@ -17,7 +17,7 @@ export default function Sidebar() {
         >
             <div
                 className={cn(
-                    'border-secondary bg-card flex grow flex-col gap-y-5 overflow-x-hidden overflow-y-auto border-r pb-4',
+                    'border-secondary bg-primary flex grow flex-col gap-y-5 overflow-x-hidden overflow-y-auto border-r pb-4',
                     isCompact ? 'px-3' : 'px-6',
                 )}
             >
@@ -27,7 +27,10 @@ export default function Sidebar() {
                         isCompact && 'justify-center',
                     )}
                 >
-                    <Link to="/" className="flex items-center">
+                    <Link
+                        to="/game-sessions/lobby"
+                        className="flex items-center"
+                    >
                         {isCompact ? (
                             <Logo kind="mark" width={36} height={36} />
                         ) : (

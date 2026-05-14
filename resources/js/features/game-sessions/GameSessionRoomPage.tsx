@@ -1,3 +1,6 @@
+import { PageHeader } from '@/components/layout/PageHeader';
+import { PageShell } from '@/components/layout/PageShell';
+import { Surface } from '@/components/layout/Surface';
 import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
 import {
@@ -297,35 +300,34 @@ export function GameSessionRoomPage() {
         textAnswer.trim().length > 0;
 
     return (
-        <div className="mx-auto max-w-4xl px-4 py-6">
-            <h1 className="mb-2 text-2xl font-bold">
-                {isRecapRoute ? 'Session recap' : `Room ${roomCode}`}
-            </h1>
-            <p className="text-muted mb-6 text-sm">
-                {isRecapRoute ? (
-                    <span className="font-mono tracking-wide">
-                        {core.room_code}
-                    </span>
-                ) : null}
-                {isRecapRoute ? ' · ' : null}
-                Status: {gameSessionStatusLabel(core.status)} · Players:{' '}
-                {displayCount} / {core.max_players}
-                {room.viewer_is_host ? (
-                    <span className="text-muted"> · You are the host</span>
-                ) : null}
-                {room.viewer_participant_id ? (
-                    <span className="text-muted">
-                        {' '}
-                        ·{' '}
-                        {isCompleted
-                            ? 'You played in this session'
-                            : 'You have a player seat'}
-                    </span>
-                ) : null}
-            </p>
+        <PageShell>
+            <PageHeader
+                title={isRecapRoute ? 'Session recap' : `Room ${roomCode}`}
+                description={
+                    <>
+                        {isRecapRoute ? (
+                            <span className="font-mono tracking-wide">
+                                {core.room_code}
+                            </span>
+                        ) : null}
+                        {isRecapRoute ? ' · ' : null}
+                        Status: {gameSessionStatusLabel(core.status)} · Players:{' '}
+                        {displayCount} / {core.max_players}
+                        {room.viewer_is_host ? (
+                            <span> · You are the host</span>
+                        ) : null}
+                        {room.viewer_participant_id && isCompleted ? (
+                            <span> · You played in this session</span>
+                        ) : null}
+                    </>
+                }
+            />
 
             {showInviteLinkCard ? (
-                <div className="bg-card mb-6 flex flex-col gap-3 rounded-lg border border-transparent p-4 shadow-md sm:flex-row sm:items-center sm:justify-between dark:border-white/10">
+                <Surface
+                    variant="tint"
+                    className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+                >
                     <div className="min-w-0 flex-1">
                         <p className="text-muted mb-1 text-xs font-medium tracking-wide uppercase">
                             Invite link
@@ -348,7 +350,7 @@ export function GameSessionRoomPage() {
                     >
                         Copy link
                     </Button>
-                </div>
+                </Surface>
             ) : null}
 
             {!isCompleted ? (
@@ -372,7 +374,7 @@ export function GameSessionRoomPage() {
             {core.status === 'lobby' &&
             !room.viewer_is_host &&
             !room.viewer_participant_id ? (
-                <div className="bg-card mb-6 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10">
+                <Surface variant="tint" className="mb-8">
                     <h2 className="mb-2 font-semibold">Join this room</h2>
                     <p className="text-muted mb-3 text-sm">
                         Opening the invite link only shows the room. Take a seat
@@ -406,11 +408,11 @@ export function GameSessionRoomPage() {
                     >
                         {joining ? 'Joining…' : 'Join this room'}
                     </Button>
-                </div>
+                </Surface>
             ) : null}
 
             {core.status === 'lobby' && room.viewer_is_host ? (
-                <div className="bg-card mb-6 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10">
+                <Surface variant="tint" className="mb-8">
                     <h2 className="mb-2 font-semibold">Host controls</h2>
                     <p className="text-muted mb-3 text-sm">
                         {core.playlist_id
@@ -424,11 +426,11 @@ export function GameSessionRoomPage() {
                     >
                         {starting ? 'Starting…' : 'Start game'}
                     </Button>
-                </div>
+                </Surface>
             ) : null}
 
             {core.status === 'in_progress' && activeRound ? (
-                <div className="bg-card mb-6 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10">
+                <Surface variant="elevated" className="mb-8">
                     <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
                         <h2 className="font-semibold">
                             Round {activeRound.round_number}
@@ -613,20 +615,20 @@ export function GameSessionRoomPage() {
                             </ul>
                         </div>
                     ) : null}
-                </div>
+                </Surface>
             ) : null}
 
             {core.status === 'in_progress' && !activeRound ? (
-                <div className="bg-card mb-6 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10">
+                <Surface variant="tint" className="mb-8">
                     <p className="text-muted text-sm">
                         No active round (loading or transitioning). Try
                         refreshing.
                     </p>
-                </div>
+                </Surface>
             ) : null}
 
             {isCompleted ? (
-                <div className="bg-card mb-6 rounded-lg border border-transparent p-6 shadow-md dark:border-white/10">
+                <Surface variant="elevated" className="mb-8 p-6 sm:p-8">
                     <p className="text-primary mb-1 text-sm font-semibold tracking-wide uppercase">
                         Game finished
                     </p>
@@ -678,135 +680,142 @@ export function GameSessionRoomPage() {
                         </ol>
                     ) : (
                         <p className="text-muted mb-8 text-sm">
-                            No participants.
+                            No scoreboard yet—when players join, they show up
+                            here.
                         </p>
                     )}
 
                     <h3 className="mb-3 font-semibold">Rounds</h3>
                     <ul className="flex flex-col gap-4">
                         {sortedRounds.map((round) => (
-                            <li
-                                key={round.id}
-                                className="border-border rounded-lg border p-4 dark:border-white/10"
-                            >
-                                <p className="text-muted mb-1 text-xs font-medium uppercase">
-                                    Round {round.round_number}
-                                </p>
-                                <p className="mb-2 text-sm font-medium">
-                                    {round.question.prompt_text?.trim() ??
-                                        'Question'}
-                                </p>
-                                {round.question.correct_answer ? (
-                                    <p className="text-muted mb-3 text-sm">
-                                        Correct answer:{' '}
-                                        <span className="text-foreground font-medium">
-                                            {round.question.correct_answer}
-                                        </span>
+                            <li key={round.id}>
+                                <Surface variant="tint" className="p-4">
+                                    <p className="text-muted mb-1 text-xs font-medium uppercase">
+                                        Round {round.round_number}
                                     </p>
-                                ) : null}
-                                {round.question.audio_upload_available ? (
-                                    <SessionRoundMediaPlayer
-                                        sessionId={core.id}
-                                        roundId={round.id}
-                                        variant="recap"
-                                        mediaStartSeconds={
-                                            round.question.media_start_seconds
-                                        }
-                                        mediaEndSeconds={
-                                            round.question.media_end_seconds
-                                        }
-                                        ariaLabel={roundAudioLabel(round)}
-                                        hasAudio
-                                        remotePlayback={null}
-                                    />
-                                ) : null}
-                                {round.answers.length > 0 ? (
-                                    <ul className="flex flex-col gap-1.5">
-                                        {round.answers.map((a) => {
-                                            const isViewerAnswer =
-                                                room.viewer_participant_id !==
-                                                    null &&
-                                                a.participant_id ===
-                                                    room.viewer_participant_id;
-                                            return (
-                                                <li
-                                                    key={a.id}
-                                                    className={cn(
-                                                        'text-muted rounded-md px-3 py-1.5 text-sm',
-                                                        isViewerAnswer &&
-                                                            'border-primary/55 bg-primary/10 text-foreground dark:bg-primary/15 border-l-4 font-medium',
-                                                    )}
-                                                >
-                                                    <span className="text-foreground font-medium">
-                                                        {
-                                                            a.participant_display_name
-                                                        }
-                                                        {isViewerAnswer ? (
-                                                            <span className="text-primary ml-1.5 text-xs font-semibold tracking-wide">
-                                                                (you)
+                                    <p className="mb-2 text-sm font-medium">
+                                        {round.question.prompt_text?.trim() ??
+                                            'Question'}
+                                    </p>
+                                    {round.question.correct_answer ? (
+                                        <p className="text-muted mb-3 text-sm">
+                                            Correct answer:{' '}
+                                            <span className="text-foreground font-medium">
+                                                {round.question.correct_answer}
+                                            </span>
+                                        </p>
+                                    ) : null}
+                                    {round.question.audio_upload_available ? (
+                                        <SessionRoundMediaPlayer
+                                            sessionId={core.id}
+                                            roundId={round.id}
+                                            variant="recap"
+                                            mediaStartSeconds={
+                                                round.question
+                                                    .media_start_seconds
+                                            }
+                                            mediaEndSeconds={
+                                                round.question.media_end_seconds
+                                            }
+                                            ariaLabel={roundAudioLabel(round)}
+                                            hasAudio
+                                            remotePlayback={null}
+                                        />
+                                    ) : null}
+                                    {round.answers.length > 0 ? (
+                                        <ul className="flex flex-col gap-1.5">
+                                            {round.answers.map((a) => {
+                                                const isViewerAnswer =
+                                                    room.viewer_participant_id !==
+                                                        null &&
+                                                    a.participant_id ===
+                                                        room.viewer_participant_id;
+                                                return (
+                                                    <li
+                                                        key={a.id}
+                                                        className={cn(
+                                                            'text-muted rounded-md px-3 py-1.5 text-sm',
+                                                            isViewerAnswer &&
+                                                                'border-primary/55 bg-primary/10 text-foreground dark:bg-primary/15 border-l-4 font-medium',
+                                                        )}
+                                                    >
+                                                        <span className="text-foreground font-medium">
+                                                            {
+                                                                a.participant_display_name
+                                                            }
+                                                            {isViewerAnswer ? (
+                                                                <span className="text-primary ml-1.5 text-xs font-semibold tracking-wide">
+                                                                    (you)
+                                                                </span>
+                                                            ) : null}
+                                                        </span>
+                                                        {multipleChoiceAnswerLabel(
+                                                            round,
+                                                            a.selected_option_id,
+                                                        ) ? (
+                                                            <span>
+                                                                {' '}
+                                                                ·{' '}
+                                                                {multipleChoiceAnswerLabel(
+                                                                    round,
+                                                                    a.selected_option_id,
+                                                                )}
                                                             </span>
                                                         ) : null}
-                                                    </span>
-                                                    {multipleChoiceAnswerLabel(
-                                                        round,
-                                                        a.selected_option_id,
-                                                    ) ? (
-                                                        <span>
-                                                            {' '}
-                                                            ·{' '}
-                                                            {multipleChoiceAnswerLabel(
-                                                                round,
-                                                                a.selected_option_id,
-                                                            )}
-                                                        </span>
-                                                    ) : null}
-                                                    {a.submitted_text ? (
-                                                        <span>
-                                                            {' '}
-                                                            · “
-                                                            {a.submitted_text}”
-                                                        </span>
-                                                    ) : null}
-                                                    {a.is_correct === true ? (
-                                                        <span className="text-success">
-                                                            {' '}
-                                                            · correct
-                                                        </span>
-                                                    ) : null}
-                                                    {a.is_correct === false ? (
-                                                        <span className="text-error">
-                                                            {' '}
-                                                            · incorrect
-                                                        </span>
-                                                    ) : null}
-                                                    {a.points_awarded != null &&
-                                                    a.points_awarded > 0 ? (
-                                                        <span>
-                                                            {' '}
-                                                            · +
-                                                            {
-                                                                a.points_awarded
-                                                            }{' '}
-                                                            pts
-                                                        </span>
-                                                    ) : null}
-                                                </li>
-                                            );
-                                        })}
-                                    </ul>
-                                ) : (
-                                    <p className="text-muted text-sm">
-                                        No answers recorded.
-                                    </p>
-                                )}
+                                                        {a.submitted_text ? (
+                                                            <span>
+                                                                {' '}
+                                                                · “
+                                                                {
+                                                                    a.submitted_text
+                                                                }
+                                                                ”
+                                                            </span>
+                                                        ) : null}
+                                                        {a.is_correct ===
+                                                        true ? (
+                                                            <span className="text-success">
+                                                                {' '}
+                                                                · correct
+                                                            </span>
+                                                        ) : null}
+                                                        {a.is_correct ===
+                                                        false ? (
+                                                            <span className="text-error">
+                                                                {' '}
+                                                                · incorrect
+                                                            </span>
+                                                        ) : null}
+                                                        {a.points_awarded !=
+                                                            null &&
+                                                        a.points_awarded > 0 ? (
+                                                            <span>
+                                                                {' '}
+                                                                · +
+                                                                {
+                                                                    a.points_awarded
+                                                                }{' '}
+                                                                pts
+                                                            </span>
+                                                        ) : null}
+                                                    </li>
+                                                );
+                                            })}
+                                        </ul>
+                                    ) : (
+                                        <p className="text-muted text-sm">
+                                            No answers recorded.
+                                        </p>
+                                    )}
+                                </Surface>
                             </li>
                         ))}
                     </ul>
-                </div>
+                </Surface>
             ) : null}
 
             {!isCompleted ? (
-                <div className="bg-card mb-6 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10">
+                <Surface variant="tint" className="mb-8">
                     <h2 className="mb-2 font-semibold">Scores</h2>
                     {sortedParticipants.length > 0 ? (
                         <ul className="flex flex-col gap-2">
@@ -832,10 +841,10 @@ export function GameSessionRoomPage() {
                         </ul>
                     ) : (
                         <p className="text-muted text-sm">
-                            No participants yet.
+                            No players yet—share the invite when you are ready.
                         </p>
                     )}
-                </div>
+                </Surface>
             ) : null}
 
             {!isCompleted && room.viewer_participant_id !== null ? (
@@ -848,6 +857,6 @@ export function GameSessionRoomPage() {
                     {leaving ? 'Leaving…' : 'Leave session'}
                 </Button>
             ) : null}
-        </div>
+        </PageShell>
     );
 }

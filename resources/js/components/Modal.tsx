@@ -59,7 +59,7 @@ export default function Modal({
             {/* Modal */}
             <div
                 className={cn(
-                    'bg-card relative w-full rounded-lg shadow-xl',
+                    'bg-card relative w-full rounded-2xl shadow-lg ring-1 ring-black/[0.07] dark:ring-white/10',
                     sizeClasses[size],
                     className,
                 )}

@@ -1,4 +1,6 @@
 import ConfirmModal from '@/components/ConfirmModal';
+import { PageHeader } from '@/components/layout/PageHeader';
+import { PageShell } from '@/components/layout/PageShell';
 import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
 import { ButtonLink } from '@/components/ui/ButtonLink';
@@ -94,8 +96,8 @@ export function MyPlaylistsPage() {
     };
 
     return (
-        <div className="mx-auto max-w-4xl px-4 py-6">
-            <h1 className="mb-6 text-2xl font-bold">My playlists</h1>
+        <PageShell>
+            <PageHeader title="My playlists" />
 
             <PageIntroExpandable
                 summary="Ordered lists of quiz questions you attach when hosting. Open a playlist to add or reorder questions; set who can see the list here."
@@ -149,7 +151,7 @@ export function MyPlaylistsPage() {
                 )}
             </div>
 
-            <details className="bg-card mb-8 rounded-lg border border-transparent shadow-md dark:border-white/10">
+            <details className="mb-8 overflow-hidden rounded-2xl bg-black/[0.025] dark:bg-white/[0.04]">
                 <summary className="cursor-pointer list-none px-4 py-3 text-lg font-semibold marker:hidden [&::-webkit-details-marker]:hidden">
                     Create a playlist
                 </summary>
@@ -206,7 +208,7 @@ export function MyPlaylistsPage() {
                 confirmText="Delete"
                 cancelText="Cancel"
             />
-        </div>
+        </PageShell>
     );
 }
 
@@ -247,7 +249,7 @@ function PlaylistRow({
     };
 
     return (
-        <details className="bg-card rounded-lg border border-transparent shadow-md dark:border-white/10">
+        <details className="overflow-hidden rounded-2xl bg-black/[0.025] dark:bg-white/[0.04]">
             <summary
                 className={cn(
                     'cursor-pointer list-none px-3 py-2 marker:hidden [&::-webkit-details-marker]:hidden',

@@ -1,3 +1,6 @@
+import { PageHeader } from '@/components/layout/PageHeader';
+import { PageShell } from '@/components/layout/PageShell';
+import { Surface } from '@/components/layout/Surface';
 import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
 import { ButtonLink } from '@/components/ui/ButtonLink';
@@ -91,8 +94,8 @@ export function MyGameSessionsPage() {
     });
 
     return (
-        <div className="mx-auto max-w-4xl px-4 py-6">
-            <h1 className="mb-6 text-2xl font-bold">My game sessions</h1>
+        <PageShell>
+            <PageHeader title="My game sessions" />
 
             <PageIntroExpandable
                 summary="Create a room, share the code, and optionally bind a playlist so rounds draw from your library. Past and in-progress games you host or join appear below."
@@ -107,7 +110,7 @@ export function MyGameSessionsPage() {
                 </p>
             </PageIntroExpandable>
 
-            <div className="bg-card mb-10 flex flex-col gap-4 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10">
+            <Surface variant="tint" className="mb-10 flex flex-col gap-4">
                 <h2 className="text-lg font-semibold">Host a new session</h2>
                 <div className="grid gap-3 sm:grid-cols-2">
                     <div>
@@ -218,7 +221,7 @@ export function MyGameSessionsPage() {
                 <Button type="button" onClick={() => void handleCreate()}>
                     Create session
                 </Button>
-            </div>
+            </Surface>
 
             {sessions.length === 0 ? (
                 <p className="text-muted">No sessions yet.</p>
@@ -228,45 +231,49 @@ export function MyGameSessionsPage() {
                         const isHost = user ? s.host_id === user.id : false;
                         const roleLabel = isHost ? 'Host' : 'Player';
                         return (
-                            <li
-                                key={s.id}
-                                className="bg-card flex flex-col gap-3 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10"
-                            >
-                                <div className="flex flex-wrap items-start justify-between gap-2">
-                                    <div>
-                                        <span className="font-mono text-lg font-semibold tracking-wide">
-                                            {s.room_code}
-                                        </span>
-                                        <p className="text-muted text-sm">
-                                            {gameSessionStatusLabel(s.status)}
-                                            {s.is_public
-                                                ? ' · public'
-                                                : ' · private'}
-                                            {' · '}
-                                            {roleLabel}
-                                        </p>
+                            <li key={s.id}>
+                                <Surface
+                                    variant="tint"
+                                    className="flex flex-col gap-3"
+                                >
+                                    <div className="flex flex-wrap items-start justify-between gap-2">
+                                        <div>
+                                            <span className="font-mono text-lg font-semibold tracking-wide">
+                                                {s.room_code}
+                                            </span>
+                                            <p className="text-muted text-sm">
+                                                {gameSessionStatusLabel(
+                                                    s.status,
+                                                )}
+                                                {s.is_public
+                                                    ? ' · public'
+                                                    : ' · private'}
+                                                {' · '}
+                                                {roleLabel}
+                                            </p>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                            {s.status === 'completed' ? (
+                                                <ButtonLink
+                                                    to={`/my/game-sessions/${s.id}/recap`}
+                                                >
+                                                    View results
+                                                </ButtonLink>
+                                            ) : (
+                                                <ButtonLink
+                                                    to={`/game-sessions/room/${s.room_code}`}
+                                                >
+                                                    Open room
+                                                </ButtonLink>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div className="flex flex-wrap gap-2">
-                                        {s.status === 'completed' ? (
-                                            <ButtonLink
-                                                to={`/my/game-sessions/${s.id}/recap`}
-                                            >
-                                                View results
-                                            </ButtonLink>
-                                        ) : (
-                                            <ButtonLink
-                                                to={`/game-sessions/room/${s.room_code}`}
-                                            >
-                                                Open room
-                                            </ButtonLink>
-                                        )}
-                                    </div>
-                                </div>
+                                </Surface>
                             </li>
                         );
                     })}
                 </ul>
             )}
-        </div>
+        </PageShell>
     );
 }

@@ -1,4 +1,7 @@
+import { AuthPageFrame } from '@/components/layout/AuthPageFrame';
+import { Surface } from '@/components/layout/Surface';
 import { Button } from '@/components/ui/Button';
+import { ButtonLink } from '@/components/ui/ButtonLink';
 import { useEffect } from 'react';
 import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
 
@@ -21,68 +24,79 @@ export function ErrorPage() {
 
     if (isRouteErrorResponse(error)) {
         return (
-            <div className="bg-primary flex min-h-dvh items-center justify-center">
-                <div className="bg-card w-full max-w-md rounded-lg p-8 shadow-lg">
+            <AuthPageFrame>
+                <Surface variant="elevated" className="p-8 sm:p-10">
                     <div className="text-center">
-                        <h1 className="text-secondary mb-4 text-6xl font-bold">
+                        <h1 className="text-secondary mb-2 text-5xl font-bold tracking-tight sm:text-6xl">
                             {error.status}
                         </h1>
-                        <h2 className="text-secondary mb-4 text-2xl font-semibold">
+                        <h2 className="text-secondary mb-4 text-xl font-semibold sm:text-2xl">
                             {error.statusText}
                         </h2>
                         {error.data?.message && (
-                            <p className="text-secondary mb-6">
+                            <p className="text-muted mb-8 text-sm leading-relaxed">
                                 {error.data.message}
                             </p>
                         )}
-                        <div className="space-x-4">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
                             <Button
                                 onClick={() => (window.location.href = '/')}
                             >
-                                Go Home
+                                Go home
                             </Button>
-                            <Button
+                            <ButtonLink
+                                to="/game-sessions/lobby"
                                 variant="secondary"
+                            >
+                                Game lobby
+                            </ButtonLink>
+                            <Button
+                                variant="outline"
                                 onClick={() => window.location.reload()}
                             >
-                                Try Again
+                                Try again
                             </Button>
                         </div>
                     </div>
-                </div>
-            </div>
+                </Surface>
+            </AuthPageFrame>
         );
     }
 
-    // For non-route errors (like thrown errors from loaders)
     return (
-        <div className="bg-primary flex min-h-dvh items-center justify-center">
-            <div className="bg-card w-full max-w-md rounded-lg p-8 shadow-lg">
+        <AuthPageFrame>
+            <Surface variant="elevated" className="p-8 sm:p-10">
                 <div className="text-center">
-                    <h1 className="text-secondary mb-4 text-6xl font-bold">
-                        Oops!
+                    <h1 className="text-secondary mb-2 text-5xl font-bold tracking-tight sm:text-6xl">
+                        Oops
                     </h1>
-                    <h2 className="text-secondary mb-4 text-2xl font-semibold">
+                    <h2 className="text-secondary mb-4 text-xl font-semibold sm:text-2xl">
                         Something went wrong
                     </h2>
-                    <p className="text-secondary mb-6">
+                    <p className="text-muted mb-8 text-sm leading-relaxed">
                         {error instanceof Error
                             ? error.message
                             : 'An unexpected error occurred'}
                     </p>
-                    <div className="space-x-4">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
                         <Button onClick={() => (window.location.href = '/')}>
-                            Go Home
+                            Go home
                         </Button>
-                        <Button
+                        <ButtonLink
+                            to="/game-sessions/lobby"
                             variant="secondary"
+                        >
+                            Game lobby
+                        </ButtonLink>
+                        <Button
+                            variant="outline"
                             onClick={() => window.location.reload()}
                         >
-                            Try Again
+                            Try again
                         </Button>
                     </div>
                 </div>
-            </div>
-        </div>
+            </Surface>
+        </AuthPageFrame>
     );
 }

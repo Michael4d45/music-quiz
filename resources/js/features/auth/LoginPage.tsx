@@ -1,3 +1,5 @@
+import { AuthPageFrame } from '@/components/layout/AuthPageFrame';
+import { Surface } from '@/components/layout/Surface';
 import { Toggle } from '@/components/Toggle';
 import { Button } from '@/components/ui/Button';
 import { Form, FormField } from '@/components/ui/Form';
@@ -25,9 +27,14 @@ export function LoginPage() {
     };
 
     return (
-        <div className="mx-auto flex h-full max-w-md items-center justify-center">
-            <div className="bg-card w-full rounded-lg p-8 shadow-md">
-                <h1 className="mb-6 text-center text-2xl font-bold">Login</h1>
+        <AuthPageFrame>
+            <Surface variant="elevated" className="p-8 sm:p-10">
+                <h1 className="mb-2 text-center text-2xl font-bold tracking-tight">
+                    Login
+                </h1>
+                <p className="text-muted mb-8 text-center text-sm">
+                    Welcome back—your quiz night HQ.
+                </p>
 
                 {isBlocked && (
                     <div className="border-danger bg-danger-light mb-6 rounded-lg border p-4">
@@ -85,13 +92,13 @@ export function LoginPage() {
                     </Button>
                 </Form>
 
-                <div className="mt-6">
+                <div className="mt-8">
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center">
                             <div className="border-secondary w-full border-t" />
                         </div>
                         <div className="relative flex justify-center text-sm">
-                            <span className="bg-card text-secondary px-2">
+                            <span className="bg-card text-secondary px-3">
                                 Or
                             </span>
                         </div>
@@ -111,9 +118,9 @@ export function LoginPage() {
                     </div>
                 </div>
 
-                <div className="mt-6 space-y-2 text-center">
+                <div className="mt-8 space-y-2 text-center">
                     <p className="text-secondary text-sm">
-                        Don't have an account?{' '}
+                        Need an account?{' '}
                         <Link
                             to="/register"
                             className="text-primary hover:text-primary-hover font-medium"
@@ -122,7 +129,7 @@ export function LoginPage() {
                         </Link>
                     </p>
                 </div>
-            </div>
-        </div>
+            </Surface>
+        </AuthPageFrame>
     );
 }

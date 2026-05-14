@@ -304,7 +304,7 @@ export function AuthGuard({ children }: { children: ReactNode }) {
         }
 
         if (registered && isOnAuthPage) {
-            navigate('/', { replace: true });
+            navigate('/game-sessions/lobby', { replace: true });
         }
 
         const needsLogin =

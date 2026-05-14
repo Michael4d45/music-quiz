@@ -33,14 +33,14 @@ it('can register a new user', function (): void {
     ]);
 });
 
-it('redirects registered users away from login to home', function (): void {
+it('redirects registered users away from login to the game lobby', function (): void {
     $user = User::factory()->create();
     $this->actingAs($user);
 
     visit('/login')
         ->assertNoJavaScriptErrors()
         ->waitForText('Welcome back', 15)
-        ->assertPathIs('/')
+        ->assertPathIs('/game-sessions/lobby')
         ->assertDontSee('Forgot password?');
 });
 
@@ -61,7 +61,7 @@ it('can login with valid credentials', function (): void {
         ->assertDontSee('Login failed'); // Should not show login error
 
     // Verify we're logged in by checking for logout button
-    $page->assertSee('Sign out')->assertPathIs('/');
+    $page->assertSee('Sign out')->assertPathIs('/game-sessions/lobby');
 });
 
 it('shows validation errors for invalid login', function (): void {
@@ -249,10 +249,10 @@ it('can logout', function (): void {
         ->assertNoJavaScriptErrors()
         ->screenshot(filename: 'before-logout.png')
         ->click('@profile-logout')
-        ->waitForText('Welcome', 10)
+        ->waitForText('Game lobby', 10)
         ->assertNoJavaScriptErrors()
         ->screenshot(filename: 'after-logout.png')
-        ->assertPathIs('/');
+        ->assertPathIs('/game-sessions/lobby');
 
     assert_no_log_errors($logPath);
 });
