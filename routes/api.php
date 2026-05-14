@@ -13,6 +13,7 @@ use App\Features\MusicTracks\Actions\CreateMusicTrack;
 use App\Features\MusicTracks\Actions\CreateMusicTrackUpload;
 use App\Features\MusicTracks\Actions\DestroyMusicTrack;
 use App\Features\MusicTracks\Actions\ListMyMusicTracks;
+use App\Features\MusicTracks\Actions\StreamMyMusicTrackUpload;
 use App\Features\MusicTracks\Actions\UpdateMusicTrack;
 use App\Features\Playlists\Actions\AddPlaylistItem;
 use App\Features\Playlists\Actions\CreatePlaylist;
@@ -96,6 +97,10 @@ Route::middleware(['web', 'registered'])->group(function (): void {
     Route::get('my/music-tracks', ListMyMusicTracks::class);
     Route::post('my/music-tracks', CreateMusicTrack::class);
     Route::post('my/music-tracks/upload', CreateMusicTrackUpload::class);
+    Route::get(
+        'my/music-tracks/{musicTrack}/audio',
+        StreamMyMusicTrackUpload::class,
+    )->whereUuid('musicTrack');
     Route::patch(
         'my/music-tracks/{musicTrack}',
         UpdateMusicTrack::class,

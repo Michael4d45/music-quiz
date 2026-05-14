@@ -8,6 +8,13 @@ import {
     updateMusicTrack,
     uploadMusicTrack,
 } from '@/features/music-tracks/api';
+import { TrackUploadAudioPlayer } from '@/features/music-tracks/TrackUploadAudioPlayer';
+import {
+    SINGLES_GROUP,
+    groupHeading,
+    sortGroupEntries,
+    usesAlbumForGrouping,
+} from '@/features/music-tracks/trackGrouping';
 import { fetchMusicSources, fetchSubCategories } from '@/features/reference/api';
 import { cn } from '@/lib/utils';
 import type { IdLabelOptionData } from '@/schemas/App/Data/Models/IdLabelOptionData';
@@ -26,8 +33,6 @@ export interface MyMusicTracksLoaderData extends MyMusicTracksResponseData {
     readonly music_sources: readonly IdLabelOptionData[];
 }
 
-const SINGLES_GROUP = 'Singles & one-offs';
-
 const ORIGIN_OPTIONS: { value: MusicTrackOriginKindValue; label: string }[] = [
     { value: MusicTrackOriginKind.Album, label: 'Studio album' },
     { value: MusicTrackOriginKind.SoundtrackGame, label: 'Video game' },
@@ -43,49 +48,6 @@ const ORIGIN_LABELS: Record<MusicTrackOriginKindValue, string> = {
     [MusicTrackOriginKind.SoundtrackTv]: 'TV show',
     [MusicTrackOriginKind.OtherMedia]: 'Other media',
 };
-
-function usesAlbumForGrouping(
-    kind: null | MusicTrackOriginKindValue,
-): boolean {
-    return kind === null || kind === MusicTrackOriginKind.Album;
-}
-
-function groupHeading(track: MusicTrackData): string {
-    const album = track.album_name?.trim();
-    if (usesAlbumForGrouping(track.origin_kind)) {
-        if (album) {
-            return album;
-        }
-        const legacyAlbumishTitle = track.origin_title?.trim();
-        if (legacyAlbumishTitle) {
-            return legacyAlbumishTitle;
-        }
-        return SINGLES_GROUP;
-    }
-
-    const work = track.origin_title?.trim();
-    if (work) {
-        return work;
-    }
-    if (album) {
-        return album;
-    }
-    return SINGLES_GROUP;
-}
-
-function sortGroupEntries(
-    entries: [string, MusicTrackData[]][],
-): [string, MusicTrackData[]][] {
-    return [...entries].sort(([a], [b]) => {
-        if (a === SINGLES_GROUP) {
-            return 1;
-        }
-        if (b === SINGLES_GROUP) {
-            return -1;
-        }
-        return a.localeCompare(b);
-    });
-}
 
 function originSummary(track: MusicTrackData): string | null {
     if (usesAlbumForGrouping(track.origin_kind)) {
@@ -320,7 +282,8 @@ export function MyMusicTracksPage() {
                 name; games, films, and shows group under one work title, with
                 an optional separate soundtrack or release title when you need
                 it. Use streaming sources for catalog rows, or upload audio you
-                keep locally.
+                keep locally. Uploaded tracks can be previewed here in the
+                browser; catalog-only rows open in your music app to listen.
             </p>
 
             <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -785,27 +748,43 @@ function TrackRow({
                     'cursor-pointer list-none px-3 py-2 marker:hidden [&::-webkit-details-marker]:hidden',
                 )}
             >
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                    <div>
-                        <div className="font-medium">
-                            {track.title} — {track.artist_name}
+                <div className="flex flex-col gap-3">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                            <div className="font-medium">
+                                {track.title} — {track.artist_name}
+                            </div>
+                            <div className="text-muted mt-0.5 flex flex-wrap gap-x-2 gap-y-1 text-xs">
+                                {originLine ? <span>{originLine}</span> : null}
+                                {showAlbumMeta ? (
+                                    <span>Album: {track.album_name}</span>
+                                ) : null}
+                                {track.primary_source?.display_name ? (
+                                    <span>{track.primary_source.display_name}</span>
+                                ) : null}
+                                {isUploadBacked ? (
+                                    <span className="rounded bg-secondary px-1.5 py-0.5">
+                                        File upload
+                                    </span>
+                                ) : null}
+                            </div>
                         </div>
-                        <div className="text-muted mt-0.5 flex flex-wrap gap-x-2 gap-y-1 text-xs">
-                            {originLine ? <span>{originLine}</span> : null}
-                            {showAlbumMeta ? (
-                                <span>Album: {track.album_name}</span>
-                            ) : null}
-                            {track.primary_source?.display_name ? (
-                                <span>{track.primary_source.display_name}</span>
-                            ) : null}
-                            {isUploadBacked ? (
-                                <span className="rounded bg-secondary px-1.5 py-0.5">
-                                    File upload
-                                </span>
-                            ) : null}
-                        </div>
+                        <span className="text-muted shrink-0 text-xs">
+                            Tap to edit
+                        </span>
                     </div>
-                    <span className="text-muted text-xs">Edit</span>
+                    <div
+                        className="border-t border-transparent pt-2 dark:border-white/10"
+                        onClick={(event) => event.stopPropagation()}
+                        onKeyDown={(event) => event.stopPropagation()}
+                        role="presentation"
+                    >
+                        <TrackUploadAudioPlayer
+                            trackId={track.id}
+                            trackTitle={`${track.title} — ${track.artist_name}`}
+                            hasUpload={isUploadBacked}
+                        />
+                    </div>
                 </div>
             </summary>
             <div className="flex flex-col gap-3 border-t border-transparent px-3 pb-3 pt-2 dark:border-white/10">

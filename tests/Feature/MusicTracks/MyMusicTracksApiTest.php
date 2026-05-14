@@ -153,4 +153,94 @@ class MyMusicTracksApiTest extends TestCase
             )
             ->assertForbidden();
     }
+
+    public function test_owner_can_stream_uploaded_track_audio(): void
+    {
+        Storage::fake('local');
+
+        $user = User::factory()->create();
+        $sub = SubCategory::factory()->create();
+        MusicSource::query()->where('name', 'user_upload')->firstOrFail();
+
+        $file = UploadedFile::fake()->create('stream-me.mp3', 64, 'audio/mpeg');
+
+        $create = $this->actingAs($user, 'web')->post(
+            '/api/my/music-tracks/upload',
+            [
+                'title' => 'Stream test',
+                'artist_name' => 'Tester',
+                'sub_category_id' => $sub->id,
+                'audio' => $file,
+            ],
+            ['Accept' => 'application/json'],
+        );
+
+        $create->assertCreated();
+        $id = $create->json('id');
+
+        $stream = $this->actingAs($user, 'web')->get(
+            "/api/my/music-tracks/{$id}/audio",
+        );
+
+        $stream->assertOk();
+        $stream->assertHeader('Content-Type', 'audio/mpeg');
+        $disposition = (string) $stream->headers->get('Content-Disposition');
+        static::assertStringContainsStringIgnoringCase('inline', $disposition);
+    }
+
+    public function test_stream_returns_404_when_track_has_no_upload(): void
+    {
+        $user = User::factory()->create();
+        $sub = SubCategory::factory()->create();
+        $streaming = MusicSource::factory()->create(['name' => 'catalog_x']);
+
+        $create = $this->actingAs(
+            $user,
+            'web',
+        )->postJson('/api/my/music-tracks', [
+            'title' => 'Catalog only',
+            'artist_name' => 'Band',
+            'sub_category_id' => $sub->id,
+            'primary_source_id' => $streaming->id,
+        ]);
+
+        $create->assertCreated();
+        $id = $create->json('id');
+
+        $this
+            ->actingAs($user, 'web')
+            ->get("/api/my/music-tracks/{$id}/audio")
+            ->assertNotFound();
+    }
+
+    public function test_other_user_cannot_stream_uploaded_audio(): void
+    {
+        Storage::fake('local');
+
+        $owner = User::factory()->create();
+        $stranger = User::factory()->create();
+        $sub = SubCategory::factory()->create();
+        MusicSource::query()->where('name', 'user_upload')->firstOrFail();
+
+        $file = UploadedFile::fake()->create('private.mp3', 32, 'audio/mpeg');
+
+        $create = $this->actingAs($owner, 'web')->post(
+            '/api/my/music-tracks/upload',
+            [
+                'title' => 'Mine',
+                'artist_name' => 'Me',
+                'sub_category_id' => $sub->id,
+                'audio' => $file,
+            ],
+            ['Accept' => 'application/json'],
+        );
+
+        $create->assertCreated();
+        $id = $create->json('id');
+
+        $this
+            ->actingAs($stranger, 'web')
+            ->get("/api/my/music-tracks/{$id}/audio")
+            ->assertForbidden();
+    }
 }
