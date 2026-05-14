@@ -26,7 +26,8 @@ use Illuminate\Validation\ValidationException;
  *
  * The frontend stores user data in localStorage and uses session cookies for API auth.
  *
- * TODO: account for "is_guest" users.
+ * When the session user is a server-side guest, a successful login merges that guest
+ * into the authenticated account via {@see \App\Services\GuestUserMergeService}.
  */
 class Login
 {

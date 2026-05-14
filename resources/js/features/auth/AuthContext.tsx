@@ -1,6 +1,7 @@
 import { authManager, AuthState } from '@/features/auth/authManager';
 import { isRegisteredUser } from '@/features/auth/authSession';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { devLog } from '@/lib/devLogging';
 import { UserData } from '@/schemas/App/Data/Models/UserData';
 import { LoginRequest } from '@/schemas/App/Features/Auth/Requests/LoginRequest';
 import { RegisterRequest } from '@/schemas/App/Features/Auth/Requests/RegisterRequest';
@@ -98,7 +99,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 return previousState;
             }
 
-            console.log('[AuthContext] Auth state changed:', state);
+            devLog('[AuthContext] Auth state changed:', state);
             return nextState;
         });
     };
@@ -115,7 +116,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                     if (result._tag === 'Success') {
                         setOfflineAuthTrust(true);
                         authManager.setUser(result.data);
-                        console.log('[AuthContext] Fetched user data');
+                        devLog('[AuthContext] Fetched user data');
                     } else if (result._tag === 'AuthenticationError') {
                         setOfflineAuthTrust(false);
                         authManager.clearAuthData();

@@ -1,6 +1,7 @@
 import { Effect, Schema } from 'effect';
 import { authManager } from '../features/auth/authManager';
 import { apiCache } from './apiCache';
+import { devLog } from './devLogging';
 import { db } from './db';
 import { getCookieValue } from './utils';
 
@@ -354,7 +355,7 @@ export const withRetry =
         return effect.pipe(
             Effect.catchTag('CsrfTokenExpiredError', (error) => {
                 if (!retryCtx.retried419) {
-                    console.log(`${context}: CSRF expired, retrying...`);
+                    devLog(`${context}: CSRF expired, retrying...`);
                     return ensureCsrfToken.pipe(
                         Effect.flatMap(() =>
                             withRetry(context + ' (csrf retry)', {
@@ -364,7 +365,7 @@ export const withRetry =
                         ),
                     );
                 }
-                console.log(
+                devLog(
                     `${context}: CSRF expired after retry, clearing auth`,
                 );
                 authManager.clearAuthData();
@@ -372,13 +373,13 @@ export const withRetry =
             }),
             Effect.catchTag('FetchError', (error) => {
                 if (!retryCtx.retriedFetchError) {
-                    console.log(`${context}: Fetch failed, retrying...`);
+                    devLog(`${context}: Fetch failed, retrying...`);
                     return withRetry(context + ' (fetch retry)', {
                         ...retryCtx,
                         retriedFetchError: true,
                     })(effect);
                 }
-                console.log(`${context}: Fetch failed after retry`);
+                devLog(`${context}: Fetch failed after retry`);
                 return Effect.fail(error);
             }),
         );
@@ -397,7 +398,7 @@ export const withCache = <A>(cacheKey: string) => {
                     apiCache.get<A>(cacheKey),
                 );
                 if (cached !== undefined) {
-                    console.log(`${cacheKey}: returning cached data (offline)`);
+                    devLog(`${cacheKey}: returning cached data (offline)`);
                     return cached;
                 }
                 return yield* Effect.fail({

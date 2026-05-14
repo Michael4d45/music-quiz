@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/Button';
 import { useAuth } from '@/features/auth/AuthContext';
 import { useOfflineBlock } from '@/hooks/useOfflineBlock';
 import { apiFailureMessage } from '@/lib/apiCore';
+import { modal } from '@/lib/modal';
 import type { GameSessionLobbyCurrentSessionData } from '@/schemas/App/Data/Models/GameSessionLobbyCurrentSessionData';
 import type { GameSessionsLobbyResponseData } from '@/schemas/App/Data/Models/GameSessionsLobbyResponseData';
 import { useState } from 'react';
@@ -71,10 +72,18 @@ export function GameSessionsLobbyPage() {
                 );
                 return;
             }
-            const ok = window.confirm(
-                `You already have an active game (${current_session.room_code}). Join ${normalized} anyway?`,
-            );
-            if (!ok) {
+            let confirmed = false;
+            try {
+                confirmed = await modal.confirm({
+                    title: 'Join another game?',
+                    message: `You already have an active game (${current_session.room_code}). Join ${normalized} anyway?`,
+                    confirmText: 'Join anyway',
+                    cancelText: 'Cancel',
+                });
+            } catch {
+                confirmed = false;
+            }
+            if (!confirmed) {
                 return;
             }
         }

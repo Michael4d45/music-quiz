@@ -1,4 +1,5 @@
 import { AuthContextState } from '@/features/auth/AuthContext';
+import { devInfo } from '@/lib/devLogging';
 import { echoManager } from '@/lib/echoManager';
 import { useEffect, useState } from 'react';
 
@@ -27,7 +28,7 @@ export function usePresenceChannel(
             return;
         }
 
-        console.info(`[usePresenceChannel] Joining ${channelName}`);
+        devInfo(`[usePresenceChannel] Joining ${channelName}`);
         const hereCallback = (members: any[]) => {
             const membersMap = members.reduce<Record<string, any>>(
                 (acc, member) => {
@@ -71,7 +72,7 @@ export function usePresenceChannel(
         );
 
         return () => {
-            console.info(`[usePresenceChannel] Leaving ${channelName}`);
+            devInfo(`[usePresenceChannel] Leaving ${channelName}`);
             echoManager.unsubscribePresence(
                 channelName,
                 hereCallback,
