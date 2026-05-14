@@ -21,7 +21,7 @@ class PlaylistData extends Data
         public null|string $description,
         public PlaylistStatus $status,
         public Visibility $visibility,
-        /** @var array<string, mixed>|null */
+        /** @var list<string>|null */
         public null|array $tags,
         public null|int $estimated_duration_minutes,
         public null|string $target_audience,

@@ -118,3 +118,23 @@ export async function removePlaylistItem(
         ),
     );
 }
+
+export async function reorderPlaylistItems(
+    playlistId: string,
+    itemIds: readonly string[],
+) {
+    return runEffect(
+        pipe(
+            Effect.succeed({ item_ids: [...itemIds] }),
+            Effect.flatMap((body) =>
+                httpRequest(`/api/my/playlists/${playlistId}/items/order`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                }),
+            ),
+            withRetry('reorderPlaylistItems'),
+            decodeJson(MyPlaylistItemsResponseDataSchema),
+        ),
+    );
+}

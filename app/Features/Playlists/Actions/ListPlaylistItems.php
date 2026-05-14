@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Features\Playlists\Actions;
 
+use App\Data\Models\PlaylistData;
 use App\Data\Models\PlaylistItemData;
 use App\Data\Responses\MyPlaylistItemsResponseData;
 use App\Models\Playlist;
@@ -30,6 +31,7 @@ class ListPlaylistItems
         )->all();
 
         return response()->json(MyPlaylistItemsResponseData::from([
+            'playlist' => PlaylistData::from($playlist),
             'items' => $mapped,
         ]));
     }

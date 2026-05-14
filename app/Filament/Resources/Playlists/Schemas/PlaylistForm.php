@@ -10,7 +10,7 @@ use App\Enums\Visibility;
 use App\Filament\Resources\ScoringRules\ScoringRuleResource;
 use App\Filament\Resources\Users\UserResource;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -52,7 +52,10 @@ class PlaylistForm
                 ->required()
                 ->default(Visibility::Private),
 
-            KeyValue::make('tags')->label('Tags')->columnSpanFull(),
+            TagsInput::make('tags')
+                ->label('Tags')
+                ->placeholder('Add a tag')
+                ->columnSpanFull(),
 
             TextInput::make('estimated_duration_minutes')
                 ->label('Estimated Duration (minutes)')

@@ -24,7 +24,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $description
  * @property PlaylistStatus $status
  * @property Visibility $visibility
- * @property array<string, mixed>|null $tags
+ * @property list<string>|null $tags
  * @property int|null $estimated_duration_minutes
  * @property string|null $target_audience
  * @property QuestionOrder $question_order
