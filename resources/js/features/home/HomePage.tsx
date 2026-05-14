@@ -26,14 +26,6 @@ export function HomePage() {
                             : 'Get started by signing in or creating an account'}
                     </p>
                     <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:flex-wrap sm:justify-center">
-                        {guestBrowsing ? (
-                            <Link
-                                to="/game-sessions/lobby"
-                                className="btn-primary px-6 py-3"
-                            >
-                                Game lobby
-                            </Link>
-                        ) : null}
                         <div className="flex gap-4">
                             <Link to="/login" className="btn-primary px-6 py-3">
                                 Log in
@@ -58,37 +50,6 @@ export function HomePage() {
                 <p className="text-muted mt-2">
                     You're all set to get started.
                 </p>
-            </div>
-
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                <Link
-                    to="/my/game-sessions"
-                    className="card block p-6 transition hover:shadow-lg"
-                >
-                    <h2 className="mb-2 text-xl font-semibold">Host games</h2>
-                    <p className="text-muted">
-                        Create a room, pick scoring and quiz mode, and share the
-                        code with players
-                    </p>
-                </Link>
-
-                <Link
-                    to="/game-sessions/lobby"
-                    className="card block p-6 transition hover:shadow-lg"
-                >
-                    <h2 className="mb-2 text-xl font-semibold">Game lobby</h2>
-                    <p className="text-muted">
-                        Join public games that have not started yet
-                    </p>
-                </Link>
-
-                <Link
-                    to="/profile"
-                    className="card block p-6 transition hover:shadow-lg"
-                >
-                    <h2 className="mb-2 text-xl font-semibold">Profile</h2>
-                    <p className="text-muted">Manage your account settings</p>
-                </Link>
             </div>
 
             <RealtimeNotifications />

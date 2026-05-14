@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/Button';
-import { ButtonLink } from '@/components/ui/ButtonLink';
 import ConfirmModal from '@/components/ConfirmModal';
 import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import {
@@ -271,12 +270,7 @@ export function MyMusicTracksPage() {
 
     return (
         <div className="mx-auto max-w-4xl px-4 py-6">
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                <h1 className="text-2xl font-bold">My music tracks</h1>
-                <ButtonLink to="/my/quiz-questions" variant="secondary">
-                    My quiz questions
-                </ButtonLink>
-            </div>
+            <h1 className="mb-6 text-2xl font-bold">My music tracks</h1>
 
             <PageIntroExpandable
                 summary="Add streaming catalog metadata or upload audio for in-browser playback. Library groups mirror albums and soundtracks."

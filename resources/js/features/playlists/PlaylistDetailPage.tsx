@@ -1,7 +1,6 @@
 import ConfirmModal from '@/components/ConfirmModal';
 import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
-import { ButtonLink } from '@/components/ui/ButtonLink';
 import {
     addPlaylistItem,
     fetchPlaylistItems,
@@ -158,17 +157,6 @@ export function PlaylistDetailPage() {
 
     return (
         <div className="mx-auto max-w-4xl px-4 py-6">
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                <ButtonLink to="/my/playlists" variant="secondary">
-                    Back to playlists
-                </ButtonLink>
-                <div className="flex flex-wrap gap-2">
-                    <ButtonLink to="/my/quiz-questions" variant="secondary">
-                        My quiz questions
-                    </ButtonLink>
-                </div>
-            </div>
-
             <h1 className="mb-2 text-2xl font-bold">{playlist.name}</h1>
             {playlist.description?.trim() ? (
                 <p className="text-muted mb-4 max-w-2xl text-sm">

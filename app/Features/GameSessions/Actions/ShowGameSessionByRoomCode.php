@@ -8,6 +8,7 @@ use App\Enums\SessionStatus;
 use App\Features\Auth\Responses\MessageResponse;
 use App\Models\GameSession;
 use App\Support\GameSessions\GameSessionRoomViewBuilder;
+use App\Support\GameSessions\ValidGameRoomCode;
 use Symfony\Component\HttpFoundation\Response;
 
 class ShowGameSessionByRoomCode
@@ -15,7 +16,14 @@ class ShowGameSessionByRoomCode
     public function __invoke(string $roomCode): Response
     {
         $user = assertedUser();
-        $normalized = strtoupper($roomCode);
+
+        if (!ValidGameRoomCode::isValid($roomCode)) {
+            return response()->json(MessageResponse::from([
+                'message' => ValidGameRoomCode::invalidFormatMessage(),
+            ]), 422);
+        }
+
+        $normalized = ValidGameRoomCode::normalize($roomCode);
 
         /** @var GameSession|null $session */
         $session = GameSession::query()

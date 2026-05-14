@@ -3,6 +3,7 @@ import { App } from './app';
 import { authRoutes } from './features/auth/routes';
 import {
     GameSessionRoomPage,
+    gameSessionRecapLoader,
     gameSessionRoomLoader,
 } from './features/game-sessions/GameSessionRoomPage';
 import {
@@ -63,6 +64,13 @@ export const router = createBrowserRouter([
                 loader: gameSessionRoomLoader,
                 errorElement: <ErrorPage />,
                 handle: { isProtected: true, requiresFullAccount: false },
+            },
+            {
+                path: 'my/game-sessions/:sessionId/recap',
+                element: <GameSessionRoomPage />,
+                loader: gameSessionRecapLoader,
+                errorElement: <ErrorPage />,
+                handle: { isProtected: true, requiresFullAccount: true },
             },
             {
                 path: 'my/game-sessions',

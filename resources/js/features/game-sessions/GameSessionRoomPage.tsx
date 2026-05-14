@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 import { QuestionType } from '@/schemas/App/Enums/QuestionType';
 import type { GameSessionRoomViewData } from '@/schemas/App/Data/Responses/GameSessionRoomViewData';
 import type { SessionRoundGameplayData } from '@/schemas/App/Data/Responses/SessionRoundGameplayData';
-import { useCallback, useMemo, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import {
     useLoaderData,
@@ -24,6 +24,7 @@ import {
     useRevalidator,
 } from 'react-router-dom';
 
+export { gameSessionRecapLoader } from '@/features/game-sessions/gameSessionRecapLoader';
 export { gameSessionRoomLoader } from '@/features/game-sessions/gameSessionRoomLoader';
 
 function findActiveRound(
@@ -34,22 +35,65 @@ function findActiveRound(
     );
 }
 
+function formatSessionInstant(value: Date | null | undefined): string {
+    if (value == null) {
+        return '—';
+    }
+    return new Intl.DateTimeFormat(undefined, {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+    }).format(value instanceof Date ? value : new Date(value));
+}
+
+function multipleChoiceAnswerLabel(
+    round: SessionRoundGameplayData,
+    selectedOptionId: string | null,
+): string | null {
+    if (!selectedOptionId) {
+        return null;
+    }
+    const opt = round.question.multiple_choice_options.find(
+        (o) => o.id === selectedOptionId,
+    );
+    return opt?.option_text ?? null;
+}
+
 export function GameSessionRoomPage() {
     const { user } = useAuth();
     const room = useLoaderData<GameSessionRoomViewData>();
     const core = room.session;
-    const params = useParams();
+    const params = useParams<{
+        roomCode?: string;
+        sessionId?: string;
+    }>();
     const navigate = useNavigate();
     const revalidator = useRevalidator();
     const roomCode = params.roomCode ?? core.room_code;
+    const isRecapRoute = Boolean(params.sessionId);
+    const isCompleted = core.status === 'completed';
+    const canLeaveAsParticipant =
+        room.viewer_participant_id !== null && !isCompleted;
+    const exitHref =
+        isRegisteredUser(user) && (isRecapRoute || isCompleted)
+            ? '/my/game-sessions'
+            : '/game-sessions/lobby';
+    const exitLabel = (() => {
+        if (isRecapRoute || isCompleted) {
+            return isRegisteredUser(user) ? 'Back to my sessions' : 'Back to lobby';
+        }
+        return 'Back to lobby';
+    })();
 
     const revalidateRoom = () => {
         revalidator.revalidate();
     };
 
-    const { participantCount } = useGameSessionChannel(core.id, {
-        onSessionUpdated: revalidateRoom,
-    });
+    const { participantCount } = useGameSessionChannel(
+        isCompleted ? undefined : core.id,
+        {
+            onSessionUpdated: revalidateRoom,
+        },
+    );
 
     const displayCount = (() => {
         if (participantCount !== null) {
@@ -63,6 +107,8 @@ export function GameSessionRoomPage() {
         list.sort((a, b) => b.current_total_score - a.current_total_score);
         return list;
     })();
+
+    const sortedRounds = [...room.rounds].sort((a, b) => a.round_number - b.round_number);
 
     const activeRound = findActiveRound(room.rounds);
 
@@ -160,42 +206,38 @@ export function GameSessionRoomPage() {
 
     return (
         <div className="mx-auto max-w-4xl px-4 py-6">
-            <div className="mb-6 flex flex-wrap items-center gap-3">
-                <ButtonLink to="/game-sessions/lobby" variant="secondary">
-                    Lobby
-                </ButtonLink>
-                {isRegisteredUser(user) ? (
-                    <ButtonLink to="/my/game-sessions" variant="secondary">
-                        My sessions
-                    </ButtonLink>
-                ) : null}
-            </div>
-
-            <h1 className="mb-2 text-2xl font-bold">Room {roomCode}</h1>
+            <h1 className="mb-2 text-2xl font-bold">
+                {isRecapRoute ? 'Session recap' : `Room ${roomCode}`}
+            </h1>
             <p className="text-muted mb-6 text-sm">
-                Status: {core.status} · Players: {displayCount} /{' '}
-                {core.max_players}
+                {isRecapRoute ? (
+                    <span className="font-mono tracking-wide">{core.room_code}</span>
+                ) : null}
+                {isRecapRoute ? ' · ' : null}
+                Status: {core.status} · Players: {displayCount} / {core.max_players}
                 {room.viewer_is_host ? (
                     <span className="text-muted"> · You are the host</span>
                 ) : null}
                 {room.viewer_participant_id ? (
-                    <span className="text-muted"> · You are playing</span>
+                    <span className="text-muted"> · You played in this session</span>
                 ) : null}
             </p>
 
-            <PageIntroExpandable
-                summary="Live session room: host can start the quiz and advance rounds; players submit answers when a round is open."
-                moreLabel="How play works"
-            >
-                <p className="text-muted text-sm">
-                    Join while the session is in the lobby. When the host starts, the
-                    host also gets a player seat so you can rehearse solo. Have guests
-                    join from the lobby before start if they need a seat. Questions follow
-                    the playlist order (up to ten rounds). After you submit, other players
-                    will not see your answer until the round closes. The host advances when
-                    you are ready for the next question.
-                </p>
-            </PageIntroExpandable>
+            {!isCompleted ? (
+                <PageIntroExpandable
+                    summary="Live session room: host can start the quiz and advance rounds; players submit answers when a round is open."
+                    moreLabel="How play works"
+                >
+                    <p className="text-muted text-sm">
+                        Join while the session is in the lobby. When the host starts, the
+                        host also gets a player seat so you can rehearse solo. Have guests
+                        join from the lobby before start if they need a seat. Questions follow
+                        the playlist order (up to ten rounds). After you submit, other players
+                        will not see your answer until the round closes. The host advances when
+                        you are ready for the next question.
+                    </p>
+                </PageIntroExpandable>
+            ) : null}
 
             {core.status === 'lobby' && room.viewer_is_host ? (
                 <div className="bg-card mb-6 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10">
@@ -381,49 +423,161 @@ export function GameSessionRoomPage() {
                 </div>
             ) : null}
 
-            {core.status === 'completed' ? (
-                <div className="bg-card mb-6 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10">
-                    <h2 className="mb-2 font-semibold">Game complete</h2>
-                    <p className="text-muted text-sm">
-                        Final scores are below. Thanks for playing.
+            {isCompleted ? (
+                <div className="bg-card mb-6 rounded-lg border border-transparent p-6 shadow-md dark:border-white/10">
+                    <p className="text-primary mb-1 text-sm font-semibold uppercase tracking-wide">
+                        Game finished
                     </p>
-                </div>
-            ) : null}
+                    <h2 className="mb-3 text-xl font-bold">Results</h2>
+                    <p className="text-muted mb-6 text-sm">
+                        Started {formatSessionInstant(core.started_at)} · Ended{' '}
+                        {formatSessionInstant(core.ended_at)}
+                    </p>
 
-            <div className="bg-card mb-6 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10">
-                <h2 className="mb-2 font-semibold">Scores</h2>
-                {sortedParticipants.length > 0 ? (
-                    <ul className="flex flex-col gap-2">
-                        {sortedParticipants.map((p) => (
+                    <h3 className="mb-2 font-semibold">Final scores</h3>
+                    {sortedParticipants.length > 0 ? (
+                        <ol className="mb-8 flex flex-col gap-2">
+                            {sortedParticipants.map((p, index) => (
+                                <li
+                                    key={p.id}
+                                    className="flex items-center justify-between rounded-md bg-black/5 px-3 py-2 text-sm dark:bg-white/5"
+                                >
+                                    <span>
+                                        <span className="text-muted mr-2 font-mono">
+                                            #{index + 1}
+                                        </span>
+                                        {p.user?.name ?? 'Player'}
+                                        {p.user_id === core.host_id ? (
+                                            <span className="text-muted"> (host)</span>
+                                        ) : null}
+                                    </span>
+                                    <span className="font-mono font-semibold">
+                                        {p.current_total_score} pts
+                                    </span>
+                                </li>
+                            ))}
+                        </ol>
+                    ) : (
+                        <p className="text-muted mb-8 text-sm">No participants.</p>
+                    )}
+
+                    <h3 className="mb-3 font-semibold">Rounds</h3>
+                    <ul className="flex flex-col gap-4">
+                        {sortedRounds.map((round) => (
                             <li
-                                key={p.id}
-                                className="flex items-center justify-between text-sm"
+                                key={round.id}
+                                className="border-border rounded-lg border p-4 dark:border-white/10"
                             >
-                                <span>
-                                    {p.user?.name ?? 'Player'}
-                                    {p.user_id === core.host_id ? (
-                                        <span className="text-muted"> (host)</span>
-                                    ) : null}
-                                </span>
-                                <span className="font-mono font-medium">
-                                    {p.current_total_score}
-                                </span>
+                                <p className="text-muted mb-1 text-xs font-medium uppercase">
+                                    Round {round.round_number}
+                                </p>
+                                <p className="mb-2 text-sm font-medium">
+                                    {round.question.prompt_text?.trim() ?? 'Question'}
+                                </p>
+                                {round.question.correct_answer ? (
+                                    <p className="text-muted mb-3 text-sm">
+                                        Correct answer:{' '}
+                                        <span className="text-foreground font-medium">
+                                            {round.question.correct_answer}
+                                        </span>
+                                    </p>
+                                ) : null}
+                                {round.answers.length > 0 ? (
+                                    <ul className="flex flex-col gap-1.5">
+                                        {round.answers.map((a) => (
+                                            <li
+                                                key={a.id}
+                                                className="text-muted text-sm"
+                                            >
+                                                <span className="text-foreground font-medium">
+                                                    {a.participant_display_name}
+                                                </span>
+                                                {multipleChoiceAnswerLabel(
+                                                    round,
+                                                    a.selected_option_id,
+                                                ) ? (
+                                                    <span>
+                                                        {' '}
+                                                        ·{' '}
+                                                        {multipleChoiceAnswerLabel(
+                                                            round,
+                                                            a.selected_option_id,
+                                                        )}
+                                                    </span>
+                                                ) : null}
+                                                {a.submitted_text ? (
+                                                    <span> · “{a.submitted_text}”</span>
+                                                ) : null}
+                                                {a.is_correct === true ? (
+                                                    <span className="text-success">
+                                                        {' '}
+                                                        · correct
+                                                    </span>
+                                                ) : null}
+                                                {a.is_correct === false ? (
+                                                    <span className="text-error">
+                                                        {' '}
+                                                        · incorrect
+                                                    </span>
+                                                ) : null}
+                                                {a.points_awarded != null &&
+                                                a.points_awarded > 0 ? (
+                                                    <span> · +{a.points_awarded} pts</span>
+                                                ) : null}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="text-muted text-sm">No answers recorded.</p>
+                                )}
                             </li>
                         ))}
                     </ul>
-                ) : (
-                    <p className="text-muted text-sm">No participants yet.</p>
-                )}
-            </div>
+                </div>
+            ) : null}
 
-            <Button
-                type="button"
-                variant="secondary"
-                disabled={leaving}
-                onClick={() => void handleLeave()}
-            >
-                {leaving ? 'Leaving…' : 'Leave session'}
-            </Button>
+            {!isCompleted ? (
+                <div className="bg-card mb-6 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10">
+                    <h2 className="mb-2 font-semibold">Scores</h2>
+                    {sortedParticipants.length > 0 ? (
+                        <ul className="flex flex-col gap-2">
+                            {sortedParticipants.map((p) => (
+                                <li
+                                    key={p.id}
+                                    className="flex items-center justify-between text-sm"
+                                >
+                                    <span>
+                                        {p.user?.name ?? 'Player'}
+                                        {p.user_id === core.host_id ? (
+                                            <span className="text-muted"> (host)</span>
+                                        ) : null}
+                                    </span>
+                                    <span className="font-mono font-medium">
+                                        {p.current_total_score}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="text-muted text-sm">No participants yet.</p>
+                    )}
+                </div>
+            ) : null}
+
+            {canLeaveAsParticipant ? (
+                <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={leaving}
+                    onClick={() => void handleLeave()}
+                >
+                    {leaving ? 'Leaving…' : 'Leave session'}
+                </Button>
+            ) : (
+                <ButtonLink to={exitHref} variant="secondary">
+                    {exitLabel}
+                </ButtonLink>
+            )}
         </div>
     );
 }

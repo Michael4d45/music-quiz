@@ -20,11 +20,21 @@ export async function fetchGameSessionsLobby() {
 }
 
 export async function fetchGameSessionByRoomCode(roomCode: string) {
-    const code = encodeURIComponent(roomCode);
+    const code = encodeURIComponent(roomCode.trim());
     return runEffect(
         pipe(
             httpRequest(`/api/game-sessions/room/${code}`),
             withRetry('fetchGameSessionByRoomCode'),
+            decodeJson(GameSessionRoomViewDataSchema),
+        ),
+    );
+}
+
+export async function fetchGameSessionRecap(sessionId: string) {
+    return runEffect(
+        pipe(
+            httpRequest(`/api/game-sessions/${sessionId}/recap`),
+            withRetry('fetchGameSessionRecap'),
             decodeJson(GameSessionRoomViewDataSchema),
         ),
     );

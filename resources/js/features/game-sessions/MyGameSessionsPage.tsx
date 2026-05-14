@@ -1,6 +1,7 @@
 import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
 import { ButtonLink } from '@/components/ui/ButtonLink';
+import { useAuth } from '@/features/auth/AuthContext';
 import {
     createGameSession,
     fetchMyGameSessions,
@@ -15,7 +16,7 @@ import type { ScoringRuleData } from '@/schemas/App/Data/Models/ScoringRuleData'
 import type { PlaylistData } from '@/schemas/App/Data/Models/PlaylistData';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { Link, useLoaderData, useRevalidator } from 'react-router-dom';
+import { useLoaderData, useRevalidator } from 'react-router-dom';
 
 export interface MyGameSessionsLoaderData {
     sessions: readonly GameSessionData[];
@@ -44,6 +45,7 @@ export async function myGameSessionsLoader(): Promise<MyGameSessionsLoaderData> 
 }
 
 export function MyGameSessionsPage() {
+    const { user } = useAuth();
     const { sessions, quiz_modes, scoring_rules, playlists } =
         useLoaderData<MyGameSessionsLoaderData>();
     const revalidator = useRevalidator();
@@ -75,17 +77,25 @@ export function MyGameSessionsPage() {
         }
     };
 
+    const sortedSessions = [...sessions].sort((a, b) => {
+        const rank = (s: (typeof sessions)[number]) =>
+            s.status === 'completed' ? 0 : 1;
+        const ar = rank(a);
+        const br = rank(b);
+        if (ar !== br) {
+            return ar - br;
+        }
+        const ad = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const bd = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return bd - ad;
+    });
+
     return (
         <div className="mx-auto max-w-4xl px-4 py-6">
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                <h1 className="text-2xl font-bold">My game sessions</h1>
-                <ButtonLink to="/game-sessions/lobby" variant="secondary">
-                    Public lobby
-                </ButtonLink>
-            </div>
+            <h1 className="mb-6 text-2xl font-bold">My game sessions</h1>
 
             <PageIntroExpandable
-                summary="Create a room, share the code, and optionally bind a playlist so rounds draw from your library."
+                summary="Create a room, share the code, and optionally bind a playlist so rounds draw from your library. Past and in-progress games you host or join appear below."
                 moreLabel="More about hosting a session"
             >
                 <p>
@@ -211,22 +221,45 @@ export function MyGameSessionsPage() {
                 <p className="text-muted">No sessions yet.</p>
             ) : (
                 <ul className="flex flex-col gap-3" role="list">
-                    {sessions.map((s) => (
-                        <li key={s.id}>
-                            <Link
-                                to={`/game-sessions/room/${s.room_code}`}
-                                className="bg-card hover:border-primary/40 flex flex-col gap-1 rounded-lg border border-transparent p-4 shadow-md transition-colors dark:border-white/10"
+                    {sortedSessions.map((s) => {
+                        const isHost = user ? s.host_id === user.id : false;
+                        const roleLabel = isHost ? 'Host' : 'Player';
+                        return (
+                            <li
+                                key={s.id}
+                                className="bg-card flex flex-col gap-3 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10"
                             >
-                                <span className="font-mono text-lg font-semibold tracking-wide">
-                                    {s.room_code}
-                                </span>
-                                <span className="text-muted text-sm">
-                                    {s.status}
-                                    {s.is_public ? ' · public' : ' · private'}
-                                </span>
-                            </Link>
-                        </li>
-                    ))}
+                                <div className="flex flex-wrap items-start justify-between gap-2">
+                                    <div>
+                                        <span className="font-mono text-lg font-semibold tracking-wide">
+                                            {s.room_code}
+                                        </span>
+                                        <p className="text-muted text-sm">
+                                            {s.status}
+                                            {s.is_public ? ' · public' : ' · private'}
+                                            {' · '}
+                                            {roleLabel}
+                                        </p>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        {s.status === 'completed' ? (
+                                            <ButtonLink
+                                                to={`/my/game-sessions/${s.id}/recap`}
+                                            >
+                                                View results
+                                            </ButtonLink>
+                                        ) : (
+                                            <ButtonLink
+                                                to={`/game-sessions/room/${s.room_code}`}
+                                            >
+                                                Open room
+                                            </ButtonLink>
+                                        )}
+                                    </div>
+                                </div>
+                            </li>
+                        );
+                    })}
                 </ul>
             )}
         </div>

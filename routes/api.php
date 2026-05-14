@@ -9,6 +9,7 @@ use App\Features\GameSessions\Actions\LeaveGameSession;
 use App\Features\GameSessions\Actions\ListMyGameSessions;
 use App\Features\GameSessions\Actions\ListPublicLobbyGameSessions;
 use App\Features\GameSessions\Actions\ShowGameSessionByRoomCode;
+use App\Features\GameSessions\Actions\ShowGameSessionRecap;
 use App\Features\GameSessions\Actions\StartGameSession;
 use App\Features\GameSessions\Actions\SubmitSessionRoundAnswer;
 use App\Features\GameSessions\Actions\UpdateGameSession;
@@ -49,7 +50,11 @@ Route::middleware(['web', 'auth'])->group(function (): void {
     Route::get(
         'game-sessions/room/{roomCode}',
         ShowGameSessionByRoomCode::class,
-    )->where('roomCode', '[A-Za-z0-9]{6}');
+    )->where('roomCode', '[A-Za-z0-9]{1,32}');
+    Route::get(
+        'game-sessions/{gameSession}/recap',
+        ShowGameSessionRecap::class,
+    )->whereUuid('gameSession');
     Route::post('game-sessions/join', JoinGameSession::class);
     Route::delete(
         'game-sessions/{gameSession}/leave',

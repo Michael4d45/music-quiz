@@ -147,17 +147,7 @@ export function MyPlaylistsPage() {
 
     return (
         <div className="mx-auto max-w-4xl px-4 py-6">
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                <h1 className="text-2xl font-bold">My playlists</h1>
-                <div className="flex flex-wrap gap-2">
-                    <ButtonLink to="/my/music-tracks" variant="secondary">
-                        My tracks
-                    </ButtonLink>
-                    <ButtonLink to="/my/quiz-questions" variant="secondary">
-                        My quiz questions
-                    </ButtonLink>
-                </div>
-            </div>
+            <h1 className="mb-6 text-2xl font-bold">My playlists</h1>
 
             <PageIntroExpandable
                 summary="Ordered lists of quiz questions you can attach when hosting. Open a playlist to reorder items; edit name, visibility, and status here."

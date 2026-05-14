@@ -1,7 +1,6 @@
 import ConfirmModal from '@/components/ConfirmModal';
 import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
-import { ButtonLink } from '@/components/ui/ButtonLink';
 import {
     createQuizQuestion,
     deleteQuizQuestion,
@@ -26,7 +25,7 @@ import type { QuestionType } from '@/schemas/App/Enums/QuestionType';
 import { Visibility } from '@/schemas/App/Enums/Visibility';
 import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
-import { Link, useLoaderData, useRevalidator } from 'react-router-dom';
+import { useLoaderData, useRevalidator } from 'react-router-dom';
 
 export interface MyQuizQuestionsLoaderData extends MyQuizQuestionsResponseData {
     readonly question_types: readonly IdLabelOptionData[];
@@ -203,17 +202,7 @@ export function MyQuizQuestionsPage() {
 
     return (
         <div className="mx-auto max-w-4xl px-4 py-6">
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                <h1 className="text-2xl font-bold">My quiz questions</h1>
-                <div className="flex flex-wrap gap-2">
-                    <ButtonLink to="/my/music-tracks" variant="secondary">
-                        My tracks
-                    </ButtonLink>
-                    <ButtonLink to="/my/playlists" variant="secondary">
-                        My playlists
-                    </ButtonLink>
-                </div>
-            </div>
+            <h1 className="mb-6 text-2xl font-bold">My quiz questions</h1>
 
             <PageIntroExpandable
                 summary="Write prompts and correct answers; link a track when a round needs a specific recording."
@@ -343,14 +332,8 @@ export function MyQuizQuestionsPage() {
                             </select>
                             {tracks.length === 0 && (
                                 <p className="text-muted mt-1 text-xs">
-                                    Add tracks under{' '}
-                                    <Link
-                                        to="/my/music-tracks"
-                                        className="text-primary hover:text-primary-hover font-medium underline"
-                                    >
-                                        My tracks
-                                    </Link>{' '}
-                                    to enable linking.
+                                    Add tracks under My tracks in the sidebar to
+                                    enable linking.
                                 </p>
                             )}
                         </div>
@@ -668,13 +651,8 @@ function QuizQuestionRow({
                         </select>
                         {tracks.length === 0 && (
                             <p className="text-muted mt-1 text-xs">
-                                <Link
-                                    to="/my/music-tracks"
-                                    className="text-primary underline"
-                                >
-                                    Add tracks
-                                </Link>{' '}
-                                to link recordings.
+                                Add tracks under My tracks in the sidebar to link
+                                recordings.
                             </p>
                         )}
                     </div>

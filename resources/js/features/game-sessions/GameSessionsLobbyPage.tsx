@@ -1,8 +1,6 @@
 import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
-import { ButtonLink } from '@/components/ui/ButtonLink';
 import { useAuth } from '@/features/auth/AuthContext';
-import { isRegisteredUser } from '@/features/auth/authSession';
 import { useOfflineBlock } from '@/hooks/useOfflineBlock';
 import { apiFailureMessage } from '@/lib/apiCore';
 import type { GameSessionLobbyCurrentSessionData } from '@/schemas/App/Data/Models/GameSessionLobbyCurrentSessionData';
@@ -101,14 +99,7 @@ export function GameSessionsLobbyPage() {
 
     return (
         <div className="mx-auto max-w-4xl px-4 py-6">
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                <h1 className="text-2xl font-bold">Game lobby</h1>
-                {isRegisteredUser(user) ? (
-                    <ButtonLink to="/my/game-sessions" variant="secondary">
-                        Host a session
-                    </ButtonLink>
-                ) : null}
-            </div>
+            <h1 className="mb-6 text-2xl font-bold">Game lobby</h1>
 
             {current_session ? (
                 <ActiveSessionBanner
