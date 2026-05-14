@@ -51,6 +51,7 @@ export function useGameSessionChannel(
             )(data);
             if (decoded._tag === 'Right') {
                 setParticipantCount(decoded.right.participant_count);
+                onSessionUpdatedRef.current?.();
             }
         };
 
@@ -59,6 +60,7 @@ export function useGameSessionChannel(
                 GameSessionUpdatedDataSchema,
             )(data);
             if (decoded._tag === 'Right' && decoded.right.session_id === sessionId) {
+                setParticipantCount(null);
                 onSessionUpdatedRef.current?.();
             }
         };

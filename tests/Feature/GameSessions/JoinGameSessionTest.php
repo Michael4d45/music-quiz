@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Events\GameSessionParticipantJoined;
+use App\Events\GameSessionUpdated;
 use App\Models\GameSession;
 use App\Models\SessionParticipant;
 use App\Models\User;
+use Illuminate\Support\Facades\Event;
 
 test('guest can join a lobby session by room code', function (): void {
     $guest = User::factory()->guest()->create();
@@ -193,6 +196,51 @@ test('join stores optional display_name on participant guest_name column', funct
 
     expect($participant)->not->toBeNull();
     expect($participant->guest_name)->toBe('Luna');
+});
+
+test('join broadcasts participant joined for a new seat', function (): void {
+    Event::fake([GameSessionParticipantJoined::class]);
+    $guest = User::factory()->guest()->create();
+    $session = GameSession::factory()->publicLobby()->create();
+
+    $this->actingAs($guest, 'web')->postJson('/api/game-sessions/join', [
+        'room_code' => $session->room_code,
+    ])->assertSuccessful();
+
+    Event::assertDispatched(GameSessionParticipantJoined::class);
+});
+
+test('join idempotent does not broadcast participant joined twice', function (): void {
+    Event::fake([GameSessionParticipantJoined::class]);
+    $guest = User::factory()->guest()->create();
+    $session = GameSession::factory()->publicLobby()->create();
+
+    $this->actingAs($guest, 'web')->postJson('/api/game-sessions/join', [
+        'room_code' => $session->room_code,
+    ])->assertSuccessful();
+
+    $this->actingAs($guest, 'web')->postJson('/api/game-sessions/join', [
+        'room_code' => $session->room_code,
+    ])->assertSuccessful();
+
+    Event::assertDispatchedTimes(GameSessionParticipantJoined::class, 1);
+});
+
+test('leave broadcasts session updated', function (): void {
+    $guest = User::factory()->guest()->create();
+    $session = GameSession::factory()->publicLobby()->create();
+
+    $this->actingAs($guest, 'web')->postJson('/api/game-sessions/join', [
+        'room_code' => $session->room_code,
+    ])->assertSuccessful();
+
+    Event::fake([GameSessionUpdated::class]);
+
+    $this->actingAs($guest, 'web')
+        ->deleteJson('/api/game-sessions/' . $session->id . '/leave')
+        ->assertSuccessful();
+
+    Event::assertDispatched(GameSessionUpdated::class);
 });
 
 test('join rejects display_name longer than 64 characters', function (): void {

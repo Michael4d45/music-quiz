@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Features\GameSessions\Actions;
 
+use App\Events\GameSessionUpdated;
 use App\Features\Auth\Responses\MessageResponse;
 use App\Models\GameSession;
 use App\Models\SessionParticipant;
@@ -27,6 +28,8 @@ class LeaveGameSession
         }
 
         $participant->delete();
+
+        event(new GameSessionUpdated($gameSession));
 
         return response()->json(MessageResponse::from([
             'message' => 'Left the session',
