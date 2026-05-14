@@ -28,7 +28,11 @@ class JoinGameSession
         $normalized = strtoupper($request->room_code);
 
         /** @var array{participant: SessionParticipant, is_new: bool}|null $result */
-        $result = DB::transaction(function () use ($normalized, $request, $user) {
+        $result = DB::transaction(function () use (
+            $normalized,
+            $request,
+            $user,
+        ) {
             /** @var GameSession|null $session */
             $session = GameSession::query()
                 ->whereRaw('upper(room_code) = ?', [$normalized])
@@ -57,7 +61,13 @@ class JoinGameSession
                 ];
             }
 
-            if ($user->is_guest && ActiveGameSessionGuards::guestHasCommitmentOutsideSession($user, $session)) {
+            if (
+                $user->is_guest
+                && ActiveGameSessionGuards::guestHasCommitmentOutsideSession(
+                    $user,
+                    $session,
+                )
+            ) {
                 abort(422, 'Leave your current game before joining another.');
             }
 
@@ -72,9 +82,7 @@ class JoinGameSession
             $created = SessionParticipant::query()->create([
                 'session_id' => $session->id,
                 'user_id' => $user->id,
-                'guest_name' => self::normalizedParticipantDisplayName(
-                    $request->display_name,
-                ),
+                'guest_name' => self::normalizedParticipantDisplayName($request->display_name),
                 'role' => Role::Player,
                 'current_total_score' => 0,
                 'is_connected' => true,
@@ -115,9 +123,8 @@ class JoinGameSession
         return response()->json(SessionParticipantData::from($participant));
     }
 
-    private static function normalizedParticipantDisplayName(
-        null|string $displayName,
-    ): null|string {
+    private static function normalizedParticipantDisplayName(null|string $displayName): null|string
+    {
         if ($displayName === null) {
             return null;
         }

@@ -112,10 +112,7 @@ export async function fetchPlaylistItems(playlistId: string) {
     );
 }
 
-export async function addPlaylistItem(
-    playlistId: string,
-    questionId: string,
-) {
+export async function addPlaylistItem(playlistId: string, questionId: string) {
     return runEffect(
         pipe(
             Effect.succeed({ question_id: questionId }),

@@ -1,9 +1,9 @@
 import { useAuth } from '@/features/auth/AuthContext';
 import { echoManager } from '@/lib/echoManager';
 import { GameSessionParticipantJoinedDataSchema } from '@/schemas/App/Data/Events/GameSessionParticipantJoinedData';
+import type { GameSessionRoundMediaPlaybackData } from '@/schemas/App/Data/Events/GameSessionRoundMediaPlaybackData';
 import { GameSessionRoundMediaPlaybackDataSchema } from '@/schemas/App/Data/Events/GameSessionRoundMediaPlaybackData';
 import { GameSessionUpdatedDataSchema } from '@/schemas/App/Data/Events/GameSessionUpdatedData';
-import type { GameSessionRoundMediaPlaybackData } from '@/schemas/App/Data/Events/GameSessionRoundMediaPlaybackData';
 import { Schema } from 'effect';
 import { useEffect, useRef, useState } from 'react';
 
@@ -11,7 +11,9 @@ export function useGameSessionChannel(
     sessionId: string | undefined,
     options?: {
         onSessionUpdated?: () => void;
-        onRoundMediaPlayback?: (data: GameSessionRoundMediaPlaybackData) => void;
+        onRoundMediaPlayback?: (
+            data: GameSessionRoundMediaPlaybackData,
+        ) => void;
         /** When false, the client will not subscribe to host media sync events. */
         subscribeRoundMediaPlayback?: boolean;
     },
@@ -59,7 +61,10 @@ export function useGameSessionChannel(
             const decoded = Schema.decodeUnknownEither(
                 GameSessionUpdatedDataSchema,
             )(data);
-            if (decoded._tag === 'Right' && decoded.right.session_id === sessionId) {
+            if (
+                decoded._tag === 'Right' &&
+                decoded.right.session_id === sessionId
+            ) {
                 setParticipantCount(null);
                 onSessionUpdatedRef.current?.();
             }
@@ -70,8 +75,8 @@ export function useGameSessionChannel(
                 GameSessionRoundMediaPlaybackDataSchema,
             )(data);
             if (
-                decoded._tag === 'Right'
-                && decoded.right.session_id === sessionId
+                decoded._tag === 'Right' &&
+                decoded.right.session_id === sessionId
             ) {
                 onRoundMediaPlaybackRef.current?.(decoded.right);
             }

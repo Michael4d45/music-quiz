@@ -25,7 +25,9 @@ class SyncGameSessionRoundMediaPlayback
         }
 
         $playing = (bool) $request->validated('playing');
-        $currentTimeSeconds = (float) $request->validated('current_time_seconds');
+        $currentTimeSeconds = (float) $request->validated(
+            'current_time_seconds',
+        );
 
         $serverSeq = hrtime(true);
 

@@ -2,7 +2,7 @@ import { decodeJson, httpRequest, runEffect, withRetry } from '@/lib/apiCore';
 import { MusicSourcesListResponseDataSchema } from '@/schemas/App/Data/Responses/MusicSourcesListResponseData';
 import { QuestionTypesListResponseDataSchema } from '@/schemas/App/Data/Responses/QuestionTypesListResponseData';
 import { SubCategoriesListResponseDataSchema } from '@/schemas/App/Data/Responses/SubCategoriesListResponseData';
-import { Effect, pipe } from 'effect';
+import { pipe } from 'effect';
 
 export async function fetchSubCategories() {
     return runEffect(

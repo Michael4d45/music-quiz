@@ -1,7 +1,7 @@
 import { decodeJson, httpRequest, runEffect, withRetry } from '@/lib/apiCore';
 import { MessageResponseSchema } from '@/schemas/App/Data/MessageResponse';
-import { MyQuizQuestionsResponseDataSchema } from '@/schemas/App/Data/Responses/MyQuizQuestionsResponseData';
 import { QuizQuestionDataSchema } from '@/schemas/App/Data/Models/QuizQuestionData';
+import { MyQuizQuestionsResponseDataSchema } from '@/schemas/App/Data/Responses/MyQuizQuestionsResponseData';
 import { Effect, pipe } from 'effect';
 
 export async function fetchMyQuizQuestions() {

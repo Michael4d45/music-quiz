@@ -16,7 +16,10 @@ test('short room code returns 422 with a clear message', function (): void {
     );
 
     $response->assertStatus(422);
-    $response->assertJsonPath('message', ValidGameRoomCode::invalidFormatMessage());
+    $response->assertJsonPath(
+        'message',
+        ValidGameRoomCode::invalidFormatMessage(),
+    );
 });
 
 test('authenticated user may load recap for a session they host', function (): void {
@@ -83,7 +86,9 @@ test('my game sessions includes games joined as a player', function (): void {
         'user_id' => $player->id,
     ]);
 
-    $response = $this->actingAs($player, 'web')->getJson('/api/my/game-sessions');
+    $response = $this->actingAs($player, 'web')->getJson(
+        '/api/my/game-sessions',
+    );
 
     $response->assertSuccessful();
     $ids = collect($response->json('sessions'))->pluck('id')->all();

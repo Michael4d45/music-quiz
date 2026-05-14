@@ -15,10 +15,10 @@ import { useGameSessionChannel } from '@/hooks/useGameSessionChannel';
 import { useOfflineBlock } from '@/hooks/useOfflineBlock';
 import { apiFailureMessage } from '@/lib/apiCore';
 import { cn } from '@/lib/utils';
-import { QuestionType } from '@/schemas/App/Enums/QuestionType';
-import type { GameSessionRoomViewData } from '@/schemas/App/Data/Responses/GameSessionRoomViewData';
 import type { SessionParticipantData } from '@/schemas/App/Data/Models/SessionParticipantData';
+import type { GameSessionRoomViewData } from '@/schemas/App/Data/Responses/GameSessionRoomViewData';
 import type { SessionRoundGameplayData } from '@/schemas/App/Data/Responses/SessionRoundGameplayData';
+import { QuestionType } from '@/schemas/App/Enums/QuestionType';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import {
@@ -120,8 +120,7 @@ export function GameSessionRoomPage() {
                     server_seq: data.server_seq,
                 });
             },
-            subscribeRoundMediaPlayback:
-                !isCompleted && !room.viewer_is_host,
+            subscribeRoundMediaPlayback: !isCompleted && !room.viewer_is_host,
         },
     );
 
@@ -138,7 +137,9 @@ export function GameSessionRoomPage() {
         return list;
     })();
 
-    const sortedRounds = [...room.rounds].sort((a, b) => a.round_number - b.round_number);
+    const sortedRounds = [...room.rounds].sort(
+        (a, b) => a.round_number - b.round_number,
+    );
 
     const activeRound = findActiveRound(room.rounds);
 
@@ -201,9 +202,7 @@ export function GameSessionRoomPage() {
             toast.success('You have a seat in this room');
             revalidateRoom();
         } else {
-            toast.error(
-                apiFailureMessage(result, 'Could not join this room'),
-            );
+            toast.error(apiFailureMessage(result, 'Could not join this room'));
         }
     };
 
@@ -300,15 +299,21 @@ export function GameSessionRoomPage() {
             </h1>
             <p className="text-muted mb-6 text-sm">
                 {isRecapRoute ? (
-                    <span className="font-mono tracking-wide">{core.room_code}</span>
+                    <span className="font-mono tracking-wide">
+                        {core.room_code}
+                    </span>
                 ) : null}
                 {isRecapRoute ? ' · ' : null}
-                Status: {core.status} · Players: {displayCount} / {core.max_players}
+                Status: {core.status} · Players: {displayCount} /{' '}
+                {core.max_players}
                 {room.viewer_is_host ? (
                     <span className="text-muted"> · You are the host</span>
                 ) : null}
                 {room.viewer_participant_id ? (
-                    <span className="text-muted"> · You played in this session</span>
+                    <span className="text-muted">
+                        {' '}
+                        · You played in this session
+                    </span>
                 ) : null}
             </p>
 
@@ -345,13 +350,14 @@ export function GameSessionRoomPage() {
                     moreLabel="How play works"
                 >
                     <p className="text-muted text-sm">
-                        Join while the session is in the lobby — use the join card
-                        below, or enter the code on the game lobby page. When the
-                        host starts, the host also gets a player seat so you can
-                        rehearse solo. Questions follow the playlist order (up to
-                        ten rounds). After you submit, other players will not see
-                        your answer until the round closes. The host advances when
-                        you are ready for the next question.
+                        Join while the session is in the lobby — use the join
+                        card below, or enter the code on the game lobby page.
+                        When the host starts, the host also gets a player seat
+                        so you can rehearse solo. Questions follow the playlist
+                        order (up to ten rounds). After you submit, other
+                        players will not see your answer until the round closes.
+                        The host advances when you are ready for the next
+                        question.
                     </p>
                 </PageIntroExpandable>
             ) : null}
@@ -432,11 +438,13 @@ export function GameSessionRoomPage() {
                         ) : null}
                     </div>
                     <p className="text-muted mb-1 text-xs uppercase">
-                        {activeRound.question.question_type.replaceAll('_', ' ')}
+                        {activeRound.question.question_type.replaceAll(
+                            '_',
+                            ' ',
+                        )}
                     </p>
                     <p className="mb-4 text-base">
-                        {activeRound.question.prompt_text?.trim() ||
-                            'Question'}
+                        {activeRound.question.prompt_text?.trim() || 'Question'}
                     </p>
 
                     {activeRound.question.audio_upload_available ? (
@@ -444,9 +452,7 @@ export function GameSessionRoomPage() {
                             key={activeRound.id}
                             sessionId={core.id}
                             roundId={activeRound.id}
-                            variant={
-                                room.viewer_is_host ? 'host' : 'follower'
-                            }
+                            variant={room.viewer_is_host ? 'host' : 'follower'}
                             mediaStartSeconds={
                                 activeRound.question.media_start_seconds
                             }
@@ -496,7 +502,9 @@ export function GameSessionRoomPage() {
                                     disabled={submitting || !canSubmitMc}
                                     onClick={() => void handleSubmitAnswer()}
                                 >
-                                    {submitting ? 'Submitting…' : 'Submit answer'}
+                                    {submitting
+                                        ? 'Submitting…'
+                                        : 'Submit answer'}
                                 </Button>
                             </div>
                         ) : (
@@ -517,7 +525,9 @@ export function GameSessionRoomPage() {
                                     disabled={submitting || !canSubmitText}
                                     onClick={() => void handleSubmitAnswer()}
                                 >
-                                    {submitting ? 'Submitting…' : 'Submit answer'}
+                                    {submitting
+                                        ? 'Submitting…'
+                                        : 'Submit answer'}
                                 </Button>
                             </div>
                         )
@@ -540,9 +550,10 @@ export function GameSessionRoomPage() {
 
                     {!room.viewer_participant_id && !room.viewer_is_host ? (
                         <p className="text-muted text-sm">
-                            You are watching without a seat (the game has already
-                            started, so joining from here is closed). Ask the
-                            host to open a new lobby game if you want to play.
+                            You are watching without a seat (the game has
+                            already started, so joining from here is closed).
+                            Ask the host to open a new lobby game if you want to
+                            play.
                         </p>
                     ) : null}
 
@@ -563,7 +574,12 @@ export function GameSessionRoomPage() {
                                         {a.selected_option_id ? (
                                             <span className="font-mono">
                                                 {' '}
-                                                · option {a.selected_option_id.slice(0, 8)}…
+                                                · option{' '}
+                                                {a.selected_option_id.slice(
+                                                    0,
+                                                    8,
+                                                )}
+                                                …
                                             </span>
                                         ) : null}
                                         {a.submitted_text ? (
@@ -596,14 +612,15 @@ export function GameSessionRoomPage() {
             {core.status === 'in_progress' && !activeRound ? (
                 <div className="bg-card mb-6 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10">
                     <p className="text-muted text-sm">
-                        No active round (loading or transitioning). Try refreshing.
+                        No active round (loading or transitioning). Try
+                        refreshing.
                     </p>
                 </div>
             ) : null}
 
             {isCompleted ? (
                 <div className="bg-card mb-6 rounded-lg border border-transparent p-6 shadow-md dark:border-white/10">
-                    <p className="text-primary mb-1 text-sm font-semibold uppercase tracking-wide">
+                    <p className="text-primary mb-1 text-sm font-semibold tracking-wide uppercase">
                         Game finished
                     </p>
                     <h2 className="mb-3 text-xl font-bold">Results</h2>
@@ -653,7 +670,9 @@ export function GameSessionRoomPage() {
                             })}
                         </ol>
                     ) : (
-                        <p className="text-muted mb-8 text-sm">No participants.</p>
+                        <p className="text-muted mb-8 text-sm">
+                            No participants.
+                        </p>
                     )}
 
                     <h3 className="mb-3 font-semibold">Rounds</h3>
@@ -667,7 +686,8 @@ export function GameSessionRoomPage() {
                                     Round {round.round_number}
                                 </p>
                                 <p className="mb-2 text-sm font-medium">
-                                    {round.question.prompt_text?.trim() ?? 'Question'}
+                                    {round.question.prompt_text?.trim() ??
+                                        'Question'}
                                 </p>
                                 {round.question.correct_answer ? (
                                     <p className="text-muted mb-3 text-sm">
@@ -707,11 +727,13 @@ export function GameSessionRoomPage() {
                                                     className={cn(
                                                         'text-muted rounded-md px-3 py-1.5 text-sm',
                                                         isViewerAnswer &&
-                                                            'border-primary/55 bg-primary/10 text-foreground border-l-4 font-medium dark:bg-primary/15',
+                                                            'border-primary/55 bg-primary/10 text-foreground dark:bg-primary/15 border-l-4 font-medium',
                                                     )}
                                                 >
                                                     <span className="text-foreground font-medium">
-                                                        {a.participant_display_name}
+                                                        {
+                                                            a.participant_display_name
+                                                        }
                                                         {isViewerAnswer ? (
                                                             <span className="text-primary ml-1.5 text-xs font-semibold tracking-wide">
                                                                 (you)
@@ -734,7 +756,8 @@ export function GameSessionRoomPage() {
                                                     {a.submitted_text ? (
                                                         <span>
                                                             {' '}
-                                                            · “{a.submitted_text}”
+                                                            · “
+                                                            {a.submitted_text}”
                                                         </span>
                                                     ) : null}
                                                     {a.is_correct === true ? (
@@ -753,7 +776,11 @@ export function GameSessionRoomPage() {
                                                     a.points_awarded > 0 ? (
                                                         <span>
                                                             {' '}
-                                                            · +{a.points_awarded} pts
+                                                            · +
+                                                            {
+                                                                a.points_awarded
+                                                            }{' '}
+                                                            pts
                                                         </span>
                                                     ) : null}
                                                 </li>
@@ -761,7 +788,9 @@ export function GameSessionRoomPage() {
                                         })}
                                     </ul>
                                 ) : (
-                                    <p className="text-muted text-sm">No answers recorded.</p>
+                                    <p className="text-muted text-sm">
+                                        No answers recorded.
+                                    </p>
                                 )}
                             </li>
                         ))}
@@ -782,7 +811,10 @@ export function GameSessionRoomPage() {
                                     <span>
                                         {participantSeatLabel(p)}
                                         {p.user_id === core.host_id ? (
-                                            <span className="text-muted"> (host)</span>
+                                            <span className="text-muted">
+                                                {' '}
+                                                (host)
+                                            </span>
                                         ) : null}
                                     </span>
                                     <span className="font-mono font-medium">
@@ -792,7 +824,9 @@ export function GameSessionRoomPage() {
                             ))}
                         </ul>
                     ) : (
-                        <p className="text-muted text-sm">No participants yet.</p>
+                        <p className="text-muted text-sm">
+                            No participants yet.
+                        </p>
                     )}
                 </div>
             ) : null}

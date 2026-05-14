@@ -1,28 +1,31 @@
 import ConfirmModal from '@/components/ConfirmModal';
 import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
+import { fetchMyMusicTracks } from '@/features/music-tracks/api';
+import {
+    questionGroupHeading,
+    sortQuestionGroupEntries,
+} from '@/features/music-tracks/trackGrouping';
 import {
     createQuizQuestion,
     deleteQuizQuestion,
     fetchMyQuizQuestions,
     updateQuizQuestion,
 } from '@/features/quiz-questions/api';
-import { fetchMyMusicTracks } from '@/features/music-tracks/api';
-import {
-    questionGroupHeading,
-    sortQuestionGroupEntries,
-} from '@/features/music-tracks/trackGrouping';
 import { QuizQuestionTrackAudioPlayer } from '@/features/quiz-questions/QuizQuestionTrackAudioPlayer';
 import { TrackPickerWithUpload } from '@/features/quiz-questions/TrackPickerWithUpload';
-import { fetchQuestionTypes, fetchSubCategories } from '@/features/reference/api';
+import {
+    fetchQuestionTypes,
+    fetchSubCategories,
+} from '@/features/reference/api';
 import { cn } from '@/lib/utils';
 import type { IdLabelOptionData } from '@/schemas/App/Data/Models/IdLabelOptionData';
 import type { MusicTrackData } from '@/schemas/App/Data/Models/MusicTrackData';
-import type { MyQuizQuestionsResponseData } from '@/schemas/App/Data/Responses/MyQuizQuestionsResponseData';
 import type { QuizQuestionData } from '@/schemas/App/Data/Models/QuizQuestionData';
+import type { MyQuizQuestionsResponseData } from '@/schemas/App/Data/Responses/MyQuizQuestionsResponseData';
 import type { QuestionType } from '@/schemas/App/Enums/QuestionType';
 import { Visibility } from '@/schemas/App/Enums/Visibility';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useLoaderData, useRevalidator } from 'react-router-dom';
 
@@ -32,7 +35,10 @@ export interface MyQuizQuestionsLoaderData extends MyQuizQuestionsResponseData {
     readonly sub_categories: readonly IdLabelOptionData[];
 }
 
-const VISIBILITY_OPTIONS: { value: (typeof Visibility)[keyof typeof Visibility]; label: string }[] = [
+const VISIBILITY_OPTIONS: {
+    value: (typeof Visibility)[keyof typeof Visibility];
+    label: string;
+}[] = [
     { value: Visibility.Private, label: 'Private (only you)' },
     { value: Visibility.Draft, label: 'Link-only' },
     { value: Visibility.Public, label: 'Public' },
@@ -143,11 +149,15 @@ export function MyQuizQuestionsPage() {
         const mediaStart = parseNullableNonNegativeInt(mediaStartSeconds);
         const mediaEnd = parseNullableNonNegativeInt(mediaEndSeconds);
         if (mediaStartSeconds.trim() !== '' && mediaStart === null) {
-            toast.error('Media start must be a non-negative whole number of seconds');
+            toast.error(
+                'Media start must be a non-negative whole number of seconds',
+            );
             return;
         }
         if (mediaEndSeconds.trim() !== '' && mediaEnd === null) {
-            toast.error('Media end must be a non-negative whole number of seconds');
+            toast.error(
+                'Media end must be a non-negative whole number of seconds',
+            );
             return;
         }
 
@@ -244,7 +254,7 @@ export function MyQuizQuestionsPage() {
                                     </div>
                                 </summary>
                                 <ul
-                                    className="flex flex-col gap-2 border-t border-transparent px-2 pb-3 pt-1 dark:border-white/10"
+                                    className="flex flex-col gap-2 border-t border-transparent px-2 pt-1 pb-3 dark:border-white/10"
                                     role="list"
                                 >
                                     {list.map((q) => (
@@ -256,10 +266,9 @@ export function MyQuizQuestionsPage() {
                                                 tracks={allTracks}
                                                 sub_categories={sub_categories}
                                                 onTrackCreated={(t) =>
-                                                    setUploadedTracks((prev) => [
-                                                        ...prev,
-                                                        t,
-                                                    ])
+                                                    setUploadedTracks(
+                                                        (prev) => [...prev, t],
+                                                    )
                                                 }
                                                 onSaved={() =>
                                                     revalidator.revalidate()
@@ -281,7 +290,7 @@ export function MyQuizQuestionsPage() {
                 <summary className="cursor-pointer list-none px-4 py-3 text-lg font-semibold marker:hidden [&::-webkit-details-marker]:hidden">
                     Create a question
                 </summary>
-                <div className="flex flex-col gap-4 border-t border-transparent px-4 pb-4 pt-3 dark:border-white/10">
+                <div className="flex flex-col gap-4 border-t border-transparent px-4 pt-3 pb-4 dark:border-white/10">
                     <div className="grid gap-3 sm:grid-cols-2">
                         <div>
                             <label className="text-muted mb-1 block text-sm font-medium">
@@ -291,7 +300,9 @@ export function MyQuizQuestionsPage() {
                                 className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                                 value={questionType}
                                 onChange={(e) =>
-                                    setQuestionType(e.target.value as QuestionType)
+                                    setQuestionType(
+                                        e.target.value as QuestionType,
+                                    )
                                 }
                             >
                                 {question_types.map((opt) => (
@@ -333,7 +344,9 @@ export function MyQuizQuestionsPage() {
                                 id="answer"
                                 className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                                 value={correctAnswer}
-                                onChange={(e) => setCorrectAnswer(e.target.value)}
+                                onChange={(e) =>
+                                    setCorrectAnswer(e.target.value)
+                                }
                                 placeholder="Must match how you want responses scored"
                             />
                         </div>
@@ -349,7 +362,8 @@ export function MyQuizQuestionsPage() {
                                 value={difficultyLevel}
                                 onChange={(e) =>
                                     setDifficultyLevel(
-                                        Number.parseInt(e.target.value, 10) || 1,
+                                        Number.parseInt(e.target.value, 10) ||
+                                            1,
                                     )
                                 }
                             />
@@ -366,7 +380,8 @@ export function MyQuizQuestionsPage() {
                                 value={basePoints}
                                 onChange={(e) =>
                                     setBasePoints(
-                                        Number.parseInt(e.target.value, 10) || 0,
+                                        Number.parseInt(e.target.value, 10) ||
+                                            0,
                                     )
                                 }
                             />
@@ -392,7 +407,7 @@ export function MyQuizQuestionsPage() {
                                 ))}
                             </select>
                         </div>
-                        <details className="sm:col-span-2 rounded-md border border-dashed border-transparent p-2 dark:border-white/15">
+                        <details className="rounded-md border border-dashed border-transparent p-2 sm:col-span-2 dark:border-white/15">
                             <summary className="text-muted cursor-pointer text-sm font-medium">
                                 Media trim (optional)
                             </summary>
@@ -468,7 +483,9 @@ function QuizQuestionRow({
     onSaved,
     onRequestDelete,
 }: QuizQuestionRowProps) {
-    const [questionType, setQuestionType] = useState<QuestionType>(q.question_type);
+    const [questionType, setQuestionType] = useState<QuestionType>(
+        q.question_type,
+    );
     const [trackId, setTrackId] = useState(q.track_id ?? '');
     const [promptText, setPromptText] = useState(q.prompt_text ?? '');
     const [correctAnswer, setCorrectAnswer] = useState(q.correct_answer);
@@ -498,11 +515,15 @@ function QuizQuestionRow({
         const mediaStart = parseNullableNonNegativeInt(mediaStartSeconds);
         const mediaEnd = parseNullableNonNegativeInt(mediaEndSeconds);
         if (mediaStartSeconds.trim() !== '' && mediaStart === null) {
-            toast.error('Media start must be a non-negative whole number of seconds');
+            toast.error(
+                'Media start must be a non-negative whole number of seconds',
+            );
             return;
         }
         if (mediaEndSeconds.trim() !== '' && mediaEnd === null) {
-            toast.error('Media end must be a non-negative whole number of seconds');
+            toast.error(
+                'Media end must be a non-negative whole number of seconds',
+            );
             return;
         }
 
@@ -538,12 +559,16 @@ function QuizQuestionRow({
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                     <div className="min-w-0 flex-1 space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
-                            <span className="bg-primary-light text-primary rounded px-2 py-0.5 text-xs font-semibold uppercase tracking-wide">
-                                {questionTypeLabel(question_types, questionType)}
+                            <span className="bg-primary-light text-primary rounded px-2 py-0.5 text-xs font-semibold tracking-wide uppercase">
+                                {questionTypeLabel(
+                                    question_types,
+                                    questionType,
+                                )}
                             </span>
                             {displayTrack ? (
                                 <span className="text-muted text-sm">
-                                    {displayTrack.title} — {displayTrack.artist_name}
+                                    {displayTrack.title} —{' '}
+                                    {displayTrack.artist_name}
                                 </span>
                             ) : (
                                 <span className="text-muted text-sm">
@@ -583,7 +608,7 @@ function QuizQuestionRow({
                     </div>
                 ) : null}
             </summary>
-            <div className="flex flex-col gap-3 border-t border-transparent px-3 pb-3 pt-2 dark:border-white/10">
+            <div className="flex flex-col gap-3 border-t border-transparent px-3 pt-2 pb-3 dark:border-white/10">
                 <div className="grid gap-3 sm:grid-cols-2">
                     <div>
                         <label className="text-muted mb-1 block text-xs font-medium">
@@ -702,7 +727,9 @@ function QuizQuestionRow({
                         <input
                             className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                             value={mediaStartSeconds}
-                            onChange={(e) => setMediaStartSeconds(e.target.value)}
+                            onChange={(e) =>
+                                setMediaStartSeconds(e.target.value)
+                            }
                             placeholder="Optional"
                         />
                     </div>

@@ -105,8 +105,8 @@ export function MyPlaylistsPage() {
                     A playlist is an ordered set of quiz questions. Open one to
                     build the round list, then pick it when you host so the game
                     draws from that set. Visibility controls who can discover or
-                    open the list; fine-tune question order on the playlist detail
-                    page.
+                    open the list; fine-tune question order on the playlist
+                    detail page.
                 </p>
             </PageIntroExpandable>
 
@@ -153,7 +153,7 @@ export function MyPlaylistsPage() {
                 <summary className="cursor-pointer list-none px-4 py-3 text-lg font-semibold marker:hidden [&::-webkit-details-marker]:hidden">
                     Create a playlist
                 </summary>
-                <div className="flex flex-col gap-4 border-t border-transparent px-4 pb-4 pt-3 dark:border-white/10">
+                <div className="flex flex-col gap-4 border-t border-transparent px-4 pt-3 pb-4 dark:border-white/10">
                     <div className="grid gap-3 sm:grid-cols-2">
                         <div className="sm:col-span-2">
                             <label
@@ -216,7 +216,11 @@ interface PlaylistRowProps {
     readonly onRequestDelete: () => void;
 }
 
-function PlaylistRow({ playlist: p, onSaved, onRequestDelete }: PlaylistRowProps) {
+function PlaylistRow({
+    playlist: p,
+    onSaved,
+    onRequestDelete,
+}: PlaylistRowProps) {
     const [name, setName] = useState(p.name);
     const [description, setDescription] = useState(p.description ?? '');
     const [visibility, setVisibility] = useState(p.visibility);
@@ -282,7 +286,7 @@ function PlaylistRow({ playlist: p, onSaved, onRequestDelete }: PlaylistRowProps
                     </div>
                 </div>
             </summary>
-            <div className="flex flex-col gap-3 border-t border-transparent px-3 pb-3 pt-2 dark:border-white/10">
+            <div className="flex flex-col gap-3 border-t border-transparent px-3 pt-2 pb-3 dark:border-white/10">
                 <div className="grid gap-3 sm:grid-cols-2">
                     <div className="sm:col-span-2">
                         <label className="text-muted mb-1 block text-xs font-medium">

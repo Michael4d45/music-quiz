@@ -61,9 +61,7 @@ class EchoManager {
 
             const subRef = sub;
             sub.channel.listen(`.${eventName}`, (data: unknown) => {
-                subRef.eventListeners
-                    .get(eventName)
-                    ?.forEach((cb) => cb(data));
+                subRef.eventListeners.get(eventName)?.forEach((cb) => cb(data));
             });
         }
 

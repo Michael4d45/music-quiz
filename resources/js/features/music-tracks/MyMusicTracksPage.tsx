@@ -1,6 +1,6 @@
-import { Button } from '@/components/ui/Button';
 import ConfirmModal from '@/components/ConfirmModal';
 import { PageIntroExpandable } from '@/components/PageIntroExpandable';
+import { Button } from '@/components/ui/Button';
 import {
     createMusicTrack,
     deleteMusicTrack,
@@ -8,14 +8,17 @@ import {
     updateMusicTrack,
     uploadMusicTrack,
 } from '@/features/music-tracks/api';
-import { TrackUploadAudioPlayer } from '@/features/music-tracks/TrackUploadAudioPlayer';
 import {
     SINGLES_GROUP,
     groupHeading,
     sortGroupEntries,
     usesAlbumForGrouping,
 } from '@/features/music-tracks/trackGrouping';
-import { fetchMusicSources, fetchSubCategories } from '@/features/reference/api';
+import { TrackUploadAudioPlayer } from '@/features/music-tracks/TrackUploadAudioPlayer';
+import {
+    fetchMusicSources,
+    fetchSubCategories,
+} from '@/features/reference/api';
 import { cn } from '@/lib/utils';
 import type { IdLabelOptionData } from '@/schemas/App/Data/Models/IdLabelOptionData';
 import type { MusicTrackData } from '@/schemas/App/Data/Models/MusicTrackData';
@@ -24,7 +27,7 @@ import {
     MusicTrackOriginKind,
     type MusicTrackOriginKind as MusicTrackOriginKindValue,
 } from '@/schemas/App/Enums/MusicTrackOriginKind';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useLoaderData, useRevalidator } from 'react-router-dom';
 
@@ -38,7 +41,10 @@ const ORIGIN_OPTIONS: { value: MusicTrackOriginKindValue; label: string }[] = [
     { value: MusicTrackOriginKind.SoundtrackGame, label: 'Video game' },
     { value: MusicTrackOriginKind.SoundtrackFilm, label: 'Film' },
     { value: MusicTrackOriginKind.SoundtrackTv, label: 'TV show' },
-    { value: MusicTrackOriginKind.OtherMedia, label: 'Other media / compilation' },
+    {
+        value: MusicTrackOriginKind.OtherMedia,
+        label: 'Other media / compilation',
+    },
 ];
 
 const ORIGIN_LABELS: Record<MusicTrackOriginKindValue, string> = {
@@ -98,9 +104,9 @@ export function MyMusicTracksPage() {
     const [durationSeconds, setDurationSeconds] = useState('');
     const [subCategoryId, setSubCategoryId] = useState('');
     const [sourceId, setSourceId] = useState('');
-    const [originKind, setOriginKind] = useState<'' | MusicTrackOriginKindValue>(
-        '',
-    );
+    const [originKind, setOriginKind] = useState<
+        '' | MusicTrackOriginKindValue
+    >('');
     const [originTitle, setOriginTitle] = useState('');
     const [audioFile, setAudioFile] = useState<File | null>(null);
 
@@ -166,9 +172,7 @@ export function MyMusicTracksPage() {
             : null;
         const durationMs =
             durationSeconds.trim() !== ''
-                ? Math.round(
-                      Number.parseFloat(durationSeconds.trim()) * 1000,
-                  )
+                ? Math.round(Number.parseFloat(durationSeconds.trim()) * 1000)
                 : null;
 
         if (
@@ -282,8 +286,8 @@ export function MyMusicTracksPage() {
                     with an optional separate soundtrack or release title when
                     you need it. Use streaming sources for catalog rows, or
                     upload audio you keep locally. Uploaded tracks can be
-                    previewed here in the browser; catalog-only rows open in your
-                    music app to listen.
+                    previewed here in the browser; catalog-only rows open in
+                    your music app to listen.
                 </p>
             </PageIntroExpandable>
 
@@ -323,12 +327,14 @@ export function MyMusicTracksPage() {
                                         </span>
                                         <span className="text-muted text-sm">
                                             {list.length}{' '}
-                                            {list.length === 1 ? 'track' : 'tracks'}
+                                            {list.length === 1
+                                                ? 'track'
+                                                : 'tracks'}
                                         </span>
                                     </div>
                                 </summary>
                                 <ul
-                                    className="flex flex-col gap-2 border-t border-transparent px-2 pb-3 pt-1 dark:border-white/10"
+                                    className="flex flex-col gap-2 border-t border-transparent px-2 pt-1 pb-3 dark:border-white/10"
                                     role="list"
                                 >
                                     {list.map((t) => (
@@ -358,7 +364,7 @@ export function MyMusicTracksPage() {
                 <summary className="cursor-pointer list-none px-4 py-3 text-lg font-semibold marker:hidden [&::-webkit-details-marker]:hidden">
                     Add a track
                 </summary>
-                <div className="flex flex-col gap-4 border-t border-transparent px-4 pb-4 pt-3 dark:border-white/10">
+                <div className="flex flex-col gap-4 border-t border-transparent px-4 pt-3 pb-4 dark:border-white/10">
                     <fieldset className="flex flex-wrap gap-4">
                         <legend className="text-muted mb-2 text-sm font-medium">
                             How is this track stored?
@@ -435,7 +441,9 @@ export function MyMusicTracksPage() {
                                 <select
                                     className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                                     value={sourceId}
-                                    onChange={(e) => setSourceId(e.target.value)}
+                                    onChange={(e) =>
+                                        setSourceId(e.target.value)
+                                    }
                                 >
                                     <option value="">Select a source…</option>
                                     {music_sources.map((opt) => (
@@ -453,15 +461,15 @@ export function MyMusicTracksPage() {
                                 <input
                                     type="file"
                                     accept="audio/mpeg,audio/wav,audio/mp4,audio/flac,audio/ogg,.mp3,.wav,.m4a,.flac,.ogg"
-                                    className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm file:mr-3 file:rounded file:border-0 file:bg-secondary file:px-3 file:py-1 file:text-sm"
+                                    className="border-input bg-background file:bg-secondary w-full rounded-md border px-3 py-2 text-sm file:mr-3 file:rounded file:border-0 file:px-3 file:py-1 file:text-sm"
                                     onChange={(e) => {
                                         const f = e.target.files?.[0];
                                         setAudioFile(f ?? null);
                                     }}
                                 />
                                 <p className="text-muted mt-1 text-xs">
-                                    MP3, WAV, M4A, FLAC, or OGG. Stored privately
-                                    on the server for your account.
+                                    MP3, WAV, M4A, FLAC, or OGG. Stored
+                                    privately on the server for your account.
                                 </p>
                             </div>
                         )}
@@ -522,9 +530,9 @@ export function MyMusicTracksPage() {
                                             />
                                             <p className="text-muted mt-1 text-xs">
                                                 When set, your library groups
-                                                this track under this album name.
-                                                Leave empty for singles and
-                                                one-offs.
+                                                this track under this album
+                                                name. Leave empty for singles
+                                                and one-offs.
                                             </p>
                                         </div>
                                     ) : (
@@ -568,8 +576,9 @@ export function MyMusicTracksPage() {
                                                 />
                                                 <p className="text-muted mt-1 text-xs">
                                                     Use when the disc or
-                                                    soundtrack title is different
-                                                    from the work above.
+                                                    soundtrack title is
+                                                    different from the work
+                                                    above.
                                                 </p>
                                             </div>
                                         </>
@@ -664,9 +673,7 @@ function TrackRow({
     );
     const [genre, setGenre] = useState(track.genre ?? '');
     const [durationSeconds, setDurationSeconds] = useState(
-        track.duration_ms != null
-            ? String(track.duration_ms / 1000)
-            : '',
+        track.duration_ms != null ? String(track.duration_ms / 1000) : '',
     );
     const [subCategoryId, setSubCategoryId] = useState(track.sub_category_id);
     const [sourceId, setSourceId] = useState(track.primary_source_id);
@@ -692,9 +699,7 @@ function TrackRow({
             : null;
         const durationMs =
             durationSeconds.trim() !== ''
-                ? Math.round(
-                      Number.parseFloat(durationSeconds.trim()) * 1000,
-                  )
+                ? Math.round(Number.parseFloat(durationSeconds.trim()) * 1000)
                 : null;
 
         if (
@@ -763,10 +768,12 @@ function TrackRow({
                                     <span>Album: {track.album_name}</span>
                                 ) : null}
                                 {track.primary_source?.display_name ? (
-                                    <span>{track.primary_source.display_name}</span>
+                                    <span>
+                                        {track.primary_source.display_name}
+                                    </span>
                                 ) : null}
                                 {isUploadBacked ? (
-                                    <span className="rounded bg-secondary px-1.5 py-0.5">
+                                    <span className="bg-secondary rounded px-1.5 py-0.5">
                                         File upload
                                     </span>
                                 ) : null}
@@ -790,7 +797,7 @@ function TrackRow({
                     </div>
                 </div>
             </summary>
-            <div className="flex flex-col gap-3 border-t border-transparent px-3 pb-3 pt-2 dark:border-white/10">
+            <div className="flex flex-col gap-3 border-t border-transparent px-3 pt-2 pb-3 dark:border-white/10">
                 <div className="grid gap-3 sm:grid-cols-2">
                     <div>
                         <label className="text-muted mb-1 block text-xs font-medium">
@@ -846,11 +853,12 @@ function TrackRow({
                             </select>
                         </div>
                     ) : (
-                        <div className="text-muted sm:col-span-2 text-xs">
+                        <div className="text-muted text-xs sm:col-span-2">
                             This row is tied to your uploaded file (
                             {track.user_upload_original_name ?? 'audio'}
                             ). The catalog source stays on &ldquo;My audio file
-                            (upload)&rdquo;; delete the track to remove the file.
+                            (upload)&rdquo;; delete the track to remove the
+                            file.
                         </div>
                     )}
                     <div className="sm:col-span-2">
@@ -915,7 +923,9 @@ function TrackRow({
                                 <input
                                     className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                                     value={albumName}
-                                    onChange={(e) => setAlbumName(e.target.value)}
+                                    onChange={(e) =>
+                                        setAlbumName(e.target.value)
+                                    }
                                 />
                             </div>
                         </>
@@ -953,9 +963,7 @@ function TrackRow({
                             step="0.1"
                             className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                             value={durationSeconds}
-                            onChange={(e) =>
-                                setDurationSeconds(e.target.value)
-                            }
+                            onChange={(e) => setDurationSeconds(e.target.value)}
                         />
                     </div>
                 </div>

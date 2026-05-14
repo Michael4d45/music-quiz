@@ -1,6 +1,6 @@
 import { NavigationSection as NavigationSectionType } from '@/config/navigation';
-import { isRegisteredUser } from '@/features/auth/authSession';
 import { useAuth } from '@/features/auth/AuthContext';
+import { isRegisteredUser } from '@/features/auth/authSession';
 import { cn } from '@/lib/utils';
 import NavigationItem from './NavigationItem';
 

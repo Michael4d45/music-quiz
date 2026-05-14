@@ -43,7 +43,11 @@ class StartGameSession
 
         $hostSeated = false;
 
-        DB::transaction(function () use ($gameSession, $items, &$hostSeated): void {
+        DB::transaction(function () use (
+            $gameSession,
+            $items,
+            &$hostSeated,
+        ): void {
             $gameSession->rounds()->delete();
 
             $maxRounds = min(10, $items->count());
@@ -110,9 +114,7 @@ class StartGameSession
                 ->where('user_id', $gameSession->host_id)
                 ->first();
 
-            if (
-                $hostParticipant instanceof SessionParticipant
-            ) {
+            if ($hostParticipant instanceof SessionParticipant) {
                 event(new GameSessionParticipantJoined(
                     $gameSession,
                     $hostParticipant,
@@ -123,9 +125,10 @@ class StartGameSession
 
         event(new GameSessionUpdated($gameSession));
 
-        return response()->json(
-            GameSessionRoomViewBuilder::build($gameSession, $user),
-        );
+        return response()->json(GameSessionRoomViewBuilder::build(
+            $gameSession,
+            $user,
+        ));
     }
 
     /**
@@ -145,9 +148,10 @@ class StartGameSession
             'rounds' => static function ($query): void {
                 $query->orderBy('round_number');
             },
-            'rounds.question.multipleChoiceOptions' => static function ($query): void {
-                $query->orderBy('sort_order');
-            },
+            'rounds.question.multipleChoiceOptions' =>
+                static function ($query): void {
+                    $query->orderBy('sort_order');
+                },
             'rounds.question.track',
             'rounds.question.answerVariants',
             'rounds.answers' => static function ($query): void {

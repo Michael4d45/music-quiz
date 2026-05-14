@@ -18,8 +18,9 @@ class ShowGameSessionRecap
 
         $gameSession->load(StartGameSession::roomEagerLoads());
 
-        return response()->json(
-            GameSessionRoomViewBuilder::build($gameSession, $user),
-        );
+        return response()->json(GameSessionRoomViewBuilder::build(
+            $gameSession,
+            $user,
+        ));
     }
 }

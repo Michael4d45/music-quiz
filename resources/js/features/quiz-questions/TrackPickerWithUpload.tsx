@@ -6,7 +6,7 @@ import {
 } from '@/features/music-tracks/trackGrouping';
 import type { IdLabelOptionData } from '@/schemas/App/Data/Models/IdLabelOptionData';
 import type { MusicTrackData } from '@/schemas/App/Data/Models/MusicTrackData';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 
 export interface TrackPickerWithUploadProps {
@@ -159,7 +159,9 @@ export function TrackPickerWithUpload({
                             className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                             value={uploadSubCategoryId}
                             disabled={disabled || uploading}
-                            onChange={(e) => setUploadSubCategoryId(e.target.value)}
+                            onChange={(e) =>
+                                setUploadSubCategoryId(e.target.value)
+                            }
                         >
                             <option value="">Select…</option>
                             {subCategories.map((c) => (
@@ -177,7 +179,7 @@ export function TrackPickerWithUpload({
                             type="file"
                             accept="audio/*,.mp3,.wav,.m4a,.flac,.ogg"
                             disabled={disabled || uploading}
-                            className="text-muted w-full text-sm file:mr-3 file:rounded file:border-0 file:bg-secondary file:px-3 file:py-1.5 file:text-sm file:font-medium"
+                            className="text-muted file:bg-secondary w-full text-sm file:mr-3 file:rounded file:border-0 file:px-3 file:py-1.5 file:text-sm file:font-medium"
                             onChange={(e) => {
                                 const f = e.target.files?.[0];
                                 setUploadFile(f ?? null);
@@ -191,7 +193,9 @@ export function TrackPickerWithUpload({
                             disabled={disabled || uploading}
                             onClick={() => void handleUpload()}
                         >
-                            {uploading ? 'Uploading…' : 'Upload and use this clip'}
+                            {uploading
+                                ? 'Uploading…'
+                                : 'Upload and use this clip'}
                         </Button>
                     </div>
                 </div>

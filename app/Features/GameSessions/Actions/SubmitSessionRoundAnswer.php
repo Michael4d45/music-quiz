@@ -82,7 +82,7 @@ class SubmitSessionRoundAnswer
             if (
                 $selectedOptionId === null
                 || $selectedOptionId === ''
-                || ($submittedText !== null && $submittedText !== '')
+                || $submittedText !== null && $submittedText !== ''
             ) {
                 abort(422, 'Select one option for this question.');
             }
@@ -134,10 +134,7 @@ class SubmitSessionRoundAnswer
             ]);
 
             if ($pointsAwarded > 0) {
-                $participant->increment(
-                    'current_total_score',
-                    $pointsAwarded,
-                );
+                $participant->increment('current_total_score', $pointsAwarded);
             }
         });
 
@@ -146,8 +143,9 @@ class SubmitSessionRoundAnswer
 
         event(new GameSessionUpdated($gameSession));
 
-        return response()->json(
-            GameSessionRoomViewBuilder::build($gameSession, $user),
-        );
+        return response()->json(GameSessionRoomViewBuilder::build(
+            $gameSession,
+            $user,
+        ));
     }
 }

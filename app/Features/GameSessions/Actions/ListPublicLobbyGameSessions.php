@@ -60,11 +60,11 @@ class ListPublicLobbyGameSessions
             : null;
 
         if ($current !== null) {
-            $summaries = $summaries
-                ->sortByDesc(static function (GameSessionLobbySummaryData $row) use ($current): int {
-                    return $row->id === $current->id ? 1 : 0;
-                })
-                ->values();
+            $summaries = $summaries->sortByDesc(static function (GameSessionLobbySummaryData $row) use (
+                $current,
+            ): int {
+                return $row->id === $current->id ? 1 : 0;
+            })->values();
         }
 
         return response()->json(GameSessionsLobbyResponseData::from([
@@ -73,7 +73,7 @@ class ListPublicLobbyGameSessions
         ]));
     }
 
-    private function resolveCurrentActiveSession(User $user): ?GameSessionLobbyCurrentSessionData
+    private function resolveCurrentActiveSession(User $user): null|GameSessionLobbyCurrentSessionData
     {
         $participant = SessionParticipant::query()
             ->where('user_id', $user->id)
@@ -95,7 +95,9 @@ class ListPublicLobbyGameSessions
                 ->first();
 
             if ($session instanceof GameSession) {
-                return GameSessionLobbyCurrentSessionData::fromGameSession($session);
+                return GameSessionLobbyCurrentSessionData::fromGameSession(
+                    $session,
+                );
             }
         }
 

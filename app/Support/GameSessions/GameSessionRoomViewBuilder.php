@@ -20,8 +20,10 @@ use App\Models\User;
 
 final class GameSessionRoomViewBuilder
 {
-    public static function build(GameSession $session, User $viewer): GameSessionRoomViewData
-    {
+    public static function build(
+        GameSession $session,
+        User $viewer,
+    ): GameSessionRoomViewData {
         $roundsRelation = $session->relationLoaded('rounds')
             ? $session->getRelation('rounds')
             : collect();
@@ -29,10 +31,9 @@ final class GameSessionRoomViewBuilder
         $sessionData = GameSessionData::from($session);
 
         $viewerIsHost = (string) $session->host_id === (string) $viewer->id;
-        $viewerParticipantId = $session
-            ->participants
-            ->first(static fn($p) => (string) $p->user_id === (string) $viewer->id)
-            ?->id;
+        $viewerParticipantId = $session->participants->first(
+            static fn($p) => (string) $p->user_id === (string) $viewer->id,
+        )?->id;
 
         /** @var list<SessionRoundGameplayData> $gameplayRounds */
         $gameplayRounds = [];
@@ -90,8 +91,13 @@ final class GameSessionRoomViewBuilder
         QuizQuestion $question,
         bool $revealSensitive,
     ): QuizQuestionGameplayData {
-        $options = $question->multipleChoiceOptions->sortBy('sort_order')->values()->map(
-            static function ($option) use ($revealSensitive): MultipleChoiceOptionGameplayData {
+        $options = $question
+            ->multipleChoiceOptions
+            ->sortBy('sort_order')
+            ->values()
+            ->map(static function ($option) use (
+                $revealSensitive,
+            ): MultipleChoiceOptionGameplayData {
                 return new MultipleChoiceOptionGameplayData(
                     id: $option->id,
                     question_id: $option->question_id,
@@ -99,25 +105,23 @@ final class GameSessionRoomViewBuilder
                     sort_order: $option->sort_order,
                     is_correct: $revealSensitive ? $option->is_correct : null,
                 );
-            },
-        )->all();
+            })
+            ->all();
 
         $variants = $revealSensitive
-            ? $question->answerVariants->map(
-                static fn($v): AnswerVariantGameplayData => new AnswerVariantGameplayData(
-                    id: $v->id,
-                    accepted_text: $v->accepted_text,
-                ),
-            )->all()
+            ? $question->answerVariants->map(static fn($v): AnswerVariantGameplayData => new AnswerVariantGameplayData(
+                id: $v->id,
+                accepted_text: $v->accepted_text,
+            ))->all()
             : [];
 
-        $track = $question->relationLoaded('track') && $question->track instanceof MusicTrack
+        $track = $question->relationLoaded('track')
+        && $question->track instanceof MusicTrack
             ? $question->track
             : null;
 
         $audioUploadAvailable =
-            $track !== null
-            && $track->user_upload_path !== null;
+            $track !== null && $track->user_upload_path !== null;
 
         return new QuizQuestionGameplayData(
             id: $question->id,
@@ -171,13 +175,13 @@ final class GameSessionRoomViewBuilder
     ): PlayerAnswerGameplayData {
         $participant = $answer->participant;
         $alias = $participant?->guest_name;
-        $displayName =
-            is_string($alias) && trim($alias) !== ''
-                ? trim($alias)
-                : ($participant?->user?->name ?? 'Player');
+        $displayName = is_string($alias) && trim($alias) !== ''
+            ? trim($alias)
+            : $participant?->user->name ?? 'Player';
         $isOwn =
             $viewerParticipantId !== null
-            && (string) $answer->participant_id === (string) $viewerParticipantId;
+            && (string) $answer->participant_id
+                === (string) $viewerParticipantId;
 
         $revealThisAnswer = $viewerIsHost || $revealSensitive || $isOwn;
 
@@ -187,7 +191,9 @@ final class GameSessionRoomViewBuilder
             participant_id: $answer->participant_id,
             participant_display_name: $displayName,
             submitted_text: $revealThisAnswer ? $answer->submitted_text : null,
-            selected_option_id: $revealThisAnswer ? $answer->selected_option_id : null,
+            selected_option_id: $revealThisAnswer
+                ? $answer->selected_option_id
+                : null,
             is_correct: $revealThisAnswer ? $answer->is_correct : null,
             points_awarded: $revealThisAnswer ? $answer->points_awarded : null,
         );

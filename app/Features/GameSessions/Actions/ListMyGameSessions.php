@@ -19,12 +19,13 @@ class ListMyGameSessions
 
         $sessions = GameSession::query()
             ->where(static function ($query) use ($user): void {
-                $query
-                    ->where('host_id', $user->id)
-                    ->orWhereHas(
-                        'participants',
-                        static fn($q) => $q->where('user_id', $user->id),
-                    );
+                $query->where(
+                    'host_id',
+                    $user->id,
+                )->orWhereHas('participants', static fn($q) => $q->where(
+                    'user_id',
+                    $user->id,
+                ));
             })
             ->with([
                 'host:id,name,is_guest,is_admin',

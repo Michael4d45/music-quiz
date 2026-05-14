@@ -65,8 +65,9 @@ class AdvanceGameSessionRound
 
         event(new GameSessionUpdated($gameSession));
 
-        return response()->json(
-            GameSessionRoomViewBuilder::build($gameSession, $user),
-        );
+        return response()->json(GameSessionRoomViewBuilder::build(
+            $gameSession,
+            $user,
+        ));
     }
 }

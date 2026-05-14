@@ -20,7 +20,11 @@ class StreamGameSessionRoundQuestionAudio
     ): Response|BinaryFileResponse {
         $user = assertedUser();
 
-        if (!GameSessionRoundMediaAccess::userMayAccessRound($user, $gameSession, $sessionRound)) {
+        if (!GameSessionRoundMediaAccess::userMayAccessRound(
+            $user,
+            $gameSession,
+            $sessionRound,
+        )) {
             abort(403);
         }
 
@@ -35,10 +39,7 @@ class StreamGameSessionRoundQuestionAudio
         $question = $sessionRound->question;
         $track = $question?->track;
 
-        if (
-            $track === null
-            || $track->user_upload_path === null
-        ) {
+        if ($track === null || $track->user_upload_path === null) {
             abort(404);
         }
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Data\Models;
 
-use App\Data\Models\UserData;
+
 use App\Enums\QuestionOrder;
 use App\Enums\Visibility;
 use Illuminate\Support\Carbon;

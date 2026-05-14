@@ -80,9 +80,7 @@ Route::middleware(['web', 'auth'])->group(function (): void {
     Route::get(
         'game-sessions/{gameSession}/rounds/{sessionRound}/audio',
         StreamGameSessionRoundQuestionAudio::class,
-    )
-        ->whereUuid('gameSession')
-        ->whereUuid('sessionRound');
+    )->whereUuid('gameSession')->whereUuid('sessionRound');
     Route::post(
         'game-sessions/{gameSession}/rounds/{sessionRound}/media-playback',
         SyncGameSessionRoundMediaPlayback::class,

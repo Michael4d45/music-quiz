@@ -49,27 +49,35 @@ test('lobby returns public sessions in lobby status that have not started', func
     $response->assertJsonPath('sessions.0.participant_count', 0);
 });
 
-test('lobby includes current_session when the user is a participant in a non-completed game', function (): void {
-    $user = User::factory()->create();
-    $session = GameSession::factory()->create([
-        'is_public' => false,
-        'status' => SessionStatus::Lobby,
-        'started_at' => null,
-    ]);
+test(
+    'lobby includes current_session when the user is a participant in a non-completed game',
+    function (): void {
+        $user = User::factory()->create();
+        $session = GameSession::factory()->create([
+            'is_public' => false,
+            'status' => SessionStatus::Lobby,
+            'started_at' => null,
+        ]);
 
-    SessionParticipant::factory()->create([
-        'session_id' => $session->id,
-        'user_id' => $user->id,
-    ]);
+        SessionParticipant::factory()->create([
+            'session_id' => $session->id,
+            'user_id' => $user->id,
+        ]);
 
-    $response = $this->actingAs($user, 'web')->getJson('/api/game-sessions/lobby');
+        $response = $this->actingAs($user, 'web')->getJson(
+            '/api/game-sessions/lobby',
+        );
 
-    $response->assertSuccessful();
-    $response->assertJsonPath('current_session.room_code', $session->room_code);
-    $response->assertJsonPath('current_session.host_id', $session->host_id);
-    $response->assertJsonPath('current_session.is_public', false);
-    $response->assertJsonCount(0, 'sessions');
-});
+        $response->assertSuccessful();
+        $response->assertJsonPath(
+            'current_session.room_code',
+            $session->room_code,
+        );
+        $response->assertJsonPath('current_session.host_id', $session->host_id);
+        $response->assertJsonPath('current_session.is_public', false);
+        $response->assertJsonCount(0, 'sessions');
+    },
+);
 
 test('lobby includes current_session when the user hosts an active session', function (): void {
     $user = User::factory()->create();
@@ -80,7 +88,9 @@ test('lobby includes current_session when the user hosts an active session', fun
         'is_public' => false,
     ]);
 
-    $response = $this->actingAs($user, 'web')->getJson('/api/game-sessions/lobby');
+    $response = $this->actingAs($user, 'web')->getJson(
+        '/api/game-sessions/lobby',
+    );
 
     $response->assertSuccessful();
     $response->assertJsonPath('current_session.id', $session->id);
@@ -93,16 +103,20 @@ test('lobby lists the user active public session before other public sessions', 
     $mode = QuizMode::factory()->create();
     $rule = ScoringRule::factory()->create();
 
-    $older = GameSession::factory()->publicLobby()->create([
-        'host_id' => $hostOther->id,
-        'quiz_mode_id' => $mode->id,
-        'scoring_rule_id' => $rule->id,
-    ]);
-    $newer = GameSession::factory()->publicLobby()->create([
-        'host_id' => $hostOther->id,
-        'quiz_mode_id' => $mode->id,
-        'scoring_rule_id' => $rule->id,
-    ]);
+    $older = GameSession::factory()
+        ->publicLobby()
+        ->create([
+            'host_id' => $hostOther->id,
+            'quiz_mode_id' => $mode->id,
+            'scoring_rule_id' => $rule->id,
+        ]);
+    $newer = GameSession::factory()
+        ->publicLobby()
+        ->create([
+            'host_id' => $hostOther->id,
+            'quiz_mode_id' => $mode->id,
+            'scoring_rule_id' => $rule->id,
+        ]);
 
     SessionParticipant::factory()->create([
         'session_id' => $older->id,
@@ -116,7 +130,9 @@ test('lobby lists the user active public session before other public sessions', 
         ->where('id', $newer->id)
         ->update(['created_at' => now()]);
 
-    $response = $this->actingAs($user, 'web')->getJson('/api/game-sessions/lobby');
+    $response = $this->actingAs($user, 'web')->getJson(
+        '/api/game-sessions/lobby',
+    );
 
     $response->assertSuccessful();
     $response->assertJsonPath('current_session.id', $older->id);

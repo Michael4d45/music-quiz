@@ -184,7 +184,10 @@ export function GameSessionsLobbyPage() {
             </div>
 
             {sessions.length > 0 ? (
-                <ul className="grid grid-cols-1 gap-4 md:grid-cols-2" role="list">
+                <ul
+                    className="grid grid-cols-1 gap-4 md:grid-cols-2"
+                    role="list"
+                >
                     {sessions.map((session) => {
                         const isFull =
                             session.participant_count >= session.max_players;
@@ -192,8 +195,7 @@ export function GameSessionsLobbyPage() {
                             current_session !== null &&
                             current_session.id === session.id;
                         const joinDisabled =
-                            isBlocked ||
-                            (isFull && !isUsersActiveListedGame);
+                            isBlocked || (isFull && !isUsersActiveListedGame);
                         const primaryLabel = isUsersActiveListedGame
                             ? 'Return to your game'
                             : isFull
@@ -333,7 +335,7 @@ function ActiveSessionBanner({
             : 'You are a player in this room.';
 
     return (
-        <div className="border-primary/30 bg-card mb-6 rounded-lg border-2 border-dashed p-4 shadow-md dark:border-primary/40">
+        <div className="border-primary/30 bg-card dark:border-primary/40 mb-6 rounded-lg border-2 border-dashed p-4 shadow-md">
             <h2 className="text-lg font-semibold">Your active game</h2>
             <p className="text-muted mt-1 text-sm">
                 Room{' '}
@@ -343,7 +345,9 @@ function ActiveSessionBanner({
                 · {gameSessionStatusLabel(session.status)} · Host{' '}
                 {session.host_display_name}
             </p>
-            <p className="text-foreground mt-2 text-sm font-medium">{roleLine}</p>
+            <p className="text-foreground mt-2 text-sm font-medium">
+                {roleLine}
+            </p>
             <p className="text-muted mt-1 text-xs">{visibilityLine}</p>
             <p className="text-muted mt-1 text-xs">
                 Mode {session.quiz_mode_name}

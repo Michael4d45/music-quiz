@@ -19,7 +19,9 @@ class PlaylistItemsApiTest extends TestCase
     public function test_list_playlist_items_includes_playlist_summary(): void
     {
         $user = User::factory()->create();
-        $playlist = Playlist::factory()->for($user)->create(['name' => 'Evening set']);
+        $playlist = Playlist::factory()->for($user)->create([
+            'name' => 'Evening set',
+        ]);
         $question = QuizQuestion::factory()->for($user)->create();
         PlaylistItem::factory()->create([
             'playlist_id' => $playlist->id,
@@ -27,7 +29,8 @@ class PlaylistItemsApiTest extends TestCase
             'sort_order' => 100,
         ]);
 
-        $this->actingAs($user, 'web')
+        $this
+            ->actingAs($user, 'web')
             ->getJson("/api/my/playlists/{$playlist->id}/items")
             ->assertOk()
             ->assertJsonPath('playlist.name', 'Evening set')
@@ -43,14 +46,17 @@ class PlaylistItemsApiTest extends TestCase
         $question = QuizQuestion::factory()->for($user)->create([
             'track_id' => $track->id,
         ]);
-        $playlist = Playlist::factory()->for($user)->create(['name' => 'With track']);
+        $playlist = Playlist::factory()->for($user)->create([
+            'name' => 'With track',
+        ]);
         PlaylistItem::factory()->create([
             'playlist_id' => $playlist->id,
             'question_id' => $question->id,
             'sort_order' => 100,
         ]);
 
-        $this->actingAs($user, 'web')
+        $this
+            ->actingAs($user, 'web')
             ->getJson("/api/my/playlists/{$playlist->id}/items")
             ->assertOk()
             ->assertJsonPath('items.0.question.track.id', $track->id);
@@ -62,7 +68,8 @@ class PlaylistItemsApiTest extends TestCase
         $playlist = Playlist::factory()->for($user)->create();
         $question = QuizQuestion::factory()->for($user)->create();
 
-        $this->actingAs($user, 'web')
+        $this
+            ->actingAs($user, 'web')
             ->postJson("/api/my/playlists/{$playlist->id}/items", [
                 'question_id' => $question->id,
             ])
@@ -86,7 +93,8 @@ class PlaylistItemsApiTest extends TestCase
             'sort_order' => 100,
         ]);
 
-        $this->actingAs($user, 'web')
+        $this
+            ->actingAs($user, 'web')
             ->postJson("/api/my/playlists/{$playlist->id}/items", [
                 'question_id' => $q2->id,
             ])
@@ -115,7 +123,8 @@ class PlaylistItemsApiTest extends TestCase
             'sort_order' => 200,
         ]);
 
-        $this->actingAs($user, 'web')
+        $this
+            ->actingAs($user, 'web')
             ->patchJson(
                 "/api/my/playlists/{$playlist->id}/items/{$itemB->id}",
                 ['before_item_id' => $itemA->id],
@@ -144,11 +153,11 @@ class PlaylistItemsApiTest extends TestCase
             'sort_order' => 100,
         ]);
 
-        $this->actingAs($user, 'web')
-            ->patchJson(
-                "/api/my/playlists/{$playlist->id}/items/{$item->id}",
-                ['before_item_id' => '00000000-0000-4000-8000-000000000001'],
-            )
+        $this
+            ->actingAs($user, 'web')
+            ->patchJson("/api/my/playlists/{$playlist->id}/items/{$item->id}", [
+                'before_item_id' => '00000000-0000-4000-8000-000000000001',
+            ])
             ->assertStatus(422);
     }
 
@@ -175,7 +184,8 @@ class PlaylistItemsApiTest extends TestCase
             'sort_order' => 102,
         ]);
 
-        $this->actingAs($user, 'web')
+        $this
+            ->actingAs($user, 'web')
             ->patchJson(
                 "/api/my/playlists/{$playlist->id}/items/{$itemC->id}",
                 ['before_item_id' => $itemB->id],
@@ -207,11 +217,11 @@ class PlaylistItemsApiTest extends TestCase
             'sort_order' => 100,
         ]);
 
-        $this->actingAs($user, 'web')
-            ->patchJson(
-                "/api/my/playlists/{$playlist->id}/items/{$item->id}",
-                ['before_item_id' => $item->id],
-            )
+        $this
+            ->actingAs($user, 'web')
+            ->patchJson("/api/my/playlists/{$playlist->id}/items/{$item->id}", [
+                'before_item_id' => $item->id,
+            ])
             ->assertStatus(422);
     }
 }

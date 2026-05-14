@@ -43,9 +43,10 @@ class ShowGameSessionByRoomCode
             ]), 403);
         }
 
-        return response()->json(
-            GameSessionRoomViewBuilder::build($session, $user),
-        );
+        return response()->json(GameSessionRoomViewBuilder::build(
+            $session,
+            $user,
+        ));
     }
 
     private function userMayViewSession(

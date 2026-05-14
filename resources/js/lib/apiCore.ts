@@ -1,8 +1,8 @@
 import { Effect, Schema } from 'effect';
 import { authManager } from '../features/auth/authManager';
 import { apiCache } from './apiCache';
-import { devLog } from './devLogging';
 import { db } from './db';
+import { devLog } from './devLogging';
 import { getCookieValue } from './utils';
 
 /* ============================================================================
@@ -365,9 +365,7 @@ export const withRetry =
                         ),
                     );
                 }
-                devLog(
-                    `${context}: CSRF expired after retry, clearing auth`,
-                );
+                devLog(`${context}: CSRF expired after retry, clearing auth`);
                 authManager.clearAuthData();
                 return Effect.fail(error);
             }),

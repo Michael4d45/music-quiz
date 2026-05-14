@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { App } from './app';
 import { authRoutes } from './features/auth/routes';
+import { ErrorPage } from './features/ErrorPage';
 import {
     GameSessionRoomPage,
     gameSessionRecapLoader,
@@ -14,15 +15,14 @@ import {
     MyGameSessionsPage,
     myGameSessionsLoader,
 } from './features/game-sessions/MyGameSessionsPage';
-import { ErrorPage } from './features/ErrorPage';
 import { HomePage } from './features/home/HomePage';
 import {
     MyMusicTracksPage,
     myMusicTracksLoader,
 } from './features/music-tracks/MyMusicTracksPage';
 import { NotFoundPage } from './features/NotFoundPage';
-import { MyPlaylistsPage } from './features/playlists/MyPlaylistsPage';
 import { myPlaylistsLoader } from './features/playlists/myPlaylistsLoader';
+import { MyPlaylistsPage } from './features/playlists/MyPlaylistsPage';
 import {
     PlaylistDetailPage,
     playlistDetailLoader,

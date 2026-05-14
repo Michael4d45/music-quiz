@@ -33,7 +33,7 @@ export function TrackUploadAudioPlayer({
                 controls
                 preload="none"
                 src={src}
-                className="h-9 w-full min-w-[12rem] max-w-md"
+                className="h-9 w-full max-w-md min-w-[12rem]"
                 aria-label={`Play uploaded audio for ${trackTitle}`}
             >
                 <a className="text-primary text-xs underline" href={src}>

@@ -23,9 +23,6 @@ final class GameSessionRoundMediaAccess
             return true;
         }
 
-        return $session
-            ->participants()
-            ->where('user_id', $user->id)
-            ->exists();
+        return $session->participants()->where('user_id', $user->id)->exists();
     }
 }

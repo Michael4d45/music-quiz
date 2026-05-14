@@ -22,10 +22,7 @@ export async function gameSessionRecapLoader({
     if (result._tag === 'AuthenticationError') {
         throw data({ message: result.message }, { status: 401 });
     }
-    if (
-        result._tag === 'FatalError' &&
-        result.message.startsWith('HTTP 403')
-    ) {
+    if (result._tag === 'FatalError' && result.message.startsWith('HTTP 403')) {
         throw data({ message: 'Forbidden' }, { status: 403 });
     }
     throw data({ message: 'Could not load recap' }, { status: 500 });

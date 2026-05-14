@@ -9,12 +9,12 @@ import {
     fetchScoringRules,
 } from '@/features/game-sessions/api';
 import { gameSessionStatusLabel } from '@/features/game-sessions/gameSessionStatusLabel';
-import { apiFailureMessage } from '@/lib/apiCore';
 import { fetchMyPlaylists } from '@/features/playlists/api';
+import { apiFailureMessage } from '@/lib/apiCore';
 import type { GameSessionData } from '@/schemas/App/Data/Models/GameSessionData';
+import type { PlaylistData } from '@/schemas/App/Data/Models/PlaylistData';
 import type { QuizModeData } from '@/schemas/App/Data/Models/QuizModeData';
 import type { ScoringRuleData } from '@/schemas/App/Data/Models/ScoringRuleData';
-import type { PlaylistData } from '@/schemas/App/Data/Models/PlaylistData';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useLoaderData, useNavigate } from 'react-router-dom';
@@ -73,9 +73,7 @@ export function MyGameSessionsPage() {
             toast.success(`Room ${code} created`);
             navigate(`/game-sessions/room/${code}`);
         } else {
-            toast.error(
-                apiFailureMessage(result, 'Could not create session'),
-            );
+            toast.error(apiFailureMessage(result, 'Could not create session'));
         }
     };
 
@@ -101,11 +99,11 @@ export function MyGameSessionsPage() {
                 moreLabel="More about hosting a session"
             >
                 <p>
-                    Host a room for your friends: pick how the game is scored, set
-                    how many players can join, and optionally tie the session to
-                    one of your playlists so each round uses your question
-                    library. When you are signed in you can host several active
-                    rooms at once if you need to.
+                    Host a room for your friends: pick how the game is scored,
+                    set how many players can join, and optionally tie the
+                    session to one of your playlists so each round uses your
+                    question library. When you are signed in you can host
+                    several active rooms at once if you need to.
                 </p>
             </PageIntroExpandable>
 
@@ -190,7 +188,9 @@ export function MyGameSessionsPage() {
                             className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                             value={maxPlayers}
                             onChange={(e) =>
-                                setMaxPlayers(Number.parseInt(e.target.value, 10))
+                                setMaxPlayers(
+                                    Number.parseInt(e.target.value, 10),
+                                )
                             }
                         />
                     </div>
@@ -239,7 +239,9 @@ export function MyGameSessionsPage() {
                                         </span>
                                         <p className="text-muted text-sm">
                                             {gameSessionStatusLabel(s.status)}
-                                            {s.is_public ? ' · public' : ' · private'}
+                                            {s.is_public
+                                                ? ' · public'
+                                                : ' · private'}
                                             {' · '}
                                             {roleLabel}
                                         </p>

@@ -1,9 +1,9 @@
 import { decodeJson, httpRequest, runEffect, withRetry } from '@/lib/apiCore';
+import { MessageResponseSchema } from '@/schemas/App/Data/MessageResponse';
 import { GameSessionDataSchema } from '@/schemas/App/Data/Models/GameSessionData';
-import { GameSessionRoomViewDataSchema } from '@/schemas/App/Data/Responses/GameSessionRoomViewData';
 import { GameSessionsLobbyResponseDataSchema } from '@/schemas/App/Data/Models/GameSessionsLobbyResponseData';
 import { SessionParticipantDataSchema } from '@/schemas/App/Data/Models/SessionParticipantData';
-import { MessageResponseSchema } from '@/schemas/App/Data/MessageResponse';
+import { GameSessionRoomViewDataSchema } from '@/schemas/App/Data/Responses/GameSessionRoomViewData';
 import { MyGameSessionsResponseDataSchema } from '@/schemas/App/Data/Responses/MyGameSessionsResponseData';
 import { QuizModesListResponseDataSchema } from '@/schemas/App/Data/Responses/QuizModesListResponseData';
 import { ScoringRulesListResponseDataSchema } from '@/schemas/App/Data/Responses/ScoringRulesListResponseData';

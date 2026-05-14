@@ -52,7 +52,11 @@ test('participant may stream round question audio when track has an upload', fun
     $this
         ->actingAs($player, 'web')
         ->get(
-            '/api/game-sessions/' . $session->id . '/rounds/' . $round->id . '/audio',
+            '/api/game-sessions/'
+            . $session->id
+            . '/rounds/'
+            . $round->id
+            . '/audio',
         )
         ->assertSuccessful();
 });
@@ -91,7 +95,11 @@ test('non participant cannot stream round question audio', function (): void {
     $this
         ->actingAs($stranger, 'web')
         ->get(
-            '/api/game-sessions/' . $session->id . '/rounds/' . $round->id . '/audio',
+            '/api/game-sessions/'
+            . $session->id
+            . '/rounds/'
+            . $round->id
+            . '/audio',
         )
         ->assertForbidden();
 });
@@ -128,7 +136,11 @@ test('host can broadcast media playback sync and participant cannot', function (
     $this
         ->actingAs($host, 'web')
         ->postJson(
-            '/api/game-sessions/' . $session->id . '/rounds/' . $round->id . '/media-playback',
+            '/api/game-sessions/'
+            . $session->id
+            . '/rounds/'
+            . $round->id
+            . '/media-playback',
             [
                 'playing' => true,
                 'current_time_seconds' => 1.25,
@@ -141,7 +153,11 @@ test('host can broadcast media playback sync and participant cannot', function (
     $this
         ->actingAs($player, 'web')
         ->postJson(
-            '/api/game-sessions/' . $session->id . '/rounds/' . $round->id . '/media-playback',
+            '/api/game-sessions/'
+            . $session->id
+            . '/rounds/'
+            . $round->id
+            . '/media-playback',
             [
                 'playing' => false,
                 'current_time_seconds' => 0,

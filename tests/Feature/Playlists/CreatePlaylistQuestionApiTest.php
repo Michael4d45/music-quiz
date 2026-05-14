@@ -22,7 +22,8 @@ class CreatePlaylistQuestionApiTest extends TestCase
         $user = User::factory()->create();
         $playlist = Playlist::factory()->for($user)->create();
 
-        $this->actingAs($user, 'web')
+        $this
+            ->actingAs($user, 'web')
             ->postJson("/api/my/playlists/{$playlist->id}/questions", [
                 'question_type' => QuestionType::Artist->value,
                 'correct_answer' => 'The Answer',
@@ -61,7 +62,8 @@ class CreatePlaylistQuestionApiTest extends TestCase
             'sort_order' => 100,
         ]);
 
-        $this->actingAs($user, 'web')
+        $this
+            ->actingAs($user, 'web')
             ->postJson("/api/my/playlists/{$playlist->id}/questions", [
                 'question_type' => QuestionType::Title->value,
                 'correct_answer' => 'Song title',
@@ -94,7 +96,8 @@ class CreatePlaylistQuestionApiTest extends TestCase
         $user = User::factory()->create();
         $playlist = Playlist::factory()->for($user)->create();
 
-        $this->actingAs($user, 'web')
+        $this
+            ->actingAs($user, 'web')
             ->postJson("/api/my/playlists/{$playlist->id}/questions", [
                 'question_type' => QuestionType::Artist->value,
                 'correct_answer' => '',
@@ -110,7 +113,8 @@ class CreatePlaylistQuestionApiTest extends TestCase
         $playlist = Playlist::factory()->for($user)->create();
         $track = MusicTrack::factory()->create(['user_id' => $user->id]);
 
-        $this->actingAs($user, 'web')
+        $this
+            ->actingAs($user, 'web')
             ->postJson("/api/my/playlists/{$playlist->id}/questions", [
                 'question_type' => QuestionType::AudioClip->value,
                 'correct_answer' => 'Clip answer',

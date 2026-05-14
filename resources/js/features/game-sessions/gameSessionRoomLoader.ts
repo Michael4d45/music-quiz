@@ -34,10 +34,7 @@ export async function gameSessionRoomLoader({
     if (result._tag === 'NotFoundError') {
         throw data({ message: result.message }, { status: 404 });
     }
-    if (
-        result._tag === 'FatalError' &&
-        result.message.startsWith('HTTP 403')
-    ) {
+    if (result._tag === 'FatalError' && result.message.startsWith('HTTP 403')) {
         throw data({ message: 'Forbidden' }, { status: 403 });
     }
     throw data({ message: 'Could not load room' }, { status: 500 });

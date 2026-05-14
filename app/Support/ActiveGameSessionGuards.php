@@ -29,12 +29,15 @@ final class ActiveGameSessionGuards
             return false;
         }
 
-        return self::guestHasParticipantCommitmentExcluding($user, $session->id);
+        return self::guestHasParticipantCommitmentExcluding(
+            $user,
+            $session->id,
+        );
     }
 
     private static function guestHasParticipantCommitmentExcluding(
         User $user,
-        ?string $exceptSessionId,
+        null|string $exceptSessionId,
     ): bool {
         $query = SessionParticipant::query()
             ->where('user_id', $user->id)

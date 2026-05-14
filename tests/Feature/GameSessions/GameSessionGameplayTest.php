@@ -58,13 +58,15 @@ test('host can start a lobby session and first round is active', function (): vo
     $session->refresh();
 
     expect($session->status)->toBe(SessionStatus::InProgress);
-    expect(SessionRound::query()->where('session_id', $session->id)->count())->toBe(1);
+    expect(SessionRound::query()->where('session_id', $session->id)->count())
+        ->toBe(1);
     expect(
         SessionParticipant::query()
             ->where('session_id', $session->id)
             ->where('user_id', $host->id)
             ->count(),
-    )->toBe(1);
+    )
+        ->toBe(1);
 
     $round = SessionRound::query()
         ->where('session_id', $session->id)
@@ -74,7 +76,10 @@ test('host can start a lobby session and first round is active', function (): vo
     expect($round->started_at)->not->toBeNull();
     expect($round->ended_at)->toBeNull();
 
-    $response->assertJsonPath('rounds.0.question.multiple_choice_options.1.is_correct', true);
+    $response->assertJsonPath(
+        'rounds.0.question.multiple_choice_options.1.is_correct',
+        true,
+    );
 });
 
 test('participant can submit a multiple choice answer and score updates', function (): void {
@@ -120,9 +125,10 @@ test('participant can submit a multiple choice answer and score updates', functi
         'user_id' => $player->id,
     ]);
 
-    $this->actingAs($host, 'web')->postJson(
-        "/api/game-sessions/{$session->id}/start",
-    )->assertSuccessful();
+    $this
+        ->actingAs($host, 'web')
+        ->postJson("/api/game-sessions/{$session->id}/start")
+        ->assertSuccessful();
 
     $round = SessionRound::query()
         ->where('session_id', $session->id)
@@ -142,10 +148,7 @@ test('participant can submit a multiple choice answer and score updates', functi
     );
 
     $answerResponse->assertSuccessful();
-    $answerResponse->assertJsonPath(
-        'rounds.0.answers.0.points_awarded',
-        75,
-    );
+    $answerResponse->assertJsonPath('rounds.0.answers.0.points_awarded', 75);
 
     $participant->refresh();
     expect($participant->current_total_score)->toBe(75);
@@ -176,13 +179,15 @@ test('host can advance rounds until session completes', function (): void {
         'status' => SessionStatus::Lobby,
     ]);
 
-    $this->actingAs($host, 'web')->postJson(
-        "/api/game-sessions/{$session->id}/start",
-    )->assertSuccessful();
+    $this
+        ->actingAs($host, 'web')
+        ->postJson("/api/game-sessions/{$session->id}/start")
+        ->assertSuccessful();
 
-    $this->actingAs($host, 'web')->postJson(
-        "/api/game-sessions/{$session->id}/advance-round",
-    )->assertSuccessful();
+    $this
+        ->actingAs($host, 'web')
+        ->postJson("/api/game-sessions/{$session->id}/advance-round")
+        ->assertSuccessful();
 
     $session->refresh();
     expect($session->status)->toBe(SessionStatus::InProgress);
@@ -199,9 +204,10 @@ test('host can advance rounds until session completes', function (): void {
         ->firstOrFail();
     expect($round2->started_at)->not->toBeNull();
 
-    $this->actingAs($host, 'web')->postJson(
-        "/api/game-sessions/{$session->id}/advance-round",
-    )->assertSuccessful();
+    $this
+        ->actingAs($host, 'web')
+        ->postJson("/api/game-sessions/{$session->id}/advance-round")
+        ->assertSuccessful();
 
     $session->refresh();
     expect($session->status)->toBe(SessionStatus::Completed);
@@ -231,7 +237,8 @@ test('non-host cannot start the game', function (): void {
         'status' => SessionStatus::Lobby,
     ]);
 
-    $this->actingAs($other, 'web')->postJson(
-        "/api/game-sessions/{$session->id}/start",
-    )->assertForbidden();
+    $this
+        ->actingAs($other, 'web')
+        ->postJson("/api/game-sessions/{$session->id}/start")
+        ->assertForbidden();
 });

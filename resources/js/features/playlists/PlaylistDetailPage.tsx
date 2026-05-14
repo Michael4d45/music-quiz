@@ -1,6 +1,7 @@
 import ConfirmModal from '@/components/ConfirmModal';
 import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
+import { fetchMyMusicTracks } from '@/features/music-tracks/api';
 import {
     addPlaylistItem,
     createPlaylistQuestion,
@@ -11,7 +12,6 @@ import {
 import { QuizQuestionTrackAudioPlayerFromQuestion } from '@/features/quiz-questions/QuizQuestionTrackAudioPlayer';
 import { TrackPickerWithUpload } from '@/features/quiz-questions/TrackPickerWithUpload';
 import { fetchMyQuizQuestions } from '@/features/quiz-questions/api';
-import { fetchMyMusicTracks } from '@/features/music-tracks/api';
 import {
     fetchQuestionTypes,
     fetchSubCategories,
@@ -24,7 +24,7 @@ import type { QuizQuestionData } from '@/schemas/App/Data/Models/QuizQuestionDat
 import type { MyPlaylistItemsResponseData } from '@/schemas/App/Data/Responses/MyPlaylistItemsResponseData';
 import type { QuestionType } from '@/schemas/App/Enums/QuestionType';
 import { Visibility } from '@/schemas/App/Enums/Visibility';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { data, type LoaderFunctionArgs } from 'react-router';
 import { useLoaderData, useRevalidator } from 'react-router-dom';
@@ -108,8 +108,8 @@ export function PlaylistDetailPage() {
     } = loaderData;
     const revalidator = useRevalidator();
     const itemsFingerprint = loaderData.items
-                .map((i) => `${i.id}:${i.sort_order}`)
-                .join('|');
+        .map((i) => `${i.id}:${i.sort_order}`)
+        .join('|');
     const [localPayload, setLocalPayload] =
         useState<MyPlaylistItemsResponseData | null>(null);
 
@@ -147,7 +147,9 @@ export function PlaylistDetailPage() {
 
     const usedQuestionIds = new Set(items.map((i) => i.question_id));
 
-    const addableQuestions = questions.filter((q) => !usedQuestionIds.has(q.id));
+    const addableQuestions = questions.filter(
+        (q) => !usedQuestionIds.has(q.id),
+    );
 
     const filteredItems = (() => {
         const q = search.trim().toLowerCase();
@@ -286,10 +288,12 @@ export function PlaylistDetailPage() {
             </PageIntroExpandable>
 
             <div className="bg-card mb-8 flex flex-col gap-4 rounded-lg border border-transparent px-4 py-4 shadow-md dark:border-white/10">
-                <h2 className="text-lg font-semibold">New question for this playlist</h2>
+                <h2 className="text-lg font-semibold">
+                    New question for this playlist
+                </h2>
                 <p className="text-muted text-sm">
-                    Saves to your library and adds the bottom of this list. You can
-                    reorder with Up / Down.
+                    Saves to your library and adds the bottom of this list. You
+                    can reorder with Up / Down.
                 </p>
                 <div className="grid gap-3 sm:grid-cols-2">
                     <div>
@@ -301,7 +305,9 @@ export function PlaylistDetailPage() {
                             value={newQuestionType}
                             disabled={creating}
                             onChange={(e) =>
-                                setNewQuestionType(e.target.value as QuestionType)
+                                setNewQuestionType(
+                                    e.target.value as QuestionType,
+                                )
                             }
                         >
                             {questionTypes.map((opt) => (
@@ -344,7 +350,9 @@ export function PlaylistDetailPage() {
                             className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                             value={newCorrectAnswer}
                             disabled={creating}
-                            onChange={(e) => setNewCorrectAnswer(e.target.value)}
+                            onChange={(e) =>
+                                setNewCorrectAnswer(e.target.value)
+                            }
                             placeholder="Must match how you want responses scored"
                         />
                     </div>
@@ -406,7 +414,7 @@ export function PlaylistDetailPage() {
                             <option value={Visibility.Public}>Public</option>
                         </select>
                     </div>
-                    <details className="sm:col-span-2 rounded-md border border-dashed border-transparent p-2 dark:border-white/15">
+                    <details className="rounded-md border border-dashed border-transparent p-2 sm:col-span-2 dark:border-white/15">
                         <summary className="text-muted cursor-pointer text-sm font-medium">
                             Media trim (optional)
                         </summary>
@@ -419,7 +427,9 @@ export function PlaylistDetailPage() {
                                     className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                                     value={newMediaStart}
                                     disabled={creating}
-                                    onChange={(e) => setNewMediaStart(e.target.value)}
+                                    onChange={(e) =>
+                                        setNewMediaStart(e.target.value)
+                                    }
                                     placeholder="Leave blank for full clip"
                                 />
                             </div>
@@ -431,7 +441,9 @@ export function PlaylistDetailPage() {
                                     className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                                     value={newMediaEnd}
                                     disabled={creating}
-                                    onChange={(e) => setNewMediaEnd(e.target.value)}
+                                    onChange={(e) =>
+                                        setNewMediaEnd(e.target.value)
+                                    }
                                     placeholder="Leave blank for full clip"
                                 />
                             </div>
@@ -461,7 +473,9 @@ export function PlaylistDetailPage() {
             </div>
 
             <div className="mb-8 flex flex-col gap-3">
-                <h2 className="text-lg font-semibold">Questions in this playlist</h2>
+                <h2 className="text-lg font-semibold">
+                    Questions in this playlist
+                </h2>
                 {items.length === 0 ? (
                     <p className="text-muted">
                         No questions yet. Create one above or add from your
@@ -477,7 +491,10 @@ export function PlaylistDetailPage() {
                             );
                             const q = item.question;
                             const typeLabel = q
-                                ? questionTypeLabel(questionTypes, q.question_type)
+                                ? questionTypeLabel(
+                                      questionTypes,
+                                      q.question_type,
+                                  )
                                 : null;
                             return (
                                 <li key={item.id} role="listitem">
@@ -494,7 +511,7 @@ export function PlaylistDetailPage() {
                                             </div>
                                             <div className="text-muted flex flex-wrap gap-x-2 gap-y-1 text-xs">
                                                 {typeLabel ? (
-                                                    <span className="rounded bg-secondary/80 px-1.5 py-0.5">
+                                                    <span className="bg-secondary/80 rounded px-1.5 py-0.5">
                                                         {typeLabel}
                                                     </span>
                                                 ) : null}
@@ -588,7 +605,7 @@ export function PlaylistDetailPage() {
                 <summary className="cursor-pointer list-none px-4 py-3 text-lg font-semibold marker:hidden [&::-webkit-details-marker]:hidden">
                     Add from library
                 </summary>
-                <div className="flex flex-col gap-4 border-t border-transparent px-4 pb-4 pt-3 dark:border-white/10">
+                <div className="flex flex-col gap-4 border-t border-transparent px-4 pt-3 pb-4 dark:border-white/10">
                     {addableQuestions.length === 0 ? (
                         <p className="text-muted text-sm">
                             {questions.length === 0
@@ -608,9 +625,7 @@ export function PlaylistDetailPage() {
                                         setSelectedQuestionId(e.target.value)
                                     }
                                 >
-                                    <option value="">
-                                        Select a question…
-                                    </option>
+                                    <option value="">Select a question…</option>
                                     {addableQuestions.map((q) => (
                                         <option key={q.id} value={q.id}>
                                             {(q.prompt_text?.trim()
