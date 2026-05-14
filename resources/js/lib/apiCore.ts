@@ -1,6 +1,6 @@
 import { Effect, Schema } from 'effect';
-import { apiCache } from './apiCache';
 import { authManager } from '../features/auth/authManager';
+import { apiCache } from './apiCache';
 import { db } from './db';
 import { getCookieValue } from './utils';
 
@@ -103,41 +103,66 @@ let tokenExpiresAt: number | null = null;
 
 let csrfToken = decodeURIComponent(getCookieValue('XSRF-TOKEN') ?? '');
 
-export const ensureCsrfToken = Effect.gen(function* () {
-    const response = yield* Effect.tryPromise({
-        try: () =>
-            fetch('/sanctum/csrf-cookie', {
+/** Bumped from `clearCsrfToken` so an in-flight CSRF fetch cannot repopulate state after logout. */
+let csrfFetchGeneration = 0;
+
+let ensureCsrfInFlight: Promise<void> | null = null;
+
+function obtainCsrfCookieOnce(): Promise<void> {
+    if (ensureCsrfInFlight !== null) {
+        return ensureCsrfInFlight;
+    }
+
+    const generationAtStart = csrfFetchGeneration;
+
+    ensureCsrfInFlight = (async (): Promise<void> => {
+        try {
+            const response = await fetch('/sanctum/csrf-cookie', {
                 credentials: 'include',
                 headers: { Accept: 'application/json' },
-            }),
-        catch: (error) => ({
-            _tag: 'FatalError' as const,
-            message: `CSRF fetch failed: ${error}`,
-        }),
-    });
+            });
 
-    if (!response.ok) {
-        return yield* Effect.fail({
-            _tag: 'FatalError' as const,
-            message: 'Failed to obtain CSRF token',
-        });
-    }
+            if (!response.ok) {
+                throw new Error('Failed to obtain CSRF token');
+            }
 
-    // Re-read the cookie after fetch
-    csrfToken = decodeURIComponent(getCookieValue('XSRF-TOKEN') ?? '');
-    tokenExpiresAt = Date.now() + CSRF_TTL_MS;
+            if (generationAtStart !== csrfFetchGeneration) {
+                throw new Error('CSRF fetch invalidated');
+            }
 
-    if (!csrfToken) {
-        return yield* Effect.fail({
-            _tag: 'FatalError' as const,
-            message: 'CSRF token missing after fetch',
-        });
-    }
+            csrfToken = decodeURIComponent(getCookieValue('XSRF-TOKEN') ?? '');
+            tokenExpiresAt = Date.now() + CSRF_TTL_MS;
+
+            if (!csrfToken) {
+                throw new Error('CSRF token missing after fetch');
+            }
+        } finally {
+            ensureCsrfInFlight = null;
+        }
+    })();
+
+    return ensureCsrfInFlight;
+}
+
+export const ensureCsrfToken = Effect.tryPromise({
+    try: () => obtainCsrfCookieOnce(),
+    catch: (error) => ({
+        _tag: 'FatalError' as const,
+        message:
+            error instanceof Error
+                ? error.message === 'Failed to obtain CSRF token' ||
+                  error.message === 'CSRF token missing after fetch' ||
+                  error.message === 'CSRF fetch invalidated'
+                    ? error.message
+                    : `CSRF fetch failed: ${error.message}`
+                : `CSRF fetch failed: ${String(error)}`,
+    }),
 });
 
 export const clearCsrfToken = () => {
     csrfToken = '';
     tokenExpiresAt = null;
+    csrfFetchGeneration += 1;
 };
 
 export const csrfTokenCheck = Effect.gen(function* () {
