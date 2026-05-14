@@ -42,8 +42,8 @@ class UsersTable
                     ->toggleable(),
 
                 TextColumn::make('verified_google_email')
-                    ->label('Google Verified')
-                    ->dateTime()
+                    ->label('Google email')
+                    ->copyable()
                     ->sortable()
                     ->toggleable(),
 
@@ -74,12 +74,6 @@ class UsersTable
                 TextColumn::make('statistics_count')
                     ->label('Statistics')
                     ->numeric()
-                    ->sortable()
-                    ->toggleable(),
-
-                TextColumn::make('email_verified_at')
-                    ->label('Email Verified')
-                    ->dateTime()
                     ->sortable()
                     ->toggleable(),
 
