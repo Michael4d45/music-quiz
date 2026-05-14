@@ -1,8 +1,5 @@
 import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
-import { ButtonLink } from '@/components/ui/ButtonLink';
-import { useAuth } from '@/features/auth/AuthContext';
-import { isRegisteredUser } from '@/features/auth/authSession';
 import {
     advanceGameSessionRound,
     leaveGameSession,
@@ -59,7 +56,6 @@ function multipleChoiceAnswerLabel(
 }
 
 export function GameSessionRoomPage() {
-    const { user } = useAuth();
     const room = useLoaderData<GameSessionRoomViewData>();
     const core = room.session;
     const params = useParams<{
@@ -71,18 +67,6 @@ export function GameSessionRoomPage() {
     const roomCode = params.roomCode ?? core.room_code;
     const isRecapRoute = Boolean(params.sessionId);
     const isCompleted = core.status === 'completed';
-    const canLeaveAsParticipant =
-        room.viewer_participant_id !== null && !isCompleted;
-    const exitHref =
-        isRegisteredUser(user) && (isRecapRoute || isCompleted)
-            ? '/my/game-sessions'
-            : '/game-sessions/lobby';
-    const exitLabel = (() => {
-        if (isRecapRoute || isCompleted) {
-            return isRegisteredUser(user) ? 'Back to my sessions' : 'Back to lobby';
-        }
-        return 'Back to lobby';
-    })();
 
     const revalidateRoom = () => {
         revalidator.revalidate();
@@ -122,6 +106,9 @@ export function GameSessionRoomPage() {
     const [textAnswer, setTextAnswer] = useState('');
 
     const handleLeave = async () => {
+        if (core.status === 'completed') {
+            return;
+        }
         setLeaving(true);
         const result = await leaveGameSession(core.id);
         setLeaving(false);
@@ -437,25 +424,42 @@ export function GameSessionRoomPage() {
                     <h3 className="mb-2 font-semibold">Final scores</h3>
                     {sortedParticipants.length > 0 ? (
                         <ol className="mb-8 flex flex-col gap-2">
-                            {sortedParticipants.map((p, index) => (
-                                <li
-                                    key={p.id}
-                                    className="flex items-center justify-between rounded-md bg-black/5 px-3 py-2 text-sm dark:bg-white/5"
-                                >
-                                    <span>
-                                        <span className="text-muted mr-2 font-mono">
-                                            #{index + 1}
+                            {sortedParticipants.map((p, index) => {
+                                const isViewerRow =
+                                    room.viewer_participant_id !== null &&
+                                    p.id === room.viewer_participant_id;
+                                return (
+                                    <li
+                                        key={p.id}
+                                        className={cn(
+                                            'flex items-center justify-between rounded-md border border-transparent bg-black/5 px-3 py-2 text-sm dark:bg-white/5',
+                                            isViewerRow &&
+                                                'border-primary/50 bg-primary/10 dark:bg-primary/15',
+                                        )}
+                                    >
+                                        <span>
+                                            <span className="text-muted mr-2 font-mono">
+                                                #{index + 1}
+                                            </span>
+                                            {p.user?.name ?? 'Player'}
+                                            {p.user_id === core.host_id ? (
+                                                <span className="text-muted">
+                                                    {' '}
+                                                    (host)
+                                                </span>
+                                            ) : null}
+                                            {isViewerRow ? (
+                                                <span className="text-primary ml-1.5 text-xs font-semibold tracking-wide">
+                                                    (you)
+                                                </span>
+                                            ) : null}
                                         </span>
-                                        {p.user?.name ?? 'Player'}
-                                        {p.user_id === core.host_id ? (
-                                            <span className="text-muted"> (host)</span>
-                                        ) : null}
-                                    </span>
-                                    <span className="font-mono font-semibold">
-                                        {p.current_total_score} pts
-                                    </span>
-                                </li>
-                            ))}
+                                        <span className="font-mono font-semibold">
+                                            {p.current_total_score} pts
+                                        </span>
+                                    </li>
+                                );
+                            })}
                         </ol>
                     ) : (
                         <p className="text-muted mb-8 text-sm">No participants.</p>
@@ -484,48 +488,70 @@ export function GameSessionRoomPage() {
                                 ) : null}
                                 {round.answers.length > 0 ? (
                                     <ul className="flex flex-col gap-1.5">
-                                        {round.answers.map((a) => (
-                                            <li
-                                                key={a.id}
-                                                className="text-muted text-sm"
-                                            >
-                                                <span className="text-foreground font-medium">
-                                                    {a.participant_display_name}
-                                                </span>
-                                                {multipleChoiceAnswerLabel(
-                                                    round,
-                                                    a.selected_option_id,
-                                                ) ? (
-                                                    <span>
-                                                        {' '}
-                                                        ·{' '}
-                                                        {multipleChoiceAnswerLabel(
-                                                            round,
-                                                            a.selected_option_id,
-                                                        )}
+                                        {round.answers.map((a) => {
+                                            const isViewerAnswer =
+                                                room.viewer_participant_id !==
+                                                    null &&
+                                                a.participant_id ===
+                                                    room.viewer_participant_id;
+                                            return (
+                                                <li
+                                                    key={a.id}
+                                                    className={cn(
+                                                        'text-muted rounded-md px-3 py-1.5 text-sm',
+                                                        isViewerAnswer &&
+                                                            'border-primary/55 bg-primary/10 text-foreground border-l-4 font-medium dark:bg-primary/15',
+                                                    )}
+                                                >
+                                                    <span className="text-foreground font-medium">
+                                                        {a.participant_display_name}
+                                                        {isViewerAnswer ? (
+                                                            <span className="text-primary ml-1.5 text-xs font-semibold tracking-wide">
+                                                                (you)
+                                                            </span>
+                                                        ) : null}
                                                     </span>
-                                                ) : null}
-                                                {a.submitted_text ? (
-                                                    <span> · “{a.submitted_text}”</span>
-                                                ) : null}
-                                                {a.is_correct === true ? (
-                                                    <span className="text-success">
-                                                        {' '}
-                                                        · correct
-                                                    </span>
-                                                ) : null}
-                                                {a.is_correct === false ? (
-                                                    <span className="text-error">
-                                                        {' '}
-                                                        · incorrect
-                                                    </span>
-                                                ) : null}
-                                                {a.points_awarded != null &&
-                                                a.points_awarded > 0 ? (
-                                                    <span> · +{a.points_awarded} pts</span>
-                                                ) : null}
-                                            </li>
-                                        ))}
+                                                    {multipleChoiceAnswerLabel(
+                                                        round,
+                                                        a.selected_option_id,
+                                                    ) ? (
+                                                        <span>
+                                                            {' '}
+                                                            ·{' '}
+                                                            {multipleChoiceAnswerLabel(
+                                                                round,
+                                                                a.selected_option_id,
+                                                            )}
+                                                        </span>
+                                                    ) : null}
+                                                    {a.submitted_text ? (
+                                                        <span>
+                                                            {' '}
+                                                            · “{a.submitted_text}”
+                                                        </span>
+                                                    ) : null}
+                                                    {a.is_correct === true ? (
+                                                        <span className="text-success">
+                                                            {' '}
+                                                            · correct
+                                                        </span>
+                                                    ) : null}
+                                                    {a.is_correct === false ? (
+                                                        <span className="text-error">
+                                                            {' '}
+                                                            · incorrect
+                                                        </span>
+                                                    ) : null}
+                                                    {a.points_awarded != null &&
+                                                    a.points_awarded > 0 ? (
+                                                        <span>
+                                                            {' '}
+                                                            · +{a.points_awarded} pts
+                                                        </span>
+                                                    ) : null}
+                                                </li>
+                                            );
+                                        })}
                                     </ul>
                                 ) : (
                                     <p className="text-muted text-sm">No answers recorded.</p>
@@ -564,7 +590,7 @@ export function GameSessionRoomPage() {
                 </div>
             ) : null}
 
-            {canLeaveAsParticipant ? (
+            {!isCompleted && room.viewer_participant_id !== null ? (
                 <Button
                     type="button"
                     variant="secondary"
@@ -573,11 +599,7 @@ export function GameSessionRoomPage() {
                 >
                     {leaving ? 'Leaving…' : 'Leave session'}
                 </Button>
-            ) : (
-                <ButtonLink to={exitHref} variant="secondary">
-                    {exitLabel}
-                </ButtonLink>
-            )}
+            ) : null}
         </div>
     );
 }

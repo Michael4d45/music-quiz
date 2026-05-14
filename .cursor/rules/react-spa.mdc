@@ -11,6 +11,7 @@ This application’s React SPA lives under **`resources/js`**. Follow these guid
 ## Foundational Context
 
 - **React** — v19
+- **React Compiler** — the SPA build enables **`babel-plugin-react-compiler`** on the React Babel pipeline (see root `vite.config.js`). Treat automatic memoization as the default: do **not** add `useMemo` / `useCallback` only to stabilize references or reduce re-renders unless you have a concrete reason (e.g. an external API that requires a stable reference, or the compiler/ESLint flags a specific fix). Prefer plain functions and derived values; follow compiler and lint feedback if rules of React are violated.
 - **TypeScript** — strict mode; path alias **`@/*`** → **`./resources/js/*`** (see root `tsconfig.json`)
 - **Vite** — v7 (root `package.json` scripts: `npm run dev`, `npm run build`)
 - **react-router-dom** — v7 (`createBrowserRouter`, loaders, data APIs)
@@ -73,6 +74,7 @@ Patterns in this repo:
 
 ## React patterns
 
+- **React Compiler:** Write idiomatic React (components and hooks follow the [Rules of React](https://react.dev/reference/rules)). Avoid manual `useMemo` / `useCallback` for micro-optimization; the compiler handles that when it is safe. Existing `useMemo` in the codebase is not a pattern to copy for new code unless the value is inherently expensive to compute or an API contract requires referential stability.
 - **Ref-forwarding:** When wrapping native elements, use `React.forwardRef` and set `displayName` where the codebase already does (e.g. `Button`).
 - **Loaders:** Export async loader functions from the page module (or a dedicated module). Use `LoaderFunctionArgs` from `react-router` / `react-router-dom` when you need `params` or `request`. In the component, `useLoaderData<YourType>()`. Handle API errors in the loader (fallback data or rethrow as appropriate).
 - **Data flow:** Loaders for initial route data; local `useState` for UI-only state. Use **`useAuth()`** from `@/features/auth/AuthContext` for session user and auth actions.
