@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/only-throw-error -- React Router loaders throw data() for error boundaries */
 import { fetchGameSessionByRoomCode } from '@/features/game-sessions/api';
 import { apiFailureMessage } from '@/lib/apiCore';
+import { RouteLoaderResponseError } from '@/lib/routeLoaderResponseError';
 import type { GameSessionRoomViewData } from '@/schemas/App/Data/Responses/GameSessionRoomViewData';
-import { data } from 'react-router-dom';
 
 const ROOM_CODE_PATTERN = /^[A-Za-z0-9]{6}$/;
 
@@ -16,26 +15,31 @@ export async function gameSessionRoomLoader({
 }): Promise<GameSessionRoomViewData> {
     const roomCode = params.roomCode;
     if (!roomCode) {
-        throw data({ message: 'Missing room code' }, { status: 400 });
+        throw new RouteLoaderResponseError(400, {
+            message: 'Missing room code',
+        });
     }
     if (!ROOM_CODE_PATTERN.test(roomCode.trim())) {
-        throw data({ message: INVALID_ROOM_CODE_MESSAGE }, { status: 422 });
+        throw new RouteLoaderResponseError(422, {
+            message: INVALID_ROOM_CODE_MESSAGE,
+        });
     }
     const result = await fetchGameSessionByRoomCode(roomCode);
     if (result._tag === 'Success') {
         return result.data;
     }
     if (result._tag === 'ValidationError') {
-        throw data(
-            { message: apiFailureMessage(result, INVALID_ROOM_CODE_MESSAGE) },
-            { status: 422 },
-        );
+        throw new RouteLoaderResponseError(422, {
+            message: apiFailureMessage(result, INVALID_ROOM_CODE_MESSAGE),
+        });
     }
     if (result._tag === 'NotFoundError') {
-        throw data({ message: result.message }, { status: 404 });
+        throw new RouteLoaderResponseError(404, { message: result.message });
     }
     if (result._tag === 'FatalError' && result.message.startsWith('HTTP 403')) {
-        throw data({ message: 'Forbidden' }, { status: 403 });
+        throw new RouteLoaderResponseError(403, { message: 'Forbidden' });
     }
-    throw data({ message: 'Could not load room' }, { status: 500 });
+    throw new RouteLoaderResponseError(500, {
+        message: 'Could not load room',
+    });
 }

@@ -14,8 +14,6 @@ interface LaravelDataTypesOptions {
     extraArgs?: string[];
 }
 
-let context: PluginContext;
-
 export const laravelDataTypes = ({
     patterns = [
         'app/Data/**/*.php',
@@ -28,22 +26,28 @@ export const laravelDataTypes = ({
 }: LaravelDataTypesOptions = {}): Plugin => {
     patterns = patterns.map((pattern) => pattern.replace('\\', '/'));
 
+    let pluginContext: PluginContext | undefined;
+
     const args: string[] = [...extraArgs];
     if (path) {
         args.push(`--path=${path}`);
     }
 
     const runCommand = async () => {
+        const ctx = pluginContext;
+        if (!ctx) {
+            return;
+        }
         try {
             await execAsync(`${command} ${args.join(' ')}`);
-            context.info('[laravel-data] TypeScript types generated.');
+            ctx.info('[laravel-data] TypeScript types generated.');
         } catch (error) {
             // Provide stdout/stderr details when available to aid debugging inside containers
             const e: any = error;
             const details = [e.message || '', e.stdout || '', e.stderr || '']
                 .filter(Boolean)
                 .join('\n');
-            context.error(
+            ctx.error(
                 '[laravel-data] Failed to generate types:\n' + details,
             );
         }
@@ -52,9 +56,8 @@ export const laravelDataTypes = ({
     return {
         name: 'laravel-data-types',
         enforce: 'pre',
-        buildStart() {
-            // eslint-disable-next-line
-            context = this;
+        buildStart(this: PluginContext) {
+            pluginContext = this;
             return runCommand();
         },
         async handleHotUpdate({ file, server }) {

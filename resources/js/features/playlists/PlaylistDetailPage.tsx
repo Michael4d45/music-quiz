@@ -24,7 +24,7 @@ import type { QuizQuestionData } from '@/schemas/App/Data/Models/QuizQuestionDat
 import type { MyPlaylistItemsResponseData } from '@/schemas/App/Data/Responses/MyPlaylistItemsResponseData';
 import type { QuestionType } from '@/schemas/App/Enums/QuestionType';
 import { Visibility } from '@/schemas/App/Enums/Visibility';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { data, type LoaderFunctionArgs } from 'react-router';
 import { useLoaderData, useRevalidator } from 'react-router-dom';
@@ -110,17 +110,21 @@ export function PlaylistDetailPage() {
     const itemsFingerprint = loaderData.items
         .map((i) => `${i.id}:${i.sort_order}`)
         .join('|');
-    const [localPayload, setLocalPayload] =
-        useState<MyPlaylistItemsResponseData | null>(null);
+    const [localItemsOverride, setLocalItemsOverride] = useState<{
+        playlistId: string;
+        loaderItemsFingerprint: string;
+        payload: MyPlaylistItemsResponseData;
+    } | null>(null);
 
-    useEffect(() => {
-        // Drop merged list when the route loader supplies a new item ordering (revalidate / navigate).
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional sync from loader fingerprint
-        setLocalPayload(null);
-    }, [itemsFingerprint]);
+    const mergedFromLocal =
+        localItemsOverride &&
+        localItemsOverride.playlistId === playlistId &&
+        localItemsOverride.loaderItemsFingerprint === itemsFingerprint
+            ? localItemsOverride.payload
+            : null;
 
-    const playlist = localPayload?.playlist ?? loaderData.playlist;
-    const items = localPayload?.items ?? loaderData.items;
+    const playlist = mergedFromLocal?.playlist ?? loaderData.playlist;
+    const items = mergedFromLocal?.items ?? loaderData.items;
 
     const [search, setSearch] = useState('');
     const [selectedQuestionId, setSelectedQuestionId] = useState('');
@@ -205,7 +209,11 @@ export function PlaylistDetailPage() {
         setReordering(false);
         if (result._tag === 'Success') {
             toast.success('Order updated');
-            setLocalPayload(result.data);
+            setLocalItemsOverride({
+                playlistId,
+                loaderItemsFingerprint: itemsFingerprint,
+                payload: result.data,
+            });
         } else {
             toast.error('Could not reorder');
         }
@@ -245,7 +253,11 @@ export function PlaylistDetailPage() {
         setCreating(false);
         if (result._tag === 'Success') {
             toast.success('Question added to playlist');
-            setLocalPayload(result.data);
+            setLocalItemsOverride({
+                playlistId,
+                loaderItemsFingerprint: itemsFingerprint,
+                payload: result.data,
+            });
             setNewCorrectAnswer('');
             setNewPrompt('');
             setNewTrackId('');
