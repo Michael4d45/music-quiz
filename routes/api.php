@@ -2,12 +2,15 @@
 
 declare(strict_types=1);
 
+use App\Features\GameSessions\Actions\AdvanceGameSessionRound;
 use App\Features\GameSessions\Actions\CreateGameSession;
 use App\Features\GameSessions\Actions\JoinGameSession;
 use App\Features\GameSessions\Actions\LeaveGameSession;
 use App\Features\GameSessions\Actions\ListMyGameSessions;
 use App\Features\GameSessions\Actions\ListPublicLobbyGameSessions;
 use App\Features\GameSessions\Actions\ShowGameSessionByRoomCode;
+use App\Features\GameSessions\Actions\StartGameSession;
+use App\Features\GameSessions\Actions\SubmitSessionRoundAnswer;
 use App\Features\GameSessions\Actions\UpdateGameSession;
 use App\Features\MusicTracks\Actions\CreateMusicTrack;
 use App\Features\MusicTracks\Actions\CreateMusicTrackUpload;
@@ -52,6 +55,20 @@ Route::middleware(['web', 'auth'])->group(function (): void {
         'game-sessions/{gameSession}/leave',
         LeaveGameSession::class,
     )->whereUuid('gameSession');
+    Route::post(
+        'game-sessions/{gameSession}/start',
+        StartGameSession::class,
+    )->whereUuid('gameSession');
+    Route::post(
+        'game-sessions/{gameSession}/advance-round',
+        AdvanceGameSessionRound::class,
+    )->whereUuid('gameSession');
+    Route::post(
+        'game-sessions/{gameSession}/rounds/{sessionRound}/answer',
+        SubmitSessionRoundAnswer::class,
+    )
+        ->whereUuid('gameSession')
+        ->whereUuid('sessionRound');
 });
 
 Route::middleware(['web', 'registered'])->group(function (): void {

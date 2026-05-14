@@ -1,6 +1,11 @@
 import { echo } from './echo';
 
-interface NotificationSubscription {
+interface PrivateNotificationSubscription {
+    channel: any;
+    eventListeners: Map<string, Set<(data: unknown) => void>>;
+}
+
+interface PublicNotificationSubscription {
     channel: any;
     refCount: number;
     callbacks: Set<(data: unknown) => void>;
@@ -23,11 +28,11 @@ interface PresenceNotificationSubscription {
 class EchoManager {
     private notificationSubscriptions = new Map<
         string,
-        NotificationSubscription
+        PrivateNotificationSubscription
     >();
     private publicNotificationSubscriptions = new Map<
         string,
-        NotificationSubscription
+        PublicNotificationSubscription
     >();
     private presenceSubscriptions = new Map<string, PresenceSubscription>();
     private presenceNotificationSubscriptions = new Map<
@@ -44,19 +49,25 @@ class EchoManager {
         if (!sub) {
             sub = {
                 channel: echo.private(channelName),
-                refCount: 0,
-                callbacks: new Set(),
+                eventListeners: new Map(),
             };
             this.notificationSubscriptions.set(channelName, sub);
+        }
 
-            // Listen to the event
-            const currentSub = sub;
+        let callbacks = sub.eventListeners.get(eventName);
+        if (!callbacks) {
+            callbacks = new Set();
+            sub.eventListeners.set(eventName, callbacks);
+
+            const subRef = sub;
             sub.channel.listen(`.${eventName}`, (data: unknown) => {
-                currentSub.callbacks.forEach((cb) => cb(data));
+                subRef.eventListeners
+                    .get(eventName)
+                    ?.forEach((cb) => cb(data));
             });
         }
-        sub.callbacks.add(callback);
-        sub.refCount++;
+
+        callbacks.add(callback);
     }
 
     subscribePublicNotifications(
@@ -88,11 +99,23 @@ class EchoManager {
         callback: (data: unknown) => void,
     ) {
         const sub = this.notificationSubscriptions.get(channelName);
-        if (!sub) return;
-        sub.callbacks.delete(callback);
-        sub.refCount--;
-        if (sub.refCount === 0) {
+        if (!sub) {
+            return;
+        }
+
+        const callbacks = sub.eventListeners.get(eventName);
+        if (!callbacks) {
+            return;
+        }
+
+        callbacks.delete(callback);
+
+        if (callbacks.size === 0) {
             sub.channel.stopListening(`.${eventName}`);
+            sub.eventListeners.delete(eventName);
+        }
+
+        if (sub.eventListeners.size === 0) {
             echo.leave(channelName);
             this.notificationSubscriptions.delete(channelName);
         }

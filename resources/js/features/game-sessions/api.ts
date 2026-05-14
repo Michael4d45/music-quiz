@@ -1,5 +1,6 @@
 import { decodeJson, httpRequest, runEffect, withRetry } from '@/lib/apiCore';
 import { GameSessionDataSchema } from '@/schemas/App/Data/Models/GameSessionData';
+import { GameSessionRoomViewDataSchema } from '@/schemas/App/Data/Responses/GameSessionRoomViewData';
 import { GameSessionsLobbyResponseDataSchema } from '@/schemas/App/Data/Models/GameSessionsLobbyResponseData';
 import { SessionParticipantDataSchema } from '@/schemas/App/Data/Models/SessionParticipantData';
 import { MessageResponseSchema } from '@/schemas/App/Data/MessageResponse';
@@ -24,7 +25,55 @@ export async function fetchGameSessionByRoomCode(roomCode: string) {
         pipe(
             httpRequest(`/api/game-sessions/room/${code}`),
             withRetry('fetchGameSessionByRoomCode'),
-            decodeJson(GameSessionDataSchema),
+            decodeJson(GameSessionRoomViewDataSchema),
+        ),
+    );
+}
+
+export async function startGameSession(sessionId: string) {
+    return runEffect(
+        pipe(
+            httpRequest(`/api/game-sessions/${sessionId}/start`, {
+                method: 'POST',
+            }),
+            withRetry('startGameSession'),
+            decodeJson(GameSessionRoomViewDataSchema),
+        ),
+    );
+}
+
+export async function advanceGameSessionRound(sessionId: string) {
+    return runEffect(
+        pipe(
+            httpRequest(`/api/game-sessions/${sessionId}/advance-round`, {
+                method: 'POST',
+            }),
+            withRetry('advanceGameSessionRound'),
+            decodeJson(GameSessionRoomViewDataSchema),
+        ),
+    );
+}
+
+export async function submitSessionRoundAnswer(
+    sessionId: string,
+    roundId: string,
+    payload: { submitted_text?: string; selected_option_id?: string },
+) {
+    return runEffect(
+        pipe(
+            Effect.succeed(payload),
+            Effect.flatMap((body) =>
+                httpRequest(
+                    `/api/game-sessions/${sessionId}/rounds/${roundId}/answer`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body),
+                    },
+                ),
+            ),
+            withRetry('submitSessionRoundAnswer'),
+            decodeJson(GameSessionRoomViewDataSchema),
         ),
     );
 }

@@ -1,14 +1,23 @@
 import { useAuth } from '@/features/auth/AuthContext';
 import { echoManager } from '@/lib/echoManager';
 import { GameSessionParticipantJoinedDataSchema } from '@/schemas/App/Data/Events/GameSessionParticipantJoinedData';
+import { GameSessionUpdatedDataSchema } from '@/schemas/App/Data/Events/GameSessionUpdatedData';
 import { Schema } from 'effect';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-export function useGameSessionChannel(sessionId: string | undefined) {
+export function useGameSessionChannel(
+    sessionId: string | undefined,
+    options?: { onSessionUpdated?: () => void },
+) {
     const { authState } = useAuth();
     const [participantCount, setParticipantCount] = useState<number | null>(
         null,
     );
+    const onSessionUpdatedRef = useRef(options?.onSessionUpdated);
+
+    useEffect(() => {
+        onSessionUpdatedRef.current = options?.onSessionUpdated;
+    }, [options?.onSessionUpdated]);
 
     useEffect(() => {
         if (
@@ -20,7 +29,8 @@ export function useGameSessionChannel(sessionId: string | undefined) {
         }
 
         const channelName = `game-session.${sessionId}`;
-        const callback = (data: unknown) => {
+
+        const onParticipantJoined = (data: unknown) => {
             const decoded = Schema.decodeUnknownEither(
                 GameSessionParticipantJoinedDataSchema,
             )(data);
@@ -29,17 +39,36 @@ export function useGameSessionChannel(sessionId: string | undefined) {
             }
         };
 
+        const onSessionUpdated = (data: unknown) => {
+            const decoded = Schema.decodeUnknownEither(
+                GameSessionUpdatedDataSchema,
+            )(data);
+            if (decoded._tag === 'Right' && decoded.right.session_id === sessionId) {
+                onSessionUpdatedRef.current?.();
+            }
+        };
+
         echoManager.subscribeNotifications(
             channelName,
             'GameSessionParticipantJoined',
-            callback,
+            onParticipantJoined,
+        );
+        echoManager.subscribeNotifications(
+            channelName,
+            'GameSessionUpdated',
+            onSessionUpdated,
         );
 
         return () => {
             echoManager.unsubscribeNotifications(
                 channelName,
                 'GameSessionParticipantJoined',
-                callback,
+                onParticipantJoined,
+            );
+            echoManager.unsubscribeNotifications(
+                channelName,
+                'GameSessionUpdated',
+                onSessionUpdated,
             );
         };
     }, [authState.hasFetchedUser, authState.isAuthenticated, sessionId]);

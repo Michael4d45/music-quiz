@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/only-throw-error -- React Router loaders throw data() for error boundaries */
 import { fetchGameSessionByRoomCode } from '@/features/game-sessions/api';
-import type { GameSessionData } from '@/schemas/App/Data/Models/GameSessionData';
+import type { GameSessionRoomViewData } from '@/schemas/App/Data/Responses/GameSessionRoomViewData';
 import { data } from 'react-router-dom';
 
 export async function gameSessionRoomLoader({
     params,
 }: {
     params: { roomCode?: string };
-}): Promise<GameSessionData> {
+}): Promise<GameSessionRoomViewData> {
     const roomCode = params.roomCode;
     if (!roomCode) {
         throw data({ message: 'Missing room code' }, { status: 400 });
@@ -18,6 +18,12 @@ export async function gameSessionRoomLoader({
     }
     if (result._tag === 'NotFoundError') {
         throw data({ message: result.message }, { status: 404 });
+    }
+    if (
+        result._tag === 'FatalError' &&
+        result.message.startsWith('HTTP 403')
+    ) {
+        throw data({ message: 'Forbidden' }, { status: 403 });
     }
     throw data({ message: 'Could not load room' }, { status: 500 });
 }

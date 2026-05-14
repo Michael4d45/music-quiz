@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Features\GameSessions\Actions;
 
-use App\Data\Models\GameSessionData;
 use App\Enums\SessionStatus;
 use App\Features\Auth\Responses\MessageResponse;
 use App\Models\GameSession;
+use App\Support\GameSessions\GameSessionRoomViewBuilder;
 use Symfony\Component\HttpFoundation\Response;
 
 class ShowGameSessionByRoomCode
@@ -20,16 +20,7 @@ class ShowGameSessionByRoomCode
         /** @var GameSession|null $session */
         $session = GameSession::query()
             ->whereRaw('upper(room_code) = ?', [$normalized])
-            ->with([
-                'host:id,name,is_guest,is_admin',
-                'quizMode:id,name,description,allows_host_override,requires_manual_scoring,created_at,updated_at',
-                'scoringRule:id,name,base_points,decay_factor,max_time_ms,streak_bonus_enabled,streak_multiplier,created_at,updated_at',
-                'playlist',
-                'participants' => static function ($query): void {
-                    $query->orderBy('joined_at');
-                },
-                'participants.user:id,name,is_guest,is_admin',
-            ])
+            ->with(StartGameSession::roomEagerLoads())
             ->first();
 
         if (!$session instanceof GameSession) {
@@ -44,7 +35,9 @@ class ShowGameSessionByRoomCode
             ]), 403);
         }
 
-        return response()->json(GameSessionData::from($session));
+        return response()->json(
+            GameSessionRoomViewBuilder::build($session, $user),
+        );
     }
 
     private function userMayViewSession(
