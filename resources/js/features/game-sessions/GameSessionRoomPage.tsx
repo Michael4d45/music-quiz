@@ -7,6 +7,7 @@ import {
     startGameSession,
     submitSessionRoundAnswer,
 } from '@/features/game-sessions/api';
+import { gameSessionStatusLabel } from '@/features/game-sessions/gameSessionStatusLabel';
 import {
     SessionRoundMediaPlayer,
     type SessionRoundRemotePlayback,
@@ -166,6 +167,9 @@ export function GameSessionRoomPage() {
             ? `${window.location.origin}/game-sessions/room/${roomCode.trim().toUpperCase()}`
             : '';
 
+    const showInviteLinkCard =
+        !isRecapRoute && core.status === 'lobby' && shareRoomUrl !== '';
+
     const copyInviteLink = async () => {
         if (isBlocked) {
             toast.error(blockReason || 'Cannot copy while offline');
@@ -304,20 +308,23 @@ export function GameSessionRoomPage() {
                     </span>
                 ) : null}
                 {isRecapRoute ? ' · ' : null}
-                Status: {core.status} · Players: {displayCount} /{' '}
-                {core.max_players}
+                Status: {gameSessionStatusLabel(core.status)} · Players:{' '}
+                {displayCount} / {core.max_players}
                 {room.viewer_is_host ? (
                     <span className="text-muted"> · You are the host</span>
                 ) : null}
                 {room.viewer_participant_id ? (
                     <span className="text-muted">
                         {' '}
-                        · You played in this session
+                        ·{' '}
+                        {isCompleted
+                            ? 'You played in this session'
+                            : 'You have a player seat'}
                     </span>
                 ) : null}
             </p>
 
-            {!isRecapRoute && shareRoomUrl !== '' ? (
+            {showInviteLinkCard ? (
                 <div className="bg-card mb-6 flex flex-col gap-3 rounded-lg border border-transparent p-4 shadow-md sm:flex-row sm:items-center sm:justify-between dark:border-white/10">
                     <div className="min-w-0 flex-1">
                         <p className="text-muted mb-1 text-xs font-medium tracking-wide uppercase">
