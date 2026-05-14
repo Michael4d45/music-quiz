@@ -29,13 +29,15 @@ export function App() {
             {/* Main content */}
             <main
                 className={cn(
-                    'min-h-0 flex-1',
+                    'flex min-h-0 flex-1 flex-col',
                     isCompact ? 'md:pl-20' : 'md:pl-64',
                 )}
             >
-                <AuthGuard>
-                    <Outlet />
-                </AuthGuard>
+                <div className="min-h-0 flex-1 overflow-y-auto">
+                    <AuthGuard>
+                        <Outlet />
+                    </AuthGuard>
+                </div>
             </main>
 
             <ModalRenderer />

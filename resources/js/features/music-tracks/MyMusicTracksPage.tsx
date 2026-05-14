@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/Button';
 import { ButtonLink } from '@/components/ui/ButtonLink';
 import ConfirmModal from '@/components/ConfirmModal';
+import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import {
     createMusicTrack,
     deleteMusicTrack,
@@ -277,14 +278,17 @@ export function MyMusicTracksPage() {
                 </ButtonLink>
             </div>
 
-            <p className="text-muted mb-6 max-w-2xl text-sm">
-                Pick a collection type: normal albums group under the album
-                name; games, films, and shows group under one work title, with
-                an optional separate soundtrack or release title when you need
-                it. Use streaming sources for catalog rows, or upload audio you
-                keep locally. Uploaded tracks can be previewed here in the
-                browser; catalog-only rows open in your music app to listen.
-            </p>
+            <PageIntroExpandable summary="Add streaming catalog metadata or upload audio for in-browser playback. Library groups mirror albums and soundtracks.">
+                <p>
+                    Pick a collection type: normal albums group under the album
+                    name; games, films, and shows group under one work title,
+                    with an optional separate soundtrack or release title when
+                    you need it. Use streaming sources for catalog rows, or
+                    upload audio you keep locally. Uploaded tracks can be
+                    previewed here in the browser; catalog-only rows open in your
+                    music app to listen.
+                </p>
+            </PageIntroExpandable>
 
             <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <label className="flex min-w-0 flex-1 flex-col gap-1 text-sm">
@@ -366,6 +370,7 @@ export function MyMusicTracksPage() {
                             <input
                                 type="radio"
                                 name="add-mode"
+                                value="streaming"
                                 checked={addMode === 'streaming'}
                                 onChange={() => setAddMode('streaming')}
                             />
@@ -375,6 +380,7 @@ export function MyMusicTracksPage() {
                             <input
                                 type="radio"
                                 name="add-mode"
+                                value="upload"
                                 checked={addMode === 'upload'}
                                 onChange={() => setAddMode('upload')}
                             />

@@ -48,7 +48,7 @@ export const navigationSections: NavigationSection[] = [
             },
             {
                 href: '/my/quiz-questions',
-                label: 'My questions',
+                label: 'My quiz questions',
                 icon: Mic2,
                 requiresRegistered: true,
             },

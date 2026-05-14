@@ -1,3 +1,4 @@
+import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
 import { ButtonLink } from '@/components/ui/ButtonLink';
 import {
@@ -80,17 +81,23 @@ export function MyGameSessionsPage() {
                 </ButtonLink>
             </div>
 
-            <p className="text-muted mb-6 max-w-2xl text-sm">
-                Host a room for your friends: pick how the game is scored, set how
-                many players can join, and optionally tie the session to one of your
-                playlists so each round uses your question library.
-            </p>
+            <PageIntroExpandable summary="Create a room, share the code, and optionally bind a playlist so rounds draw from your library.">
+                <p>
+                    Host a room for your friends: pick how the game is scored, set
+                    how many players can join, and optionally tie the session to
+                    one of your playlists so each round uses your question
+                    library.
+                </p>
+            </PageIntroExpandable>
 
             <div className="bg-card mb-10 flex flex-col gap-4 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10">
                 <h2 className="text-lg font-semibold">Host a new session</h2>
                 <div className="grid gap-3 sm:grid-cols-2">
                     <div>
-                        <label className="text-muted mb-1 block text-sm">
+                        <label
+                            htmlFor="host-quiz-mode"
+                            className="text-muted mb-1 block text-sm"
+                        >
                             Quiz mode
                         </label>
                         <select
@@ -108,7 +115,10 @@ export function MyGameSessionsPage() {
                         </select>
                     </div>
                     <div>
-                        <label className="text-muted mb-1 block text-sm">
+                        <label
+                            htmlFor="host-scoring-rule"
+                            className="text-muted mb-1 block text-sm"
+                        >
                             Scoring rule
                         </label>
                         <select
@@ -126,10 +136,14 @@ export function MyGameSessionsPage() {
                         </select>
                     </div>
                     <div>
-                        <label className="text-muted mb-1 block text-sm">
+                        <label
+                            htmlFor="host-playlist"
+                            className="text-muted mb-1 block text-sm"
+                        >
                             Playlist (optional)
                         </label>
                         <select
+                            id="host-playlist"
                             className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                             value={playlistId}
                             onChange={(e) => setPlaylistId(e.target.value)}
@@ -143,10 +157,14 @@ export function MyGameSessionsPage() {
                         </select>
                     </div>
                     <div>
-                        <label className="text-muted mb-1 block text-sm">
+                        <label
+                            htmlFor="host-max-players"
+                            className="text-muted mb-1 block text-sm"
+                        >
                             Max players
                         </label>
                         <input
+                            id="host-max-players"
                             type="number"
                             min={2}
                             max={50}
@@ -158,14 +176,26 @@ export function MyGameSessionsPage() {
                         />
                     </div>
                 </div>
-                <label className="flex items-center gap-2 text-sm">
-                    <input
-                        type="checkbox"
-                        checked={isPublic}
-                        onChange={(e) => setIsPublic(e.target.checked)}
-                    />
-                    List in public lobby
-                </label>
+                <div className="flex flex-col gap-1">
+                    <label className="flex items-center gap-2 text-sm">
+                        <input
+                            id="host-is-public"
+                            type="checkbox"
+                            aria-describedby="host-is-public-hint"
+                            checked={isPublic}
+                            onChange={(e) => setIsPublic(e.target.checked)}
+                        />
+                        List in public lobby
+                    </label>
+                    <p
+                        id="host-is-public-hint"
+                        className="text-muted max-w-xl pl-6 text-xs"
+                    >
+                        When checked, joiners can discover this room from the
+                        game lobby before it starts. Turn off for a private code
+                        only you share.
+                    </p>
+                </div>
                 <Button type="button" onClick={() => void handleCreate()}>
                     Create session
                 </Button>

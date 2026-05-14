@@ -1,3 +1,4 @@
+import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
 import { ButtonLink } from '@/components/ui/ButtonLink';
 import { useOfflineBlock } from '@/hooks/useOfflineBlock';
@@ -67,10 +68,12 @@ export function GameSessionsLobbyPage() {
                 </ButtonLink>
             </div>
 
-            <p className="text-muted mb-6 max-w-2xl">
-                Public games that have not started yet. Join with a room code,
-                or open a session you host from My game sessions.
-            </p>
+            <PageIntroExpandable summary="Join listed games that have not started, or enter a six-character room code.">
+                <p>
+                    Public games that have not started yet. Join with a room
+                    code, or open a session you host from My game sessions.
+                </p>
+            </PageIntroExpandable>
 
             <div className="bg-card mb-6 flex flex-col gap-3 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10 sm:flex-row sm:items-end">
                 <div className="grow">
@@ -131,6 +134,7 @@ export function GameSessionsLobbyPage() {
                                             variant="secondary"
                                             className="shrink-0"
                                             disabled={isBlocked}
+                                            aria-label={`Copy room code ${session.room_code}`}
                                             onClick={() =>
                                                 void copyRoomCode(
                                                     session.room_code,
@@ -172,7 +176,7 @@ export function GameSessionsLobbyPage() {
                                                 {session.max_players}
                                                 {isFull ? (
                                                     <span className="ml-2 text-sm text-amber-600 dark:text-amber-400">
-                                                        Full
+                                                        At capacity
                                                     </span>
                                                 ) : null}
                                             </dd>
@@ -181,13 +185,18 @@ export function GameSessionsLobbyPage() {
                                     <Button
                                         type="button"
                                         disabled={isBlocked || isFull}
+                                        aria-label={
+                                            isFull
+                                                ? `Room ${session.room_code} is at capacity`
+                                                : `Join room ${session.room_code}`
+                                        }
                                         onClick={() =>
                                             void goToRoomAfterJoin(
                                                 session.room_code,
                                             )
                                         }
                                     >
-                                        {isFull ? 'Full' : 'Join this game'}
+                                        {isFull ? 'At capacity' : 'Join this game'}
                                     </Button>
                                 </div>
                             </li>

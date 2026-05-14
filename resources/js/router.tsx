@@ -32,11 +32,20 @@ import {
     myQuizQuestionsLoader,
 } from './features/quiz-questions/MyQuizQuestionsPage';
 
+function RouterHydrateFallback() {
+    return (
+        <div className="bg-primary text-muted flex min-h-dvh items-center justify-center p-6 text-sm">
+            Loading…
+        </div>
+    );
+}
+
 export const router = createBrowserRouter([
     {
         path: '/',
         element: <App />,
         errorElement: <ErrorPage />,
+        HydrateFallback: RouterHydrateFallback,
         children: [
             {
                 index: true,

@@ -6,7 +6,9 @@
     <meta name="viewport"
         content="width=device-width, height=device-height, initial-scale=1.0, viewport-fit=auto, user-scalable=no, interactive-widget=resizes-content" />
 
-    <link rel="manifest" crossorigin="use-credentials" href="/build/manifest.webmanifest" />
+    @if (file_exists(public_path('build/manifest.json')))
+        <link rel="manifest" crossorigin="use-credentials" href="/build/manifest.webmanifest" />
+    @endif
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="mobile-web-app-capable" content="yes" />

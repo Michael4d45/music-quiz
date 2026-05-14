@@ -1,4 +1,5 @@
 import ConfirmModal from '@/components/ConfirmModal';
+import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
 import { ButtonLink } from '@/components/ui/ButtonLink';
 import {
@@ -34,7 +35,7 @@ export interface MyQuizQuestionsLoaderData extends MyQuizQuestionsResponseData {
 
 const VISIBILITY_OPTIONS: { value: (typeof Visibility)[keyof typeof Visibility]; label: string }[] = [
     { value: Visibility.Private, label: 'Private (only you)' },
-    { value: Visibility.Draft, label: 'Draft' },
+    { value: Visibility.Draft, label: 'Link-only' },
     { value: Visibility.Public, label: 'Public' },
 ];
 
@@ -214,12 +215,15 @@ export function MyQuizQuestionsPage() {
                 </div>
             </div>
 
-            <p className="text-muted mb-6 max-w-2xl text-sm">
-                Build prompts and the canonical correct answer. Link a track when
-                the round should reference a specific recording; groups below
-                follow the same library headings as on My tracks. Uploaded tracks
-                can be previewed while you tune wording or media trim.
-            </p>
+            <PageIntroExpandable summary="Write prompts and correct answers; link a track when a round needs a specific recording.">
+                <p>
+                    Build prompts and the canonical correct answer. Link a track
+                    when the round should reference a specific recording; groups
+                    below follow the same library headings as on My tracks.
+                    Uploaded tracks can be previewed while you tune wording or
+                    media trim.
+                </p>
+            </PageIntroExpandable>
 
             <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <label className="flex min-w-0 flex-1 flex-col gap-1 text-sm">

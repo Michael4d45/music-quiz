@@ -1,4 +1,5 @@
 import ConfirmModal from '@/components/ConfirmModal';
+import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
 import { ButtonLink } from '@/components/ui/ButtonLink';
 import {
@@ -23,7 +24,10 @@ const VISIBILITY_OPTIONS: {
     label: string;
 }[] = [
     { value: Visibility.Private, label: 'Private' },
-    { value: Visibility.Draft, label: 'Draft' },
+    {
+        value: Visibility.Draft,
+        label: 'Link-only',
+    },
     { value: Visibility.Public, label: 'Public' },
 ];
 
@@ -155,12 +159,14 @@ export function MyPlaylistsPage() {
                 </div>
             </div>
 
-            <p className="text-muted mb-6 max-w-2xl text-sm">
-                A playlist is an ordered set of quiz questions. Open one to add
-                or reorder items, then pick it when you host so rounds draw from
-                that set. Edit name, visibility, or status here; fine-tune
-                question order on the playlist detail page.
-            </p>
+            <PageIntroExpandable summary="Ordered lists of quiz questions you can attach when hosting. Open a playlist to reorder items; edit name, visibility, and status here.">
+                <p>
+                    A playlist is an ordered set of quiz questions. Open one to
+                    add or reorder items, then pick it when you host so rounds
+                    draw from that set. Edit name, visibility, or status here;
+                    fine-tune question order on the playlist detail page.
+                </p>
+            </PageIntroExpandable>
 
             <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <label className="flex min-w-0 flex-1 flex-col gap-1 text-sm">
