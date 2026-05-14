@@ -23,4 +23,18 @@ class SubmitSessionRoundAnswerRequest extends FormRequest
             'selected_option_id' => ['nullable', 'uuid'],
         ];
     }
+
+    public function validatedSubmittedText(): null|string
+    {
+        $value = $this->validated('submitted_text');
+
+        return is_string($value) ? $value : null;
+    }
+
+    public function validatedSelectedOptionId(): null|string
+    {
+        $value = $this->validated('selected_option_id');
+
+        return is_string($value) ? $value : null;
+    }
 }

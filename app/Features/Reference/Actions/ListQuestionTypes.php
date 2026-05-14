@@ -13,15 +13,14 @@ class ListQuestionTypes
 {
     public function __invoke(): Response
     {
-        $mapped = collect(
-            QuestionType::cases(),
-        )->map(static fn(QuestionType $type): IdLabelOptionData => IdLabelOptionData::from([
-            'id' => $type->value,
-            'label' => $type->getLabel(),
-        ]))->all();
-
         return response()->json(QuestionTypesListResponseData::from([
-            'question_types' => $mapped,
+            'question_types' => IdLabelOptionData::collect(array_map(
+                static fn(QuestionType $type): array => [
+                    'id' => $type->value,
+                    'label' => $type->getLabel(),
+                ],
+                QuestionType::cases(),
+            )),
         ]));
     }
 }

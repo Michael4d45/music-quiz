@@ -7,6 +7,7 @@ namespace App\Features\GameSessions\Actions;
 use App\Data\Models\GameSessionData;
 use App\Data\Responses\MyGameSessionsResponseData;
 use App\Models\GameSession;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -18,14 +19,12 @@ class ListMyGameSessions
         Gate::authorize('viewAny', GameSession::class);
 
         $sessions = GameSession::query()
-            ->where(static function ($query) use ($user): void {
-                $query->where(
-                    'host_id',
-                    $user->id,
-                )->orWhereHas('participants', static fn($q) => $q->where(
+            ->where(static function (Builder $query) use ($user): void {
+                $query->where('host_id', $user->id)->orWhereRelation(
+                    'participants',
                     'user_id',
                     $user->id,
-                ));
+                );
             })
             ->with([
                 'host:id,name,is_guest,is_admin',
@@ -37,14 +36,8 @@ class ListMyGameSessions
             ->limit(50)
             ->get();
 
-        $payload = $sessions->map(
-            static fn(GameSession $session): GameSessionData => GameSessionData::from(
-                $session,
-            ),
-        )->all();
-
         return response()->json(MyGameSessionsResponseData::from([
-            'sessions' => $payload,
+            'sessions' => GameSessionData::collect($sessions),
         ]));
     }
 }

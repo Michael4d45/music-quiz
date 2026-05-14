@@ -24,8 +24,8 @@ final class GameSessionRoomViewBuilder
         GameSession $session,
         User $viewer,
     ): GameSessionRoomViewData {
-        $roundsRelation = $session->relationLoaded('rounds')
-            ? $session->getRelation('rounds')
+        $roundsCollection = $session->relationLoaded('rounds')
+            ? $session->rounds
             : collect();
         $session->unsetRelation('rounds');
         $sessionData = GameSessionData::from($session);
@@ -38,18 +38,16 @@ final class GameSessionRoomViewBuilder
         /** @var list<SessionRoundGameplayData> $gameplayRounds */
         $gameplayRounds = [];
 
-        if ($roundsRelation !== null) {
-            foreach ($roundsRelation as $round) {
-                if (!$round instanceof SessionRound) {
-                    continue;
-                }
-
-                $gameplayRounds[] = self::mapRound(
-                    $round,
-                    $viewerIsHost,
-                    $viewerParticipantId,
-                );
+        foreach ($roundsCollection as $round) {
+            if (!$round instanceof SessionRound) {
+                continue;
             }
+
+            $gameplayRounds[] = self::mapRound(
+                $round,
+                $viewerIsHost,
+                $viewerParticipantId,
+            );
         }
 
         return new GameSessionRoomViewData(
@@ -131,8 +129,8 @@ final class GameSessionRoomViewBuilder
             base_points: $question->base_points,
             media_start_seconds: $question->media_start_seconds,
             media_end_seconds: $question->media_end_seconds,
-            multiple_choice_options: $options,
-            answer_variants: $variants,
+            multiple_choice_options: array_values($options),
+            answer_variants: array_values($variants),
             track_id: $question->track_id,
             track_title: $track?->title,
             track_artist_name: $track?->artist_name,
@@ -152,10 +150,6 @@ final class GameSessionRoomViewBuilder
         $answers = [];
 
         foreach ($round->answers as $answer) {
-            if (!$answer instanceof PlayerAnswer) {
-                continue;
-            }
-
             $answers[] = self::mapAnswer(
                 $answer,
                 $revealSensitive,
@@ -174,10 +168,15 @@ final class GameSessionRoomViewBuilder
         null|string $viewerParticipantId,
     ): PlayerAnswerGameplayData {
         $participant = $answer->participant;
-        $alias = $participant?->guest_name;
-        $displayName = is_string($alias) && trim($alias) !== ''
-            ? trim($alias)
-            : $participant?->user->name ?? 'Player';
+        $alias = $participant->guest_name;
+        $userModel = $participant->user;
+        if (is_string($alias) && trim($alias) !== '') {
+            $displayName = trim($alias);
+        } elseif ($userModel instanceof User) {
+            $displayName = $userModel->name ?? 'Player';
+        } else {
+            $displayName = 'Player';
+        }
         $isOwn =
             $viewerParticipantId !== null
             && (string) $answer->participant_id

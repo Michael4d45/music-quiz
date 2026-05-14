@@ -24,14 +24,8 @@ class ListMyMusicTracks
             ->limit(200)
             ->get();
 
-        $mapped = $tracks->map(
-            static fn(MusicTrack $track): MusicTrackData => MusicTrackData::from(
-                $track,
-            ),
-        )->all();
-
         return response()->json(MyMusicTracksResponseData::from([
-            'tracks' => $mapped,
+            'tracks' => MusicTrackData::collect($tracks),
         ]));
     }
 }

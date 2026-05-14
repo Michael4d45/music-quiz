@@ -15,14 +15,8 @@ class ListQuizModes
     {
         $modes = QuizMode::query()->orderBy('name')->get();
 
-        $mapped = $modes->map(
-            static fn(QuizMode $mode): QuizModeData => QuizModeData::from(
-                $mode,
-            ),
-        )->all();
-
         return response()->json(QuizModesListResponseData::from([
-            'quiz_modes' => $mapped,
+            'quiz_modes' => QuizModeData::collect($modes),
         ]));
     }
 }

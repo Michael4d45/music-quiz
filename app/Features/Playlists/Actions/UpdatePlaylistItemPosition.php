@@ -91,11 +91,16 @@ class UpdatePlaylistItemPosition
                 return;
             }
 
-            $left = $newIndex > 0
-                ? (int) $ordered->get($newIndex - 1)->sort_order
+            $leftModel = $newIndex > 0 ? $ordered->get($newIndex - 1) : null;
+            $left = $leftModel instanceof PlaylistItem
+                ? (int) $leftModel->sort_order
                 : null;
-            $right = $newIndex < ($ordered->count() - 1)
-                ? (int) $ordered->get($newIndex + 1)->sort_order
+
+            $rightModel = $newIndex < ($ordered->count() - 1)
+                ? $ordered->get($newIndex + 1)
+                : null;
+            $right = $rightModel instanceof PlaylistItem
+                ? (int) $rightModel->sort_order
                 : null;
 
             $newSort = $this->midpointSortOrder($left, $right);
@@ -130,7 +135,7 @@ class UpdatePlaylistItemPosition
         }
 
         if ($left === null) {
-            if ($right === null || $right <= 1) {
+            if ($right <= 1) {
                 return null;
             }
 

@@ -26,17 +26,18 @@ class ListSubCategories
             ->select('sub_categories.*')
             ->get();
 
-        $mapped = $rows->map(static function (SubCategory $sub): IdLabelOptionData {
-            $categoryName = $sub->category->name ?? 'Category';
-
-            return IdLabelOptionData::from([
-                'id' => $sub->id,
-                'label' => "{$categoryName} › {$sub->name}",
-            ]);
-        })->all();
-
         return response()->json(SubCategoriesListResponseData::from([
-            'sub_categories' => $mapped,
+            'sub_categories' => IdLabelOptionData::collect(
+                $rows->map(static function (SubCategory $sub): array {
+                    $categoryName = $sub->category->name ?? 'Category';
+
+                    return [
+                        'id' => $sub->id,
+                        'label' => "{$categoryName} › {$sub->name}",
+                    ];
+                })->all(),
+                'array',
+            ),
         ]));
     }
 }

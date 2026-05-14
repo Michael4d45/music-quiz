@@ -41,9 +41,12 @@ final class ActiveGameSessionGuards
     ): bool {
         $query = SessionParticipant::query()
             ->where('user_id', $user->id)
-            ->whereHas('session', static function ($q): void {
-                $q->where('status', '!=', SessionStatus::Completed);
-            });
+            ->whereRelation(
+                'session',
+                'status',
+                '!=',
+                SessionStatus::Completed,
+            );
 
         if ($exceptSessionId !== null) {
             $query->where('session_id', '!=', $exceptSessionId);

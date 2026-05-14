@@ -20,13 +20,14 @@ class ListMusicSources
             ->orderBy('display_name')
             ->get();
 
-        $mapped = $sources->map(static fn(MusicSource $source): IdLabelOptionData => IdLabelOptionData::from([
-            'id' => $source->id,
-            'label' => $source->display_name,
-        ]))->all();
-
         return response()->json(MusicSourcesListResponseData::from([
-            'music_sources' => $mapped,
+            'music_sources' => IdLabelOptionData::collect(
+                $sources->map(static fn(MusicSource $source): array => [
+                    'id' => $source->id,
+                    'label' => $source->display_name,
+                ])->all(),
+                'array',
+            ),
         ]));
     }
 }

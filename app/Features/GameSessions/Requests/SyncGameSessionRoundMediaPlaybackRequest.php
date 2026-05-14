@@ -23,4 +23,14 @@ class SyncGameSessionRoundMediaPlaybackRequest extends FormRequest
             'current_time_seconds' => ['required', 'numeric', 'min:0'],
         ];
     }
+
+    public function validatedCurrentTimeSeconds(): float
+    {
+        $value = $this->validated('current_time_seconds');
+        if (!is_numeric($value)) {
+            abort(422, 'Invalid playback position.');
+        }
+
+        return (float) $value;
+    }
 }

@@ -13,6 +13,7 @@ use App\Models\PlaylistItem;
 use App\Models\SessionParticipant;
 use App\Models\SessionRound;
 use App\Support\GameSessions\GameSessionRoomViewBuilder;
+use Closure;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
@@ -132,7 +133,10 @@ class StartGameSession
     }
 
     /**
-     * @return list<string|array{0: string, 1: callable}>
+     * Relation paths and eager-load constraints for
+     * {@see \Illuminate\Database\Eloquent\Model::load()}.
+     *
+     * @return array<int|string, string|Closure>
      */
     public static function roomEagerLoads(): array
     {

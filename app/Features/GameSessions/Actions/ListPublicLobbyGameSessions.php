@@ -77,9 +77,7 @@ class ListPublicLobbyGameSessions
     {
         $participant = SessionParticipant::query()
             ->where('user_id', $user->id)
-            ->whereHas('session', static function ($query): void {
-                $query->where('status', '!=', SessionStatus::Completed);
-            })
+            ->whereRelation('session', 'status', '!=', SessionStatus::Completed)
             ->orderByDesc('joined_at')
             ->first();
 

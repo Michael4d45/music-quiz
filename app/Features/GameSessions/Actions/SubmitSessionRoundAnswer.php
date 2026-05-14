@@ -75,8 +75,8 @@ class SubmitSessionRoundAnswer
             ->with(['multipleChoiceOptions', 'answerVariants'])
             ->firstOrFail();
 
-        $submittedText = $request->validated('submitted_text');
-        $selectedOptionId = $request->validated('selected_option_id');
+        $submittedText = $request->validatedSubmittedText();
+        $selectedOptionId = $request->validatedSelectedOptionId();
 
         if ($question->question_type === QuestionType::MultipleChoice) {
             if (

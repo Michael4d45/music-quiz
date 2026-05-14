@@ -25,15 +25,9 @@ class ListPlaylistItems
             ->orderBy('id')
             ->get();
 
-        $mapped = $items->map(
-            static fn(PlaylistItem $item): PlaylistItemData => PlaylistItemData::from(
-                $item,
-            ),
-        )->all();
-
         return response()->json(MyPlaylistItemsResponseData::from([
             'playlist' => PlaylistData::from($playlist),
-            'items' => $mapped,
+            'items' => PlaylistItemData::collect($items),
         ]));
     }
 }

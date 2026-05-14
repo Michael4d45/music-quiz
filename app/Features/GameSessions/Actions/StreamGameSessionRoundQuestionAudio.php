@@ -37,7 +37,7 @@ class StreamGameSessionRoundQuestionAudio
         ]);
 
         $question = $sessionRound->question;
-        $track = $question?->track;
+        $track = $question->track;
 
         if ($track === null || $track->user_upload_path === null) {
             abort(404);
