@@ -7,6 +7,7 @@ import {
     fetchQuizModes,
     fetchScoringRules,
 } from '@/features/game-sessions/api';
+import { apiFailureMessage } from '@/lib/apiCore';
 import { fetchMyPlaylists } from '@/features/playlists/api';
 import type { GameSessionData } from '@/schemas/App/Data/Models/GameSessionData';
 import type { QuizModeData } from '@/schemas/App/Data/Models/QuizModeData';
@@ -68,7 +69,9 @@ export function MyGameSessionsPage() {
             toast.success(`Room ${result.data.room_code} created`);
             revalidator.revalidate();
         } else {
-            toast.error('Could not create session');
+            toast.error(
+                apiFailureMessage(result, 'Could not create session'),
+            );
         }
     };
 

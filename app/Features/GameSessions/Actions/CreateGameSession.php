@@ -9,6 +9,7 @@ use App\Enums\SessionStatus;
 use App\Features\GameSessions\Requests\CreateGameSessionRequest;
 use App\Models\GameSession;
 use App\Models\Playlist;
+use App\Support\ActiveGameSessionGuards;
 use App\Support\RoomCodeGenerator;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,6 +20,10 @@ class CreateGameSession
     {
         $user = assertedUser();
         Gate::authorize('create', GameSession::class);
+
+        if (ActiveGameSessionGuards::userAlreadyHostsActiveSession($user)) {
+            abort(422, 'Leave or end your current hosted game before starting another.');
+        }
 
         if ($request->playlist_id !== null) {
             Gate::authorize(

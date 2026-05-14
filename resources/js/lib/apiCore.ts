@@ -79,6 +79,21 @@ export type ApiError =
     | FatalError
     | FetchError;
 
+/**
+ * Prefer server-provided message (for example Laravel `abort(422, '…')`) for user-facing errors.
+ */
+export function apiFailureMessage(error: ApiError, fallback: string): string {
+    const m = error.message.trim();
+    if (m.length === 0) {
+        return fallback;
+    }
+    if (error._tag === 'ValidationError' && m === 'ValidationError') {
+        return fallback;
+    }
+
+    return m;
+}
+
 type EffectResult<A> =
     | { _tag: 'Success'; data: A }
     | { _tag: 'ValidationError'; message: string; errors: Errors }

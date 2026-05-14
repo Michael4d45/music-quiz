@@ -32,6 +32,7 @@ class GameSessionPolicy
 
     public function create(User $user): bool
     {
+        /** Guests cannot host; use a full account to create sessions. */
         return !$user->is_guest;
     }
 

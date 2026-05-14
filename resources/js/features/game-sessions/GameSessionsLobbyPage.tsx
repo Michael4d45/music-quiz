@@ -1,7 +1,10 @@
 import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
 import { ButtonLink } from '@/components/ui/ButtonLink';
+import { useAuth } from '@/features/auth/AuthContext';
+import { isRegisteredUser } from '@/features/auth/authSession';
 import { useOfflineBlock } from '@/hooks/useOfflineBlock';
+import { apiFailureMessage } from '@/lib/apiCore';
 import type { GameSessionLobbyCurrentSessionData } from '@/schemas/App/Data/Models/GameSessionLobbyCurrentSessionData';
 import type { GameSessionsLobbyResponseData } from '@/schemas/App/Data/Models/GameSessionsLobbyResponseData';
 import { useState } from 'react';
@@ -36,6 +39,7 @@ function lobbySessionStatusLabel(status: string): string {
 export function GameSessionsLobbyPage() {
     const { sessions, current_session } =
         useLoaderData<GameSessionsLobbyResponseData>();
+    const { user } = useAuth();
     const { isBlocked, blockReason } = useOfflineBlock();
     const navigate = useNavigate();
     const [joinCode, setJoinCode] = useState('');
@@ -67,12 +71,31 @@ export function GameSessionsLobbyPage() {
             toast.error('Room code must be 6 characters');
             return;
         }
+
+        if (
+            current_session !== null &&
+            normalized !== current_session.room_code.toUpperCase()
+        ) {
+            if (user?.is_guest) {
+                toast.error(
+                    `You are already in room ${current_session.room_code}. Leave that game before joining another.`,
+                );
+                return;
+            }
+            const ok = window.confirm(
+                `You already have an active game (${current_session.room_code}). Join ${normalized} anyway?`,
+            );
+            if (!ok) {
+                return;
+            }
+        }
+
         const result = await joinGameSession(normalized);
         if (result._tag === 'Success') {
             toast.success('Joined');
             navigate(`/game-sessions/room/${normalized}`);
         } else {
-            toast.error('Could not join this room');
+            toast.error(apiFailureMessage(result, 'Could not join this room'));
         }
     };
 
@@ -80,15 +103,18 @@ export function GameSessionsLobbyPage() {
         <div className="mx-auto max-w-4xl px-4 py-6">
             <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                 <h1 className="text-2xl font-bold">Game lobby</h1>
-                <ButtonLink to="/my/game-sessions" variant="secondary">
-                    Host a session
-                </ButtonLink>
+                {isRegisteredUser(user) ? (
+                    <ButtonLink to="/my/game-sessions" variant="secondary">
+                        Host a session
+                    </ButtonLink>
+                ) : null}
             </div>
 
             {current_session ? (
                 <ActiveSessionBanner
                     session={current_session}
                     isOffline={isBlocked}
+                    currentUserId={user?.id ?? null}
                     onReturn={() => returnToRoom(current_session.room_code)}
                 />
             ) : null}
@@ -274,17 +300,24 @@ export function GameSessionsLobbyPage() {
 interface ActiveSessionBannerProps {
     readonly session: GameSessionLobbyCurrentSessionData;
     readonly isOffline: boolean;
+    readonly currentUserId: string | null;
     readonly onReturn: () => void;
 }
 
 function ActiveSessionBanner({
     session,
     isOffline,
+    currentUserId,
     onReturn,
 }: ActiveSessionBannerProps) {
     const visibilityLine = session.is_public
         ? 'This room is listed in the public lobby.'
         : 'This room is not listed here (private or not in lobby).';
+
+    const roleLine =
+        currentUserId !== null && currentUserId === session.host_id
+            ? 'You are the host of this room.'
+            : 'You are a player in this room.';
 
     return (
         <div className="border-primary/30 bg-card mb-6 rounded-lg border-2 border-dashed p-4 shadow-md dark:border-primary/40">
@@ -297,6 +330,7 @@ function ActiveSessionBanner({
                 · {lobbySessionStatusLabel(session.status)} · Host{' '}
                 {session.host_display_name}
             </p>
+            <p className="text-foreground mt-2 text-sm font-medium">{roleLine}</p>
             <p className="text-muted mt-1 text-xs">{visibilityLine}</p>
             <p className="text-muted mt-1 text-xs">
                 Mode {session.quiz_mode_name}

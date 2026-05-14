@@ -1271,9 +1271,6 @@ class DatabaseSeeder extends Seeder
         Collection $users,
         Collection $questions,
     ): void {
-        $playlistsData = [];
-        $playlistItemsData = [];
-
         foreach ($users->random(50) as $user) {
             $numPlaylists = rand(2, 5);
 
@@ -1297,7 +1294,7 @@ class DatabaseSeeder extends Seeder
                     PlaylistItem::create([
                         'playlist_id' => $playlist->id,
                         'question_id' => $question->id,
-                        'sort_order' => $index + 1,
+                        'sort_order' => ($index + 1) * 100,
                         'added_at' => now(),
                     ]);
                 }

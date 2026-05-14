@@ -59,6 +59,14 @@ class ListPublicLobbyGameSessions
             ? $this->resolveCurrentActiveSession($user)
             : null;
 
+        if ($current !== null) {
+            $summaries = $summaries
+                ->sortByDesc(static function (GameSessionLobbySummaryData $row) use ($current): int {
+                    return $row->id === $current->id ? 1 : 0;
+                })
+                ->values();
+        }
+
         return response()->json(GameSessionsLobbyResponseData::from([
             'sessions' => $summaries,
             'current_session' => $current,

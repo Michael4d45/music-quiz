@@ -16,7 +16,7 @@ class PlaylistItemFactory extends Factory
         return [
             'playlist_id' => \App\Models\Playlist::factory(),
             'question_id' => \App\Models\QuizQuestion::factory(),
-            'sort_order' => fake()->numberBetween(1, 100),
+            'sort_order' => fake()->numberBetween(1, 50) * 100,
             'added_at' => now(),
         ];
     }

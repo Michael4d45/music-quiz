@@ -12,6 +12,7 @@ class GameSessionLobbyCurrentSessionData extends Data
     public function __construct(
         public string $id,
         public string $room_code,
+        public string $host_id,
         public string $host_display_name,
         public string $quiz_mode_name,
         public null|string $playlist_name,
@@ -36,6 +37,7 @@ class GameSessionLobbyCurrentSessionData extends Data
         return self::from([
             'id' => $session->id,
             'room_code' => $session->room_code,
+            'host_id' => $session->host_id,
             'host_display_name' => $hostLabel,
             'quiz_mode_name' => $session->quizMode->name,
             'playlist_name' => $session->playlist?->name,

@@ -1,6 +1,8 @@
 import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
 import { ButtonLink } from '@/components/ui/ButtonLink';
+import { useAuth } from '@/features/auth/AuthContext';
+import { isRegisteredUser } from '@/features/auth/authSession';
 import { leaveGameSession } from '@/features/game-sessions/api';
 import { useGameSessionChannel } from '@/hooks/useGameSessionChannel';
 import type { GameSessionData } from '@/schemas/App/Data/Models/GameSessionData';
@@ -11,6 +13,7 @@ import { useLoaderData, useNavigate, useParams, useRevalidator } from 'react-rou
 export { gameSessionRoomLoader } from '@/features/game-sessions/gameSessionRoomLoader';
 
 export function GameSessionRoomPage() {
+    const { user } = useAuth();
     const session = useLoaderData<GameSessionData>();
     const params = useParams();
     const navigate = useNavigate();
@@ -46,9 +49,11 @@ export function GameSessionRoomPage() {
                 <ButtonLink to="/game-sessions/lobby" variant="secondary">
                     Lobby
                 </ButtonLink>
-                <ButtonLink to="/my/game-sessions" variant="secondary">
-                    My sessions
-                </ButtonLink>
+                {isRegisteredUser(user) ? (
+                    <ButtonLink to="/my/game-sessions" variant="secondary">
+                        My sessions
+                    </ButtonLink>
+                ) : null}
             </div>
 
             <h1 className="mb-2 text-2xl font-bold">Room {roomCode}</h1>

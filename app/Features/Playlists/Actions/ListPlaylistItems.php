@@ -22,6 +22,7 @@ class ListPlaylistItems
             ->where('playlist_id', $playlist->id)
             ->with(['question'])
             ->orderBy('sort_order')
+            ->orderBy('id')
             ->get();
 
         $mapped = $items->map(

@@ -21,8 +21,8 @@ use App\Features\Playlists\Actions\DestroyPlaylist;
 use App\Features\Playlists\Actions\ListMyPlaylists;
 use App\Features\Playlists\Actions\ListPlaylistItems;
 use App\Features\Playlists\Actions\RemovePlaylistItem;
-use App\Features\Playlists\Actions\ReorderPlaylistItems;
 use App\Features\Playlists\Actions\UpdatePlaylist;
+use App\Features\Playlists\Actions\UpdatePlaylistItemPosition;
 use App\Features\QuizQuestions\Actions\CreateQuizQuestion;
 use App\Features\QuizQuestions\Actions\DestroyQuizQuestion;
 use App\Features\QuizQuestions\Actions\ListMyQuizQuestions;
@@ -73,14 +73,16 @@ Route::middleware(['web', 'registered'])->group(function (): void {
         'my/playlists/{playlist}/items',
         ListPlaylistItems::class,
     )->whereUuid('playlist');
-    Route::patch(
-        'my/playlists/{playlist}/items/order',
-        ReorderPlaylistItems::class,
-    )->whereUuid('playlist');
     Route::post(
         'my/playlists/{playlist}/items',
         AddPlaylistItem::class,
     )->whereUuid('playlist');
+    Route::patch(
+        'my/playlists/{playlist}/items/{playlistItem}',
+        UpdatePlaylistItemPosition::class,
+    )
+        ->whereUuid('playlist')
+        ->whereUuid('playlistItem');
     Route::delete(
         'my/playlists/{playlist}/items/{playlistItem}',
         RemovePlaylistItem::class,

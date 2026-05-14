@@ -72,20 +72,6 @@ test('guest cannot join a second lobby while still a participant in another acti
     $response->assertStatus(422);
 });
 
-test('guest cannot join a different room while hosting another active session', function (): void {
-    $guest = User::factory()->guest()->create();
-    GameSession::factory()->publicLobby()->create([
-        'host_id' => $guest->id,
-    ]);
-    $other = GameSession::factory()->publicLobby()->create();
-
-    $response = $this->actingAs($guest, 'web')->postJson('/api/game-sessions/join', [
-        'room_code' => $other->room_code,
-    ]);
-
-    $response->assertStatus(422);
-});
-
 test('registered user may join a new lobby while still a participant elsewhere', function (): void {
     $user = User::factory()->create();
     $sessionA = GameSession::factory()->publicLobby()->create();

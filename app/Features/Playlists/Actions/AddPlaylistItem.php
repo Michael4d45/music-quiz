@@ -27,12 +27,16 @@ class AddPlaylistItem
             'playlist_id',
             $playlist->id,
         )->max('sort_order');
-        $nextOrder = is_numeric($maxSort) ? (int) $maxSort : 0;
+
+        $sortOrder = is_numeric($maxSort)
+            ? (int) $maxSort + 100
+            : 100;
 
         $item = PlaylistItem::query()->create([
             'playlist_id' => $playlist->id,
             'question_id' => $question->id,
-            'sort_order' => $nextOrder + 1,
+            'sort_order' => $sortOrder,
+            'added_at' => now(),
         ]);
 
         $item->load('question');

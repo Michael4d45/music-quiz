@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 use App\Enums\SessionStatus;
 use App\Models\GameSession;
+use App\Models\QuizMode;
+use App\Models\ScoringRule;
 use App\Models\SessionParticipant;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 test('lobby is available without authentication, session, or spa origin headers', function (): void {
     $response = $this->getJson('/api/game-sessions/lobby');
@@ -63,6 +66,7 @@ test('lobby includes current_session when the user is a participant in a non-com
 
     $response->assertSuccessful();
     $response->assertJsonPath('current_session.room_code', $session->room_code);
+    $response->assertJsonPath('current_session.host_id', $session->host_id);
     $response->assertJsonPath('current_session.is_public', false);
     $response->assertJsonCount(0, 'sessions');
 });
@@ -80,4 +84,42 @@ test('lobby includes current_session when the user hosts an active session', fun
 
     $response->assertSuccessful();
     $response->assertJsonPath('current_session.id', $session->id);
+    $response->assertJsonPath('current_session.host_id', $user->id);
+});
+
+test('lobby lists the user active public session before other public sessions', function (): void {
+    $user = User::factory()->create();
+    $hostOther = User::factory()->create();
+    $mode = QuizMode::factory()->create();
+    $rule = ScoringRule::factory()->create();
+
+    $older = GameSession::factory()->publicLobby()->create([
+        'host_id' => $hostOther->id,
+        'quiz_mode_id' => $mode->id,
+        'scoring_rule_id' => $rule->id,
+    ]);
+    $newer = GameSession::factory()->publicLobby()->create([
+        'host_id' => $hostOther->id,
+        'quiz_mode_id' => $mode->id,
+        'scoring_rule_id' => $rule->id,
+    ]);
+
+    SessionParticipant::factory()->create([
+        'session_id' => $older->id,
+        'user_id' => $user->id,
+    ]);
+
+    DB::table('game_sessions')
+        ->where('id', $older->id)
+        ->update(['created_at' => now()->subHour()]);
+    DB::table('game_sessions')
+        ->where('id', $newer->id)
+        ->update(['created_at' => now()]);
+
+    $response = $this->actingAs($user, 'web')->getJson('/api/game-sessions/lobby');
+
+    $response->assertSuccessful();
+    $response->assertJsonPath('current_session.id', $older->id);
+    $response->assertJsonPath('sessions.0.id', $older->id);
+    $response->assertJsonPath('sessions.1.id', $newer->id);
 });

@@ -119,21 +119,25 @@ export async function removePlaylistItem(
     );
 }
 
-export async function reorderPlaylistItems(
+export async function updatePlaylistItemPosition(
     playlistId: string,
-    itemIds: readonly string[],
+    playlistItemId: string,
+    body: { before_item_id: string | null },
 ) {
     return runEffect(
         pipe(
-            Effect.succeed({ item_ids: [...itemIds] }),
-            Effect.flatMap((body) =>
-                httpRequest(`/api/my/playlists/${playlistId}/items/order`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body),
-                }),
+            Effect.succeed(body),
+            Effect.flatMap((json) =>
+                httpRequest(
+                    `/api/my/playlists/${playlistId}/items/${playlistItemId}`,
+                    {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(json),
+                    },
+                ),
             ),
-            withRetry('reorderPlaylistItems'),
+            withRetry('updatePlaylistItemPosition'),
             decodeJson(MyPlaylistItemsResponseDataSchema),
         ),
     );

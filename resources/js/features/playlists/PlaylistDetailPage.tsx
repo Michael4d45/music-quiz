@@ -6,7 +6,7 @@ import {
     addPlaylistItem,
     fetchPlaylistItems,
     removePlaylistItem,
-    reorderPlaylistItems,
+    updatePlaylistItemPosition,
 } from '@/features/playlists/api';
 import { fetchMyQuizQuestions } from '@/features/quiz-questions/api';
 import { fetchQuestionTypes } from '@/features/reference/api';
@@ -16,7 +16,7 @@ import type { PlaylistItemData } from '@/schemas/App/Data/Models/PlaylistItemDat
 import type { QuizQuestionData } from '@/schemas/App/Data/Models/QuizQuestionData';
 import type { MyPlaylistItemsResponseData } from '@/schemas/App/Data/Responses/MyPlaylistItemsResponseData';
 import type { QuestionType } from '@/schemas/App/Enums/QuestionType';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { data, type LoaderFunctionArgs } from 'react-router';
 import { useLoaderData, useRevalidator } from 'react-router-dom';
@@ -61,26 +61,37 @@ function questionTypeLabel(
 function itemSearchBlob(item: PlaylistItemData): string {
     const q = item.question;
     return [
-        item.question_id,
-        item.id,
         q?.prompt_text ?? '',
         q?.correct_answer ?? '',
         q?.question_type ?? '',
-        String(item.sort_order),
     ]
         .join(' ')
         .toLowerCase();
 }
 
 export function PlaylistDetailPage() {
+    const loaderData = useLoaderData<PlaylistDetailLoaderData>();
     const {
-        playlist,
-        items,
         playlistId,
         questions,
         question_types: questionTypes,
-    } = useLoaderData<PlaylistDetailLoaderData>();
+    } = loaderData;
     const revalidator = useRevalidator();
+    const itemsFingerprint = loaderData.items
+                .map((i) => `${i.id}:${i.sort_order}`)
+                .join('|');
+    const [localPayload, setLocalPayload] =
+        useState<MyPlaylistItemsResponseData | null>(null);
+
+    useEffect(() => {
+        // Drop merged list when the route loader supplies a new item ordering (revalidate / navigate).
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional sync from loader fingerprint
+        setLocalPayload(null);
+    }, [itemsFingerprint]);
+
+    const playlist = localPayload?.playlist ?? loaderData.playlist;
+    const items = localPayload?.items ?? loaderData.items;
+
     const [search, setSearch] = useState('');
     const [selectedQuestionId, setSelectedQuestionId] = useState('');
     const [pendingRemoveItemId, setPendingRemoveItemId] = useState<
@@ -126,29 +137,23 @@ export function PlaylistDetailPage() {
         }
     };
 
-    const applyOrder = async (nextIds: readonly string[]) => {
+    const moveItem = async (
+        playlistItemId: string,
+        beforeItemId: string | null,
+    ) => {
         setReordering(true);
-        const result = await reorderPlaylistItems(playlistId, nextIds);
+        const result = await updatePlaylistItemPosition(
+            playlistId,
+            playlistItemId,
+            { before_item_id: beforeItemId },
+        );
         setReordering(false);
         if (result._tag === 'Success') {
             toast.success('Order updated');
-            revalidator.revalidate();
+            setLocalPayload(result.data);
         } else {
             toast.error('Could not reorder');
         }
-    };
-
-    const moveItem = async (fromIndex: number, toIndex: number) => {
-        if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0) {
-            return;
-        }
-        const ordered = [...items];
-        const [removed] = ordered.splice(fromIndex, 1);
-        if (!removed) {
-            return;
-        }
-        ordered.splice(toIndex, 0, removed);
-        await applyOrder(ordered.map((i) => i.id));
     };
 
     return (
@@ -181,7 +186,7 @@ export function PlaylistDetailPage() {
             </div>
 
             <PageIntroExpandable
-                summary="Use Up and Down to set play order, then add questions from your library."
+                summary="Use Up and Down to set play order (one save per tap). Add questions from your library below."
                 moreLabel="How this playlist is used in a game"
             >
                 <p className="text-muted text-sm">
@@ -199,7 +204,7 @@ export function PlaylistDetailPage() {
                         className="border-input bg-background w-full rounded-md border px-3 py-2 text-sm"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Prompt, answer, type, or ID…"
+                        placeholder="Prompt, answer, or type…"
                         autoComplete="off"
                     />
                 </label>
@@ -242,10 +247,6 @@ export function PlaylistDetailPage() {
                                                         {typeLabel}
                                                     </span>
                                                 ) : null}
-                                                <span className="font-mono">
-                                                    {item.question_id}
-                                                </span>
-                                                <span>#{item.sort_order}</span>
                                             </div>
                                             {q?.correct_answer ? (
                                                 <p className="text-muted line-clamp-2 text-sm">
@@ -263,12 +264,19 @@ export function PlaylistDetailPage() {
                                                         reordering ||
                                                         globalIndex <= 0
                                                     }
-                                                    onClick={() =>
+                                                    onClick={() => {
+                                                        const beforeId =
+                                                            items[
+                                                                globalIndex - 1
+                                                            ]?.id;
+                                                        if (!beforeId) {
+                                                            return;
+                                                        }
                                                         void moveItem(
-                                                            globalIndex,
-                                                            globalIndex - 1,
-                                                        )
-                                                    }
+                                                            item.id,
+                                                            beforeId,
+                                                        );
+                                                    }}
                                                 >
                                                     Up
                                                 </Button>
@@ -282,12 +290,20 @@ export function PlaylistDetailPage() {
                                                         globalIndex >=
                                                             items.length - 1
                                                     }
-                                                    onClick={() =>
+                                                    onClick={() => {
+                                                        const beforeId =
+                                                            globalIndex + 2 <
+                                                            items.length
+                                                                ? items[
+                                                                      globalIndex +
+                                                                          2
+                                                                  ].id
+                                                                : null;
                                                         void moveItem(
-                                                            globalIndex,
-                                                            globalIndex + 1,
-                                                        )
-                                                    }
+                                                            item.id,
+                                                            beforeId,
+                                                        );
+                                                    }}
                                                 >
                                                     Down
                                                 </Button>
