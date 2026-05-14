@@ -81,7 +81,10 @@ export function MyGameSessionsPage() {
                 </ButtonLink>
             </div>
 
-            <PageIntroExpandable summary="Create a room, share the code, and optionally bind a playlist so rounds draw from your library.">
+            <PageIntroExpandable
+                summary="Create a room, share the code, and optionally bind a playlist so rounds draw from your library."
+                moreLabel="More about hosting a session"
+            >
                 <p>
                     Host a room for your friends: pick how the game is scored, set
                     how many players can join, and optionally tie the session to

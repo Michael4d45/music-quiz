@@ -14,5 +14,6 @@ class GameSessionsLobbyResponseData extends Data
      */
     public function __construct(
         public Collection $sessions,
+        public GameSessionLobbyCurrentSessionData|null $current_session = null,
     ) {}
 }

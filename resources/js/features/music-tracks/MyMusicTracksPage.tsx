@@ -278,7 +278,10 @@ export function MyMusicTracksPage() {
                 </ButtonLink>
             </div>
 
-            <PageIntroExpandable summary="Add streaming catalog metadata or upload audio for in-browser playback. Library groups mirror albums and soundtracks.">
+            <PageIntroExpandable
+                summary="Add streaming catalog metadata or upload audio for in-browser playback. Library groups mirror albums and soundtracks."
+                moreLabel="More about tracks and playback"
+            >
                 <p>
                     Pick a collection type: normal albums group under the album
                     name; games, films, and shows group under one work title,

@@ -55,6 +55,80 @@ test('join is idempotent for the same user', function (): void {
         ->toBe(1);
 });
 
+test('guest cannot join a second lobby while still a participant in another active session', function (): void {
+    $guest = User::factory()->guest()->create();
+    $sessionA = GameSession::factory()->publicLobby()->create();
+    $sessionB = GameSession::factory()->publicLobby()->create();
+
+    SessionParticipant::factory()->create([
+        'session_id' => $sessionA->id,
+        'user_id' => $guest->id,
+    ]);
+
+    $response = $this->actingAs($guest, 'web')->postJson('/api/game-sessions/join', [
+        'room_code' => $sessionB->room_code,
+    ]);
+
+    $response->assertStatus(422);
+});
+
+test('guest cannot join a different room while hosting another active session', function (): void {
+    $guest = User::factory()->guest()->create();
+    GameSession::factory()->publicLobby()->create([
+        'host_id' => $guest->id,
+    ]);
+    $other = GameSession::factory()->publicLobby()->create();
+
+    $response = $this->actingAs($guest, 'web')->postJson('/api/game-sessions/join', [
+        'room_code' => $other->room_code,
+    ]);
+
+    $response->assertStatus(422);
+});
+
+test('registered user may join a new lobby while still a participant elsewhere', function (): void {
+    $user = User::factory()->create();
+    $sessionA = GameSession::factory()->publicLobby()->create();
+    $sessionB = GameSession::factory()->publicLobby()->create();
+
+    SessionParticipant::factory()->create([
+        'session_id' => $sessionA->id,
+        'user_id' => $user->id,
+    ]);
+
+    $response = $this->actingAs($user, 'web')->postJson('/api/game-sessions/join', [
+        'room_code' => $sessionB->room_code,
+    ]);
+
+    $response->assertSuccessful();
+});
+
+test('guest may rejoin the same lobby they already participate in when the room is full', function (): void {
+    $guest = User::factory()->guest()->create();
+    $session = GameSession::factory()
+        ->publicLobby()
+        ->create([
+            'max_players' => 2,
+        ]);
+
+    SessionParticipant::factory()->create([
+        'session_id' => $session->id,
+        'user_id' => $guest->id,
+    ]);
+
+    $other = User::factory()->guest()->create();
+    SessionParticipant::factory()->create([
+        'session_id' => $session->id,
+        'user_id' => $other->id,
+    ]);
+
+    $response = $this->actingAs($guest, 'web')->postJson('/api/game-sessions/join', [
+        'room_code' => $session->room_code,
+    ]);
+
+    $response->assertSuccessful();
+});
+
 test('join rejects when room is full', function (): void {
     $guest = User::factory()->guest()->create();
     $session = GameSession::factory()

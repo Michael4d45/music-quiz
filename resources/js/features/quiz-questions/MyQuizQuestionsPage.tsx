@@ -215,7 +215,10 @@ export function MyQuizQuestionsPage() {
                 </div>
             </div>
 
-            <PageIntroExpandable summary="Write prompts and correct answers; link a track when a round needs a specific recording.">
+            <PageIntroExpandable
+                summary="Write prompts and correct answers; link a track when a round needs a specific recording."
+                moreLabel="More about quiz questions"
+            >
                 <p>
                     Build prompts and the canonical correct answer. Link a track
                     when the round should reference a specific recording; groups

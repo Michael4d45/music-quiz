@@ -2,6 +2,7 @@ import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
 import { ButtonLink } from '@/components/ui/ButtonLink';
 import { useOfflineBlock } from '@/hooks/useOfflineBlock';
+import type { GameSessionLobbyCurrentSessionData } from '@/schemas/App/Data/Models/GameSessionLobbyCurrentSessionData';
 import type { GameSessionsLobbyResponseData } from '@/schemas/App/Data/Models/GameSessionsLobbyResponseData';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -18,14 +19,30 @@ export async function gameSessionsLobbyLoader(): Promise<GameSessionsLobbyRespon
             ? result.message
             : 'Could not load joinable games';
     console.error('Failed to load game session lobby:', errorMessage);
-    return { sessions: [] };
+    return { sessions: [], current_session: null };
+}
+
+function lobbySessionStatusLabel(status: string): string {
+    const labels: Record<string, string> = {
+        lobby: 'Waiting in lobby',
+        in_progress: 'In progress',
+        round_transition: 'Between rounds',
+        paused: 'Paused',
+        completed: 'Completed',
+    };
+    return labels[status] ?? status;
 }
 
 export function GameSessionsLobbyPage() {
-    const { sessions } = useLoaderData<GameSessionsLobbyResponseData>();
+    const { sessions, current_session } =
+        useLoaderData<GameSessionsLobbyResponseData>();
     const { isBlocked, blockReason } = useOfflineBlock();
     const navigate = useNavigate();
     const [joinCode, setJoinCode] = useState('');
+
+    const returnToRoom = (roomCode: string) => {
+        navigate(`/game-sessions/room/${roomCode.trim().toUpperCase()}`);
+    };
 
     const copyRoomCode = async (code: string) => {
         if (isBlocked) {
@@ -68,10 +85,25 @@ export function GameSessionsLobbyPage() {
                 </ButtonLink>
             </div>
 
-            <PageIntroExpandable summary="Join listed games that have not started, or enter a six-character room code.">
+            {current_session ? (
+                <ActiveSessionBanner
+                    session={current_session}
+                    isOffline={isBlocked}
+                    onReturn={() => returnToRoom(current_session.room_code)}
+                />
+            ) : null}
+
+            <PageIntroExpandable
+                summary="Join listed games that have not started, or enter a six-character room code."
+                moreLabel="More about the public lobby"
+            >
                 <p>
                     Public games that have not started yet. Join with a room
-                    code, or open a session you host from My game sessions.
+                    code, or open a session you host from My game sessions. If
+                    you already have an active game, it is highlighted above;
+                    you can return even when a listed room shows as full. Guest
+                    accounts can only join one active game at a time—leave your
+                    current room before joining another.
                 </p>
             </PageIntroExpandable>
 
@@ -117,6 +149,23 @@ export function GameSessionsLobbyPage() {
                     {sessions.map((session) => {
                         const isFull =
                             session.participant_count >= session.max_players;
+                        const isUsersActiveListedGame =
+                            current_session !== null &&
+                            current_session.id === session.id;
+                        const joinDisabled =
+                            isBlocked ||
+                            (isFull && !isUsersActiveListedGame);
+                        const primaryLabel = isUsersActiveListedGame
+                            ? 'Return to your game'
+                            : isFull
+                              ? 'At capacity'
+                              : 'Join this game';
+                        const joinAriaLabel = isUsersActiveListedGame
+                            ? `Return to your game in room ${session.room_code}`
+                            : isFull
+                              ? `Room ${session.room_code} is at capacity`
+                              : `Join room ${session.room_code}`;
+
                         return (
                             <li key={session.id}>
                                 <div className="bg-card flex flex-col gap-3 rounded-lg border border-transparent p-5 shadow-md dark:border-white/10">
@@ -175,7 +224,10 @@ export function GameSessionsLobbyPage() {
                                                 {session.participant_count} /{' '}
                                                 {session.max_players}
                                                 {isFull ? (
-                                                    <span className="ml-2 text-sm text-amber-600 dark:text-amber-400">
+                                                    <span
+                                                        className="ml-2 text-sm text-amber-600 dark:text-amber-400"
+                                                        aria-hidden="true"
+                                                    >
                                                         At capacity
                                                     </span>
                                                 ) : null}
@@ -184,19 +236,19 @@ export function GameSessionsLobbyPage() {
                                     </dl>
                                     <Button
                                         type="button"
-                                        disabled={isBlocked || isFull}
-                                        aria-label={
-                                            isFull
-                                                ? `Room ${session.room_code} is at capacity`
-                                                : `Join room ${session.room_code}`
-                                        }
+                                        disabled={joinDisabled}
+                                        aria-label={joinAriaLabel}
                                         onClick={() =>
-                                            void goToRoomAfterJoin(
-                                                session.room_code,
-                                            )
+                                            isUsersActiveListedGame
+                                                ? returnToRoom(
+                                                      session.room_code,
+                                                  )
+                                                : void goToRoomAfterJoin(
+                                                      session.room_code,
+                                                  )
                                         }
                                     >
-                                        {isFull ? 'At capacity' : 'Join this game'}
+                                        {primaryLabel}
                                     </Button>
                                 </div>
                             </li>
@@ -215,6 +267,53 @@ export function GameSessionsLobbyPage() {
                     </p>
                 </div>
             )}
+        </div>
+    );
+}
+
+interface ActiveSessionBannerProps {
+    readonly session: GameSessionLobbyCurrentSessionData;
+    readonly isOffline: boolean;
+    readonly onReturn: () => void;
+}
+
+function ActiveSessionBanner({
+    session,
+    isOffline,
+    onReturn,
+}: ActiveSessionBannerProps) {
+    const visibilityLine = session.is_public
+        ? 'This room is listed in the public lobby.'
+        : 'This room is not listed here (private or not in lobby).';
+
+    return (
+        <div className="border-primary/30 bg-card mb-6 rounded-lg border-2 border-dashed p-4 shadow-md dark:border-primary/40">
+            <h2 className="text-lg font-semibold">Your active game</h2>
+            <p className="text-muted mt-1 text-sm">
+                Room{' '}
+                <span className="text-foreground font-mono font-semibold tracking-wide">
+                    {session.room_code}
+                </span>{' '}
+                · {lobbySessionStatusLabel(session.status)} · Host{' '}
+                {session.host_display_name}
+            </p>
+            <p className="text-muted mt-1 text-xs">{visibilityLine}</p>
+            <p className="text-muted mt-1 text-xs">
+                Mode {session.quiz_mode_name}
+                {session.playlist_name
+                    ? ` · Playlist ${session.playlist_name}`
+                    : ''}{' '}
+                · Players {session.participant_count} / {session.max_players}
+            </p>
+            <div className="mt-3">
+                <Button
+                    type="button"
+                    disabled={isOffline}
+                    onClick={() => onReturn()}
+                >
+                    Return to room
+                </Button>
+            </div>
         </div>
     );
 }

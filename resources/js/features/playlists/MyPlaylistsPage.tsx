@@ -159,7 +159,10 @@ export function MyPlaylistsPage() {
                 </div>
             </div>
 
-            <PageIntroExpandable summary="Ordered lists of quiz questions you can attach when hosting. Open a playlist to reorder items; edit name, visibility, and status here.">
+            <PageIntroExpandable
+                summary="Ordered lists of quiz questions you can attach when hosting. Open a playlist to reorder items; edit name, visibility, and status here."
+                moreLabel="How playlists work in hosting"
+            >
                 <p>
                     A playlist is an ordered set of quiz questions. Open one to
                     add or reorder items, then pick it when you host so rounds

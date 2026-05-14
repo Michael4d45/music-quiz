@@ -85,7 +85,7 @@ it('registered user can open playlist and question management pages', function (
     visit('/my/playlists')
         ->assertNoJavaScriptErrors()
         ->waitForText('My playlists', 15)
-        ->assertSee('More about this screen');
+        ->assertSee('How playlists work in hosting');
 
     visit('/my/quiz-questions')
         ->assertNoJavaScriptErrors()

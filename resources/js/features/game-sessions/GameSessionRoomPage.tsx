@@ -1,9 +1,10 @@
+import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
 import { ButtonLink } from '@/components/ui/ButtonLink';
 import { leaveGameSession } from '@/features/game-sessions/api';
 import { useGameSessionChannel } from '@/hooks/useGameSessionChannel';
 import type { GameSessionData } from '@/schemas/App/Data/Models/GameSessionData';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useLoaderData, useNavigate, useParams, useRevalidator } from 'react-router-dom';
 
@@ -55,6 +56,17 @@ export function GameSessionRoomPage() {
                 Status: {session.status} · Players: {displayCount} /{' '}
                 {session.max_players}
             </p>
+
+            <PageIntroExpandable
+                summary="You are in a live session room. Player count updates when you are connected to realtime."
+                moreLabel="What you can do in the room"
+            >
+                <p className="text-muted text-sm">
+                    Use Leave session to return to the lobby. The participants list
+                    reflects who has joined; more host and player actions will appear
+                    here as the game flow grows.
+                </p>
+            </PageIntroExpandable>
 
             <div className="bg-card mb-6 rounded-lg border border-transparent p-4 shadow-md dark:border-white/10">
                 <h2 className="mb-2 font-semibold">Participants</h2>

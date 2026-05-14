@@ -12,6 +12,7 @@ use App\Features\Auth\Responses\MessageResponse;
 use App\Features\GameSessions\Requests\JoinGameSessionRequest;
 use App\Models\GameSession;
 use App\Models\SessionParticipant;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -23,7 +24,7 @@ class JoinGameSession
         $normalized = strtoupper($request->room_code);
 
         /** @var array{participant: SessionParticipant, is_new: bool}|null $result */
-        $result = DB::transaction(static function () use ($normalized, $user) {
+        $result = DB::transaction(function () use ($normalized, $user) {
             /** @var GameSession|null $session */
             $session = GameSession::query()
                 ->whereRaw('upper(room_code) = ?', [$normalized])
@@ -50,6 +51,10 @@ class JoinGameSession
                     'participant' => $existing,
                     'is_new' => false,
                 ];
+            }
+
+            if ($user->is_guest && $this->guestHasOtherActiveCommitment($user, $session)) {
+                abort(422, 'Leave your current game before joining another.');
             }
 
             $count = SessionParticipant::query()
@@ -102,5 +107,28 @@ class JoinGameSession
         $participant->load('user');
 
         return response()->json(SessionParticipantData::from($participant));
+    }
+
+    private function guestHasOtherActiveCommitment(
+        User $user,
+        GameSession $session,
+    ): bool {
+        $otherParticipant = SessionParticipant::query()
+            ->where('user_id', $user->id)
+            ->where('session_id', '!=', $session->id)
+            ->whereHas('session', static function ($query): void {
+                $query->where('status', '!=', SessionStatus::Completed);
+            })
+            ->exists();
+
+        if ($otherParticipant) {
+            return true;
+        }
+
+        return GameSession::query()
+            ->where('host_id', $user->id)
+            ->where('id', '!=', $session->id)
+            ->where('status', '!=', SessionStatus::Completed)
+            ->exists();
     }
 }

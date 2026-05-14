@@ -1,4 +1,5 @@
 import ConfirmModal from '@/components/ConfirmModal';
+import { PageIntroExpandable } from '@/components/PageIntroExpandable';
 import { Button } from '@/components/ui/Button';
 import { ButtonLink } from '@/components/ui/ButtonLink';
 import {
@@ -178,6 +179,18 @@ export function PlaylistDetailPage() {
                 <span>Order: {playlist.question_order}</span>
                 <span>Played {playlist.play_count}×</span>
             </div>
+
+            <PageIntroExpandable
+                summary="Use Up and Down to set play order, then add questions from your library."
+                moreLabel="How this playlist is used in a game"
+            >
+                <p className="text-muted text-sm">
+                    Removing a question only takes it out of this playlist; it
+                    stays in My quiz questions. When you host with this playlist
+                    attached, rounds follow the order shown here (subject to the
+                    playlist's order mode in the editor).
+                </p>
+            </PageIntroExpandable>
 
             <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <label className="flex min-w-0 flex-1 flex-col gap-1 text-sm">
