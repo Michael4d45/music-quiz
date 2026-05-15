@@ -13,6 +13,7 @@ use App\Features\GameSessions\Requests\JoinGameSessionRequest;
 use App\Models\GameSession;
 use App\Models\SessionParticipant;
 use App\Support\ActiveGameSessionGuards;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -44,7 +45,7 @@ class JoinGameSession
             }
 
             if ($session->status !== SessionStatus::Lobby) {
-                abort(422, 'This game is not accepting new players.');
+                self::failJoin('This game is not accepting new players.');
             }
 
             $existing = SessionParticipant::query()
@@ -68,7 +69,9 @@ class JoinGameSession
                     $session,
                 )
             ) {
-                abort(422, 'Leave your current game before joining another.');
+                self::failJoin(
+                    'Leave your current game before joining another.',
+                );
             }
 
             $count = SessionParticipant::query()
@@ -76,7 +79,7 @@ class JoinGameSession
                 ->count();
 
             if ($count >= $session->max_players) {
-                abort(422, 'This room is full.');
+                self::failJoin('This room is full.');
             }
 
             $created = SessionParticipant::query()->create([
@@ -121,6 +124,23 @@ class JoinGameSession
         $participant->load('user');
 
         return response()->json(SessionParticipantData::from($participant));
+    }
+
+    /**
+     * Return a JSON 422 for API clients (no Laravel debug exception envelope with `trace`).
+     *
+     * @param  non-empty-string  $message
+     */
+    private static function failJoin(
+        string $message,
+        string $field = 'room_code',
+    ): never {
+        throw new HttpResponseException(response()->json([
+            'message' => $message,
+            'errors' => [
+                $field => [$message],
+            ],
+        ], 422));
     }
 
     private static function normalizedParticipantDisplayName(null|string $displayName): null|string

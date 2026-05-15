@@ -78,6 +78,8 @@ test(
         ]);
 
         $response->assertStatus(422);
+        $response->assertJsonMissing(['trace', 'exception', 'file', 'line']);
+        $response->assertJsonStructure(['message', 'errors' => ['room_code']]);
     },
 );
 
